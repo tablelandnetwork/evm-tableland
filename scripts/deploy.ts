@@ -16,7 +16,7 @@ async function main() {
   // We get the contract (proxy) to deploy
   const Registry = await ethers.getContractFactory("Registry");
   const registry = await upgrades.deployProxy(Registry, [], {
-    initializer: "initialize",
+    kind: "uups",
   });
   console.log("Proxy deployed to:", registry.address);
 }
