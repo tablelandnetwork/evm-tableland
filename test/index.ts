@@ -1,19 +1,20 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
 
-describe("Greeter", function () {
-  it("Should return the new greeting once it's changed", async function () {
-    const Greeter = await ethers.getContractFactory("Greeter");
-    const greeter = await Greeter.deploy("Hello, world!");
-    await greeter.deployed();
+describe("Registry", function () {
+  it("Should mint a new table", async function () {
+    const accounts = await ethers.getSigners();
 
-    expect(await greeter.greet()).to.equal("Hello, world!");
+    const Registry = await ethers.getContractFactory("Registry");
+    const registry = await Registry.deploy();
+    await registry.deployed();
+    // Manually call initialize because we are "deploying" the contract directly.
+    await registry.initialize();
 
-    const setGreetingTx = await greeter.setGreeting("Hola, mundo!");
-
-    // wait until the transaction is mined
-    await setGreetingTx.wait();
-
-    expect(await greeter.greet()).to.equal("Hola, mundo!");
+    await registry
+      .connect(accounts[0]) // Use connect just to test things out
+      .mint(accounts[0].address, 0, 1, "0x00");
+    const balance = await registry.balanceOf(accounts[0].address, 0);
+    expect(1).to.equal(Number(balance.toString()));
   });
 });
