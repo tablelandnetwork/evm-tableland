@@ -1,7 +1,7 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT AND Apache-2.0
 pragma solidity ^0.8.2;
 
-// https://wizard.openzeppelin.com/#erc1155
+// Created with: https://wizard.openzeppelin.com/#erc1155
 
 import "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";

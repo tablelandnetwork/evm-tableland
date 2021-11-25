@@ -35,7 +35,7 @@ jobs:
       - name: Compile 🛠
         run: npx hardhat compile
 
-      - name: build 🛠
+      - name: Build ⚒️
         run: npm run build
 
       - name: Test 🧪
