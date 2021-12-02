@@ -1,4 +1,4 @@
-# eth-storage-bridge
+# eth-tableland
 
 [![GitHub license](https://img.shields.io/github/license/textileio/eth-tableland.svg)](./LICENSE)
 [![GitHub package.json version](https://img.shields.io/github/package-json/v/textileio/eth-tableland.svg)](./package.json)
@@ -29,7 +29,7 @@ Get started with installing and building the project:
 
 ```shell
 npm install
-npx hardhard compile
+npx hardhat compile
 npm run build
 ```
 
@@ -60,7 +60,7 @@ You can build the Typescript client locally:
 
 ```shell
 npm install
-npx hardhard compile
+npx hardhat compile
 npm run build
 ```
 
