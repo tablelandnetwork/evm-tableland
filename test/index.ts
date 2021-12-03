@@ -13,8 +13,8 @@ describe("Registry", function () {
 
     await registry
       .connect(accounts[0]) // Use connect just to test things out
-      .mint(accounts[0].address, 0, 1, "0x00");
-    const balance = await registry.balanceOf(accounts[0].address, 0);
+      .safeMint(accounts[0].address);
+    const balance = await registry.balanceOf(accounts[0].address);
     expect(1).to.equal(Number(balance.toString()));
   });
 });
