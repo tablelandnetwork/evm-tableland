@@ -4,6 +4,7 @@ coverage
 coverage.json
 typechain
 abi.json
+bytecode.bin
 gobuild
 
 #Hardhat files
