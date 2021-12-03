@@ -3,6 +3,9 @@ node_modules
 coverage
 coverage.json
 typechain
+abi.json
+bytecode.bin
+gobuild
 
 #Hardhat files
 cache
