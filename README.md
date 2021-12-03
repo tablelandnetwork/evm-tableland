@@ -64,6 +64,33 @@ npx hardhat compile
 npm run build
 ```
 
+## Extacting the ABI and Bytecode
+
+Can you grab the assets you need by compiling and then using some jq magic:
+
+### ABI
+
+```shell
+cat artifacts/contracts/Registry.sol/Registry.json | jq '.abi' > abi.json
+```
+
+### Generate the Go client!
+
+You can use the above `abi.json` to build the Go client:
+
+```shell
+mkdir gobuild
+abigen --abi ./abi.json --pkg contracts --out gobuild/Registry.go
+```
+
+### Bytecode
+
+To extract just the raw bytecode so you can deploy it in Go tests (to a locally running chain):
+
+```shell
+cat artifacts/contracts/Registry.sol/Registry.json | jq -r '.bytecode' > bytecode.bin
+```
+
 ## Etherscan verification
 
 To try out Etherscan verification, you first need to deploy a contract to an Ethereum network that's supported by Etherscan, such as Ropsten.
