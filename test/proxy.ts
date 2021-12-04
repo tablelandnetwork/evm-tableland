@@ -4,9 +4,9 @@ import type { Registry } from "../typechain/index";
 
 describe("Proxy", function () {
   it(" Should be callable from deployed proxy contract", async function () {
-    const Registry = await ethers.getContractFactory("Registry");
+    const Factory = await ethers.getContractFactory("Registry");
 
-    const registry = (await upgrades.deployProxy(Registry, [], {
+    const registry = (await upgrades.deployProxy(Factory, [], {
       kind: "uups",
     })) as Registry;
     await registry.deployed();
