@@ -27,8 +27,10 @@ contract Registry is
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     bytes32 public constant UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
 
+    uint256 private _nextTokenId; // default: 0
+
     function initialize() public initializer {
-        __ERC1155_init("https://tableland.textile.io/{id}.json");
+        __ERC1155_init("https://tableland.com/table/{id}.json");
         __AccessControl_init();
         __Pausable_init();
         __ERC1155Burnable_init();
@@ -53,11 +55,12 @@ contract Registry is
     }
 
     function safeMint(address account) public {
-        uint256 tokenId = _tokenIdCounter.current();
-        _tokenIdCounter.increment();
-        _mint(account, tokenId, 1, "");
+        _mint(account, _nextTokenId, 1, "");
+        _nextTokenId += 1;
     }
 
+    // WARN: This operation is unsafe. Consider using safeMint.
+    // NOTE: mintBatch is not currently enabled.
     function mint(
         address account,
         uint256 id,
@@ -65,15 +68,7 @@ contract Registry is
         bytes memory data
     ) public {
         _mint(account, id, amount, data);
-    }
-
-    function mintBatch(
-        address to,
-        uint256[] memory ids,
-        uint256[] memory amounts,
-        bytes memory data
-    ) public {
-        _mintBatch(to, ids, amounts, data);
+        _nextTokenId = id + 1;
     }
 
     function _beforeTokenTransfer(
