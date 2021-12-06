@@ -12,6 +12,6 @@ describe("Proxy", function () {
     await registry.deployed();
 
     const uri = await registry.uri(0);
-    expect(uri).to.equal("https://tableland.textile.io/{id}.json");
+    expect(uri).to.equal("https://tableland.com/table/{id}.json");
   });
 });
