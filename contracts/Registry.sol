@@ -59,7 +59,7 @@ contract Registry is
     }
 
     // Return next available token id. Not guaranteed across transactions.
-    function nextId() uint256 public {
+    function nextId() public view returns (uint256) {
         return _tokenIdCounter.current();
     }
 
