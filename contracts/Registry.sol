@@ -28,7 +28,7 @@ contract Registry is
     bytes32 public constant UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
 
     function initialize() public initializer {
-        __ERC1155_init("https://tableland.textile.io/{id}.json");
+        __ERC1155_init("https://tableland.com/table/{id}.json");
         __AccessControl_init();
         __Pausable_init();
         __ERC1155Burnable_init();
