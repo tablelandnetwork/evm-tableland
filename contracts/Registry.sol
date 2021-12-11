@@ -91,9 +91,15 @@ contract Registry is
         if (from == address(0)) {
             for (uint256 i = 0; i < ids.length; ++i) {
                 require(
-                    exists(ids[i]) == false,
+                    exists(ids[i]) == false && amounts[i] == 1,
                     "Cannot mint token more than once"
                 );
+                for (uint256 j = 0; j < i; ++j) {
+                    require(
+                        ids[j] != ids[i],
+                        "Cannot mint token more than once"
+                    );
+                }
             }
         }
         super._beforeTokenTransfer(operator, from, to, ids, amounts, data);

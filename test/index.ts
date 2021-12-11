@@ -33,7 +33,7 @@ describe("Registry", function () {
     expect(1).to.equal(Number(balance.toString()));
   });
 
-  it("Should not be able to mint the same table twice", async function () {
+  it("Should not be able to mint the same token twice", async function () {
     // Create a random uuid, strip out the -s and treat it like a hex value
     const uuid = "0x" + v4().replace(/-/g, "");
 
@@ -50,5 +50,31 @@ describe("Registry", function () {
 
     totalSupply = await registry.totalSupply(uuid);
     expect(totalSupply).to.equal(BigNumber.from(1));
+  });
+
+  it("Should not be able to mint multiples of a token", async function () {
+    // Create a random uuid, strip out the -s and treat it like a hex value
+    const uuid = "0x" + v4().replace(/-/g, "");
+    const two = BigNumber.from(2);
+
+    await expect(
+      registry.mint(accounts[3].address, uuid, two, [])
+    ).to.be.revertedWith("Cannot mint token more than once");
+
+    const totalSupply = await registry.totalSupply(uuid);
+    expect(totalSupply).to.equal(BigNumber.from(0));
+  });
+
+  it("Should not be able to mint the same token twice in a batch", async function () {
+    // Create a random uuid, strip out the -s and treat it like a hex value
+    const uuid = "0x" + v4().replace(/-/g, "");
+    const one = BigNumber.from(1);
+
+    await expect(
+      registry.mintBatch(accounts[3].address, [uuid, uuid], [one, one], [])
+    ).to.be.revertedWith("Cannot mint token more than once");
+
+    const totalSupply = await registry.totalSupply(uuid);
+    expect(totalSupply).to.equal(BigNumber.from(0));
   });
 });
