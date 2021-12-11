@@ -1,29 +1,54 @@
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import { v4 } from "uuid";
+import { Registry } from "../typechain";
 const { BigNumber } = ethers;
 
 describe("Registry", function () {
-  it("Should mint a new table", async function () {
-    const accounts = await ethers.getSigners();
+  let registry: Registry;
+  let accounts: SignerWithAddress[];
 
-    const Registry = await ethers.getContractFactory("Registry");
-    const registry = await Registry.deploy();
+  beforeEach(async function () {
+    accounts = await ethers.getSigners();
+    const Factory = await ethers.getContractFactory("Registry");
+    registry = await Factory.deploy();
     await registry.deployed();
     // Manually call initialize because we are "deploying" the contract directly.
     await registry.initialize();
+  });
 
+  it("Should mint a new table", async function () {
     // Create a random uuid, strip out the -s and treat it like a hex value
     const uuid = "0x" + v4().replace(/-/g, "");
 
     const tx = await registry
       .connect(accounts[4]) // Use connect to test that _anyone_ can mint
-      .mintOne(accounts[0].address, uuid);
+      .mintOne(accounts[4].address, uuid);
     const receipt = await tx.wait();
     // Await for receipt and inspect events for token id etc.
     const [event] = receipt.events ?? [];
     expect(event.args!.id).to.equal(BigNumber.from(uuid));
-    const balance = await registry.balanceOf(accounts[0].address, uuid);
+    const balance = await registry.balanceOf(accounts[4].address, uuid);
     expect(1).to.equal(Number(balance.toString()));
+  });
+
+  it("Should not be able to mint the same table twice", async function () {
+    // Create a random uuid, strip out the -s and treat it like a hex value
+    const uuid = "0x" + v4().replace(/-/g, "");
+
+    const tx = await registry
+      .connect(accounts[2])
+      .mintOne(accounts[2].address, uuid);
+    await tx.wait();
+    let totalSupply = await registry.totalSupply(uuid);
+    expect(totalSupply).to.equal(BigNumber.from(1));
+
+    await expect(
+      registry.connect(accounts[3]).mintOne(accounts[3].address, uuid)
+    ).to.be.revertedWith("Cannot mint token more than once");
+
+    totalSupply = await registry.totalSupply(uuid);
+    expect(totalSupply).to.equal(BigNumber.from(1));
   });
 });

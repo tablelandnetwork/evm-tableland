@@ -52,7 +52,7 @@ contract Registry is
     }
 
     function mintOne(address account, uint256 id) public {
-        // TODO: Validate that it is a real UUID
+        // TODO: Validate that it is a real UUID?
         _mint(account, id, 1, "");
     }
 
@@ -83,9 +83,19 @@ contract Registry is
         bytes memory data
     )
         internal
+        virtual
         override(ERC1155Upgradeable, ERC1155SupplyUpgradeable)
         whenNotPaused
     {
+        // When `from` is zero, `amount` tokens of token type `id` will be minted for `to`.
+        if (from == address(0)) {
+            for (uint256 i = 0; i < ids.length; ++i) {
+                require(
+                    exists(ids[i]) == false,
+                    "Cannot mint token more than once"
+                );
+            }
+        }
         super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
     }
 
