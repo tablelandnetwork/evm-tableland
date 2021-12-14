@@ -7,22 +7,20 @@ import "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC1155/extensions/ERC1155BurnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC1155/extensions/ERC1155SupplyUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-/// @custom:security-contact security@textile.io
+/// @custom:security-contact security@tableland.com
 contract Registry is
     Initializable,
     ERC1155Upgradeable,
     AccessControlUpgradeable,
     PausableUpgradeable,
     ERC1155BurnableUpgradeable,
+    ERC1155SupplyUpgradeable,
     UUPSUpgradeable
 {
-    using CountersUpgradeable for CountersUpgradeable.Counter;
-    CountersUpgradeable.Counter private _tokenIdCounter;
-
     bytes32 public constant URI_SETTER_ROLE = keccak256("URI_SETTER_ROLE");
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     bytes32 public constant UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
@@ -32,12 +30,13 @@ contract Registry is
         __AccessControl_init();
         __Pausable_init();
         __ERC1155Burnable_init();
+        __ERC1155Supply_init();
         __UUPSUpgradeable_init();
 
-        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        _setupRole(URI_SETTER_ROLE, msg.sender);
-        _setupRole(PAUSER_ROLE, msg.sender);
-        _setupRole(UPGRADER_ROLE, msg.sender);
+        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _grantRole(URI_SETTER_ROLE, msg.sender);
+        _grantRole(PAUSER_ROLE, msg.sender);
+        _grantRole(UPGRADER_ROLE, msg.sender);
     }
 
     function setURI(string memory newuri) public onlyRole(URI_SETTER_ROLE) {
@@ -52,15 +51,9 @@ contract Registry is
         _unpause();
     }
 
-    function safeMint(address account) public {
-        uint256 tokenId = _tokenIdCounter.current();
-        _tokenIdCounter.increment();
-        _mint(account, tokenId, 1, "");
-    }
-
-    // Return next available token id. Not guaranteed across transactions.
-    function nextId() public view returns (uint256) {
-        return _tokenIdCounter.current();
+    function mintOne(address account, uint256 id) public {
+        // TODO: Validate that it is a real UUID?
+        _mint(account, id, 1, "");
     }
 
     function mint(
@@ -69,12 +62,16 @@ contract Registry is
         uint256 amount,
         bytes memory data
     ) public {
-        uint256 tokenId = _tokenIdCounter.current();
-        // May only mint next id. Amount should be 1 for tables,
-        // but other token types might require value != 1
-        require(id == tokenId, "Invalid token id");
-        _tokenIdCounter.increment();
         _mint(account, id, amount, data);
+    }
+
+    function mintBatch(
+        address to,
+        uint256[] memory ids,
+        uint256[] memory amounts,
+        bytes memory data
+    ) public {
+        _mintBatch(to, ids, amounts, data);
     }
 
     function _beforeTokenTransfer(
@@ -84,7 +81,27 @@ contract Registry is
         uint256[] memory ids,
         uint256[] memory amounts,
         bytes memory data
-    ) internal override whenNotPaused {
+    )
+        internal
+        virtual
+        override(ERC1155Upgradeable, ERC1155SupplyUpgradeable)
+        whenNotPaused
+    {
+        // When `from` is zero, `amount` tokens of token type `id` will be minted for `to`.
+        if (from == address(0)) {
+            for (uint256 i = 0; i < ids.length; ++i) {
+                require(
+                    exists(ids[i]) == false && amounts[i] == 1,
+                    "Cannot mint token more than once"
+                );
+                for (uint256 j = 0; j < i; ++j) {
+                    require(
+                        ids[j] != ids[i],
+                        "Cannot mint token more than once"
+                    );
+                }
+            }
+        }
         super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
     }
 
