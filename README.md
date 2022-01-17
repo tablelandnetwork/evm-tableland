@@ -74,13 +74,19 @@ Can you grab the assets you need by compiling and then using some jq magic:
 cat artifacts/contracts/Registry.sol/Registry.json | jq '.abi' > abi.json
 ```
 
+### Bytecode
+
+```shell
+cat artifacts/contracts/Registry.sol/Registry.json | jq -r '.bytecode' > bytecode.bin
+```
+
 ### Generate the Go client!
 
 You can use the above `abi.json` to build the Go client:
 
 ```shell
 mkdir gobuild
-abigen --abi ./abi.json --pkg contracts --out gobuild/Registry.go
+abigen --abi ./abi.json --bin ./bytecode.bin --pkg contracts --out gobuild/Registry.go
 ```
 
 ### Bytecode
