@@ -4,10 +4,6 @@
   "description": "On-chain ETH registry and client components for Tableland",
   "main": "typechain/index.js",
   "types": "typechain/index.d.ts",
-  "files": [
-    "typechain/**/*.js?(.map)",
-    "typechain/**/*.d.ts"
-  ],
   "scripts": {
     "build": "npx tsc -p ./tsconfig.build.json"
   },
