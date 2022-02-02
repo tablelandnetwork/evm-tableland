@@ -1,46 +1,48 @@
-// SPDX-License-Identifier: MIT AND Apache-2.0
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.2;
 
-// Created with: https://wizard.openzeppelin.com/#erc1155
+// Created with: https://wizard.openzeppelin.com/#erc721
 
-import "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC1155/extensions/ERC1155BurnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC1155/extensions/ERC1155SupplyUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
 
-/// @custom:security-contact security@tableland.com
-contract Registry is
+/// @custom:security-contact security@textile.io
+contract TablelandTables is
     Initializable,
-    ERC1155Upgradeable,
-    AccessControlUpgradeable,
+    ERC721Upgradeable,
+    ERC721EnumerableUpgradeable,
     PausableUpgradeable,
-    ERC1155BurnableUpgradeable,
-    ERC1155SupplyUpgradeable,
+    AccessControlUpgradeable,
+    ERC721BurnableUpgradeable,
     UUPSUpgradeable
 {
-    bytes32 public constant URI_SETTER_ROLE = keccak256("URI_SETTER_ROLE");
+    using CountersUpgradeable for CountersUpgradeable.Counter;
+
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
+    CountersUpgradeable.Counter private _tokenIdCounter;
     bytes32 public constant UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
 
     function initialize() public initializer {
-        __ERC1155_init("https://tableland.com/table/{id}.json");
-        __AccessControl_init();
+        __ERC721_init("Tableland Tables", "TABLE");
+        __ERC721Enumerable_init();
         __Pausable_init();
-        __ERC1155Burnable_init();
-        __ERC1155Supply_init();
+        __AccessControl_init();
+        __ERC721Burnable_init();
         __UUPSUpgradeable_init();
 
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        _grantRole(URI_SETTER_ROLE, msg.sender);
         _grantRole(PAUSER_ROLE, msg.sender);
         _grantRole(UPGRADER_ROLE, msg.sender);
     }
 
-    function setURI(string memory newuri) public onlyRole(URI_SETTER_ROLE) {
-        _setURI(newuri);
+    function _baseURI() internal pure override returns (string memory) {
+        return "https://testnet.tableland.network/tables";
     }
 
     function pause() public onlyRole(PAUSER_ROLE) {
@@ -51,58 +53,22 @@ contract Registry is
         _unpause();
     }
 
-    function mintOne(address account, uint256 id) public {
-        // TODO: Validate that it is a real UUID?
-        _mint(account, id, 1, "");
-    }
-
-    function mint(
-        address account,
-        uint256 id,
-        uint256 amount,
-        bytes memory data
-    ) public {
-        _mint(account, id, amount, data);
-    }
-
-    function mintBatch(
-        address to,
-        uint256[] memory ids,
-        uint256[] memory amounts,
-        bytes memory data
-    ) public {
-        _mintBatch(to, ids, amounts, data);
+    function safeMint(address to) public {
+        uint256 tokenId = _tokenIdCounter.current();
+        _tokenIdCounter.increment();
+        _safeMint(to, tokenId);
     }
 
     function _beforeTokenTransfer(
-        address operator,
         address from,
         address to,
-        uint256[] memory ids,
-        uint256[] memory amounts,
-        bytes memory data
+        uint256 tokenId
     )
         internal
-        virtual
-        override(ERC1155Upgradeable, ERC1155SupplyUpgradeable)
+        override(ERC721Upgradeable, ERC721EnumerableUpgradeable)
         whenNotPaused
     {
-        // When `from` is zero, `amount` tokens of token type `id` will be minted for `to`.
-        if (from == address(0)) {
-            for (uint256 i = 0; i < ids.length; ++i) {
-                require(
-                    exists(ids[i]) == false && amounts[i] == 1,
-                    "Cannot mint token more than once"
-                );
-                for (uint256 j = 0; j < i; ++j) {
-                    require(
-                        ids[j] != ids[i],
-                        "Cannot mint token more than once"
-                    );
-                }
-            }
-        }
-        super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
+        super._beforeTokenTransfer(from, to, tokenId);
     }
 
     function _authorizeUpgrade(address newImplementation)
@@ -116,7 +82,11 @@ contract Registry is
     function supportsInterface(bytes4 interfaceId)
         public
         view
-        override(ERC1155Upgradeable, AccessControlUpgradeable)
+        override(
+            ERC721Upgradeable,
+            ERC721EnumerableUpgradeable,
+            AccessControlUpgradeable
+        )
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
