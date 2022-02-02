@@ -1,8 +1,8 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
+import { BigNumber } from "ethers";
 import { ethers } from "hardhat";
 import { TablelandTables } from "../typechain";
-const { BigNumber } = ethers;
 
 describe("Registry", function () {
   let registry: TablelandTables;
@@ -29,5 +29,19 @@ describe("Registry", function () {
     expect(1).to.equal(Number(balance.toString()));
     const totalSupply = await registry.totalSupply();
     expect(1).to.equal(Number(totalSupply.toString()));
+  });
+
+  it("Should be easy to await the transaction", async function () {
+    const mintAndReturnId = async (address: string): Promise<BigNumber> => {
+      const tx = await registry.safeMint(address);
+      const receipt = await tx.wait();
+      const [event] = receipt.events ?? [];
+      return event.args?.tokenId;
+    };
+
+    const target = accounts[4].address;
+    // Here's our nice awaitable function
+    const tokenId = await mintAndReturnId(target);
+    expect(tokenId).to.equal(BigNumber.from(0));
   });
 });
