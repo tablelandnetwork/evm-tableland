@@ -31,6 +31,10 @@
     "url": "https://github.com/textileio/eth-tableland/issues"
   },
   "homepage": "https://github.com/textileio/eth-tableland#readme",
+  "dependencies": {
+    "@ethersproject/providers": "^5.5.0",
+    "ethers": "^5.5.1"
+  },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-etherscan": "^2.1.8",
@@ -55,7 +59,6 @@
     "eslint-plugin-prettier": "^3.4.1",
     "eslint-plugin-promise": "^5.1.1",
     "ethereum-waffle": "^3.4.0",
-    "ethers": "^5.5.1",
     "hardhat": "^2.7.0",
     "hardhat-gas-reporter": "^1.0.4",
     "prettier": "^2.5.0",
@@ -64,7 +67,6 @@
     "solidity-coverage": "^0.7.17",
     "ts-node": "^10.4.0",
     "typechain": "^5.2.0",
-    "typescript": "^4.5.2",
-    "uuid": "^8.3.2"
+    "typescript": "^4.5.2"
   }
 }

@@ -14,7 +14,7 @@ async function main() {
   // await hre.run('compile');
 
   // We get the contract (proxy) to deploy
-  const Registry = await ethers.getContractFactory("Registry");
+  const Registry = await ethers.getContractFactory("TablelandTables");
   const registry = await upgrades.deployProxy(Registry, [], {
     kind: "uups",
   });
