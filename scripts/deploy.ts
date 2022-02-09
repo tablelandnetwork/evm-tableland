@@ -6,19 +6,25 @@
 import { ethers, upgrades } from "hardhat";
 
 async function main() {
-  // Hardhat always runs the compile task when running scripts with its command
-  // line interface.
-  //
-  // If this script is run directly using `node` you may want to call compile
-  // manually to make sure everything is compiled
-  // await hre.run('compile');
-
-  // We get the contract (proxy) to deploy
   const Registry = await ethers.getContractFactory("TablelandTables");
-  const registry = await upgrades.deployProxy(Registry, [], {
-    kind: "uups",
-  });
-  console.log("Proxy deployed to:", registry.address);
+
+  // const testnet = await upgrades.deployProxy(
+  //   Registry,
+  //   ["https://testnet.tableland.network/tables/"],
+  //   {
+  //     kind: "uups",
+  //   }
+  // );
+  // console.log("Testnet proxy deployed to:", testnet.address);
+
+  const staging = await upgrades.deployProxy(
+    Registry,
+    ["https://staging.tableland.network/tables/"],
+    {
+      kind: "uups",
+    }
+  );
+  console.log("Staging proxy deployed to:", staging.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

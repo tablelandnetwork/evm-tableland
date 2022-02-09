@@ -14,7 +14,7 @@ describe("Registry", function () {
     registry = await Factory.deploy();
     await registry.deployed();
     // Manually call initialize because we are "deploying" the contract directly.
-    await registry.initialize();
+    await registry.initialize("https://website.com/");
   });
 
   it("Should mint a new table", async function () {
@@ -29,6 +29,17 @@ describe("Registry", function () {
     expect(1).to.equal(Number(balance.toString()));
     const totalSupply = await registry.totalSupply();
     expect(1).to.equal(Number(totalSupply.toString()));
+  });
+
+  it("Should udpate the base URI", async function () {
+    let tx = await registry.setBaseURI("https://fake.com/");
+    await tx.wait();
+
+    const target = accounts[4].address;
+    tx = await registry.safeMint(target);
+    await tx.wait();
+    const tokenURI = await registry.tokenURI(0);
+    expect(tokenURI).includes("https://fake.com/");
   });
 
   it("Should be easy to await the transaction", async function () {
