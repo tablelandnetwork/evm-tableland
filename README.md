@@ -71,13 +71,13 @@ Can you grab the assets you need by compiling and then using some jq magic:
 ### ABI
 
 ```shell
-cat artifacts/contracts/Registry.sol/Registry.json | jq '.abi' > abi.json
+cat artifacts/contracts/Registry.sol/TablelandTables.json | jq '.abi' > abi.json
 ```
 
 ### Bytecode
 
 ```shell
-cat artifacts/contracts/Registry.sol/Registry.json | jq -r '.bytecode' > bytecode.bin
+cat artifacts/contracts/Registry.sol/TablelandTables.json | jq -r '.bytecode' > bytecode.bin
 ```
 
 ### Generate the Go client!
