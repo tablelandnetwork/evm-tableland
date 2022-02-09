@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.2;
+pragma solidity ^0.8.4;
 
 // Created with: https://wizard.openzeppelin.com/#erc721
 
@@ -42,7 +42,7 @@ contract TablelandTables is
     }
 
     function _baseURI() internal pure override returns (string memory) {
-        return "https://testnet.tableland.network/tables";
+        return "https://testnet.tableland.network/tables/";
     }
 
     function pause() public onlyRole(PAUSER_ROLE) {
