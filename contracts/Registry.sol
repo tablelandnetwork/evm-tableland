@@ -28,7 +28,9 @@ contract TablelandTables is
     CountersUpgradeable.Counter private _tokenIdCounter;
     bytes32 public constant UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
 
-    function initialize() public initializer {
+    string private _baseURIString;
+
+    function initialize(string memory baseURI) public initializer {
         __ERC721_init("Tableland Tables", "TABLE");
         __ERC721Enumerable_init();
         __Pausable_init();
@@ -39,10 +41,19 @@ contract TablelandTables is
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(PAUSER_ROLE, msg.sender);
         _grantRole(UPGRADER_ROLE, msg.sender);
+
+        setBaseURI(baseURI);
     }
 
-    function _baseURI() internal pure override returns (string memory) {
-        return "https://testnet.tableland.network/tables/";
+    function setBaseURI(string memory baseURI)
+        public
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
+        _baseURIString = baseURI;
+    }
+
+    function _baseURI() internal view override returns (string memory) {
+        return _baseURIString;
     }
 
     function pause() public onlyRole(PAUSER_ROLE) {
