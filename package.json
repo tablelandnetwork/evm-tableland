@@ -1,6 +1,6 @@
 {
   "name": "@tableland/eth",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "On-chain ETH registry and client components for Tableland",
   "main": "typechain/index.js",
   "types": "typechain/index.d.ts",
