@@ -1,6 +1,6 @@
 {
-  "name": "@textile/eth-tableland",
-  "version": "0.0.3",
+  "name": "@tableland/eth",
+  "version": "0.0.1",
   "description": "On-chain ETH registry and client components for Tableland",
   "main": "typechain/index.js",
   "types": "typechain/index.d.ts",
@@ -16,7 +16,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/textileio/eth-tableland.git"
+    "url": "git+https://github.com/tablelandnetwork/eth-tableland.git"
   },
   "keywords": [
     "tableland",
@@ -25,12 +25,11 @@
     "contract",
     "textile"
   ],
-  "author": "Carson Farmer <carson@textile.io>",
   "license": "MIT AND Apache-2.0",
   "bugs": {
-    "url": "https://github.com/textileio/eth-tableland/issues"
+    "url": "https://github.com/tablelandnetwork/eth-tableland/issues"
   },
-  "homepage": "https://github.com/textileio/eth-tableland#readme",
+  "homepage": "https://github.com/tablelandnetwork/eth-tableland#readme",
   "dependencies": {
     "@ethersproject/providers": "^5.5.0",
     "ethers": "^5.5.1"
@@ -68,5 +67,9 @@
     "ts-node": "^10.4.0",
     "typechain": "^5.2.0",
     "typescript": "^4.5.2"
-  }
+  },
+  "contributors": [
+    "Carson Farmer <carson@textile.io>",
+    "Aaron Sutula <aaron@textile.io>"
+  ]
 }
