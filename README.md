@@ -1,11 +1,11 @@
-# eth-tableland
+# @tableland/eth
 
-[![GitHub license](https://img.shields.io/github/license/textileio/eth-tableland.svg)](./LICENSE)
-[![GitHub package.json version](https://img.shields.io/github/package-json/v/textileio/eth-tableland.svg)](./package.json)
-[![Release](https://img.shields.io/github/release/textileio/eth-tableland.svg)](https://github.com/textileio/eth-tableland/releases/latest)
+[![GitHub license](https://img.shields.io/github/license/tablelandnetwork/eth-tableland.svg)](./LICENSE)
+[![GitHub package.json version](https://img.shields.io/github/package-json/v/tablelandnetwork/eth-tableland.svg)](./package.json)
+[![Release](https://img.shields.io/github/release/tablelandnetwork/eth-tableland.svg)](https://github.com/tablelandnetwork/eth-tableland/releases/latest)
 [![standard-readme compliant](https://img.shields.io/badge/standard--readme-OK-green.svg)](https://github.com/RichardLitt/standard-readme)
 
-![Tests](https://github.com/textileio/eth-tableland/workflows/Test/badge.svg)
+![Tests](https://github.com/tablelandnetwork/eth-tableland/workflows/Test/badge.svg)
 
 > On-chain ETH registry and client components for Tableland
 
@@ -130,4 +130,4 @@ Small note: If editing the README, please conform to the
 
 # License
 
-MIT AND Apache-2.0, © 2021-2022 Textile.io
+MIT AND Apache-2.0, © 2021-2022 Tableland Network Contributors
