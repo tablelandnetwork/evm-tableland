@@ -17,7 +17,7 @@ describe("Registry", function () {
     await registry.initialize("https://website.com/");
   });
 
-  it("Should mint a new table", async function () {
+  it.skip("Should mint a new table", async function () {
     const tx = await registry
       .connect(accounts[4]) // Use connect to test that _anyone_ can mint
       .safeMint(accounts[4].address);
@@ -31,7 +31,7 @@ describe("Registry", function () {
     expect(1).to.equal(Number(totalSupply.toString()));
   });
 
-  it("Should udpate the base URI", async function () {
+  it.skip("Should udpate the base URI", async function () {
     let tx = await registry.setBaseURI("https://fake.com/");
     await tx.wait();
 
@@ -42,7 +42,7 @@ describe("Registry", function () {
     expect(tokenURI).includes("https://fake.com/");
   });
 
-  it("Should be easy to await the transaction", async function () {
+  it.skip("Should be easy to await the transaction", async function () {
     const mintAndReturnId = async (address: string): Promise<BigNumber> => {
       const tx = await registry.safeMint(address);
       const receipt = await tx.wait();

@@ -3,7 +3,7 @@ import { ethers, upgrades } from "hardhat";
 import type { TablelandTables } from "../typechain/index";
 
 describe("Proxy", function () {
-  it(" Should be callable from deployed proxy contract", async function () {
+  it.skip(" Should be callable from deployed proxy contract", async function () {
     const Factory = await ethers.getContractFactory("TablelandTables");
 
     const registry = (await upgrades.deployProxy(
@@ -19,7 +19,7 @@ describe("Proxy", function () {
     expect(0).to.equal(Number(totalSupply.toString()));
   });
 
-  it(" Should be able to deploy two proxy contracts with different baseURI", async function () {
+  it.skip(" Should be able to deploy two proxy contracts with different baseURI", async function () {
     const [account] = await ethers.getSigners();
     const Factory = await ethers.getContractFactory("TablelandTables");
 
