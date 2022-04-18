@@ -12,6 +12,11 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
 
+import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
+import "./Controller.sol";
+
+import "hardhat/console.sol";
+
 /// @custom:security-contact security@textile.io
 contract TablelandTables is
     Initializable,
@@ -30,6 +35,8 @@ contract TablelandTables is
 
     string private _baseURIString;
 
+    mapping(uint256 => address) private _controllers;
+
     function initialize(string memory baseURI) public initializer {
         __ERC721_init("Tableland Tables", "TABLE");
         __ERC721Enumerable_init();
@@ -45,10 +52,56 @@ contract TablelandTables is
         setBaseURI(baseURI);
     }
 
-    event RunSQL(uint256 tableId, address caller, string statement);
+    event RunSQL(
+        address caller,
+        uint256 tokenId,
+        string statement,
+        TablelandControllerLibrary.Policy policy
+    );
 
-    function runSQL(uint256 tableId, address  controller, string memory query) public {
-        emit RunSQL(tableId, controller, query);
+    function runSQL(address caller, uint256 tokenId, string memory statement) public {
+        require(caller == _msgSender(), "Tables: caller must be sender"); // temp, caller must be sender (later msg.sender could be a delegate)
+        
+        TablelandControllerLibrary.Policy memory policy = _checkController(caller, tokenId);
+
+	    emit RunSQL(caller, tokenId, statement, policy);
+    }
+
+    event SetController(uint256 tokenId, address controller);
+
+    function setController(address caller, uint256 tokenId, address controller) public {
+        require(caller == _msgSender(), "Tables: caller must be sender"); // temp, caller must be sender (later msg.sender could be a delegate)
+        require(_isApprovedOrOwner(caller, tokenId), "ERC721: caller is not owner nor approved");
+
+        _controllers[tokenId] = controller;
+
+        emit SetController(tokenId, controller);
+    }
+
+    function _checkController(address caller, uint256 tokenId) private view returns (TablelandControllerLibrary.Policy memory) {
+        address controller = _controllers[tokenId];
+        if (_isContract(controller)) {
+            TablelandController c = TablelandController(controller);
+            return c.getPolicy(caller);
+        }
+        require(controller == address(0) || controller == caller, "Tables: unauthorized");
+
+        return TablelandControllerLibrary.Policy({
+            allowInsert: true,
+            allowUpdate: true,
+            allowDelete: true,
+            whereClause: "",
+            withCheck: "",
+            updatableColumns: new string[](1)
+        });
+    }
+
+    function _isContract(address account) private view returns (bool) {
+        uint256 size;
+        assembly {
+            size := extcodesize(account)
+        }
+        return size > 0;
     }
 
     function setBaseURI(string memory baseURI)

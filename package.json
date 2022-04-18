@@ -32,7 +32,10 @@
   "homepage": "https://github.com/tablelandnetwork/eth-tableland#readme",
   "dependencies": {
     "@ethersproject/providers": "^5.5.0",
-    "ethers": "^5.5.1"
+    "@openzeppelin/contracts": "^4.5.0",
+    "@tableland/sdk": "../js-tableland",
+    "ethers": "^5.5.1",
+    "node-fetch": "^2.6.7"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",

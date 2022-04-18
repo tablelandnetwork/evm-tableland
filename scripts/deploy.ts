@@ -17,14 +17,14 @@ async function main() {
   // );
   // console.log("Testnet proxy deployed to:", testnet.address);
 
-  const staging = await upgrades.deployProxy(
+  const contract = await upgrades.deployProxy(
     Registry,
-    ["https://staging.tableland.network/tables/"],
+    ["http://localhost:8080/tables/"],
     {
       kind: "uups",
     }
   );
-  console.log("Staging proxy deployed to:", staging.address);
+  console.log("Proxy deployed to:", contract.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
