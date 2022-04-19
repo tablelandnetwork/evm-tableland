@@ -2,35 +2,24 @@
 pragma solidity ^0.8.4;
 
 import "./Controller.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import "@openzeppelin/contracts/utils/Strings.sol";
 
 import "hardhat/console.sol";
 
 contract BadgesController is TablelandController {
 
     address private _rigs;
+    address private _badges;
 
     function getPolicy(address caller) public override view returns(TablelandControllerLibrary.Policy memory) {
-        // Get target contract
-        ERC721Enumerable token = ERC721Enumerable(_rigs);
+        string[] memory clauses = new string[](2);
 
-        // Caller must own at least one token
-        uint256 balance = token.balanceOf(caller);
-        require(balance > 0, "BadgesController: unauthorized");
+        // Require one of rigs
+        clauses[0] = requireOneOfERC721(caller, _rigs, "rig_id");
 
-        // Build updateWhere clause with list of the tokens owned by caller
-        bytes memory updateWhere = "rig_id in (";
-        for (uint256 i = 0; i < balance; i++) {
-            bytes memory id = bytes(Strings.toString(token.tokenOfOwnerByIndex(caller, i)));
-            if (i == 0) {
-                updateWhere = bytes.concat(updateWhere, id);
-            } else {
-                updateWhere = bytes.concat(updateWhere, ",", id);
-            }
-        }
-        updateWhere = bytes.concat(updateWhere, ")");
+        // Require one of badges
+        clauses[1] = requireOneOfERC721(caller, _badges, "id");
 
+        // Restrict updates to the position column
         string[] memory updateColumns = new string[](1);
         updateColumns[0] = "position";
 
@@ -39,12 +28,16 @@ contract BadgesController is TablelandController {
             allowInsert: false,
             allowUpdate: true,
             allowDelete: false,
-            updateWhere: string(updateWhere),
+            updateWhere: joinClauses(clauses),
             updateColumns: updateColumns
         });
     }
 
     function setRigs(address rigs) public {
         _rigs = rigs;
+    }
+
+    function setBadges(address badges) public {
+        _badges = badges;
     }
 }

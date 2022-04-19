@@ -16,7 +16,7 @@ import { Badges, BadgesController, Rigs, TablelandTables } from "../typechain";
 import { connect, ConnectionOptions } from "@tableland/sdk";
 
 describe("Controller", function () {
-  const registryAddress = "0x8A93d247134d91e0de6f96547cB0204e5BE8e5D8";
+  const registryAddress = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
   const validatorHost = "http://localhost:8080";
 
   let accounts: SignerWithAddress[];
@@ -41,26 +41,37 @@ describe("Controller", function () {
   before(async function () {
     accounts = await ethers.getSigners();
 
+    // Get deployed registry
     const TT = await ethers.getContractFactory("TablelandTables");
     registry = TT.attach(registryAddress);
 
+    // Deploy rigs
     const R = await ethers.getContractFactory("Rigs");
     rigs = await R.deploy();
     await rigs.deployed();
 
+    // Deploy badges
     const B = await ethers.getContractFactory("Badges");
     badges = await B.deploy();
     await badges.deployed();
 
+    // Deploy badges controller
     const C = await ethers.getContractFactory("BadgesController");
     controller = await C.deploy();
     await controller.deployed();
 
-    const tx = await controller.setRigs(rigs.address);
+    // Set rigs on badges controller
+    let tx = await controller.setRigs(rigs.address);
+    await tx.wait();
+
+    // Set badges on badges controller
+    tx = await controller.setBadges(badges.address);
     await tx.wait();
   });
 
   it("Create mutable relational metadata", async function () {
+    this.timeout(60000);
+
     const owner = accounts[1];
     const user1 = accounts[2];
     const user2 = accounts[3];
@@ -84,6 +95,7 @@ describe("Controller", function () {
       { description: "rigs metadata" }
     );
     const rigsTableName = res.name;
+    console.log("Rigs name:", rigsTableName);
     const rigsTokenId = BigNumber.from(rigsTableName.replace("rigs_", ""));
     res = await tbl.create(
       `create table badges (
@@ -97,12 +109,13 @@ describe("Controller", function () {
       { description: "badges metadata" }
     );
     const badgesTableName = res.name;
+    console.log("Badges name:", badgesTableName);
     const badgesTokenId = BigNumber.from(
       badgesTableName.replace("badges_", "")
     );
 
     // Insert some rigs
-    let event = await runSQLAndReturnEvent(
+    await runSQLAndReturnEvent(
       owner,
       rigsTokenId,
       `insert into ${rigsTableName} values (0, 'a', 'b', 'c', 'b', 'ipfs://bafybeibb3ogzqpge6goyyz2dvjla33odbl2yia4qwa6i774fof525y5rja');`
@@ -130,9 +143,6 @@ describe("Controller", function () {
       `insert into ${badgesTableName} values (2, 0, 'Validator', 'ipfs://Qmf9e4DjpFNszeck45P6sdHNu8R1Es5FRAPgHUFXfhwtXs', 0);`
     );
 
-    let q = await tbl.query(`select * from ${rigsTableName};`);
-    console.log(q?.rows);
-
     // Set badges controller
     let tx = await registry
       .connect(owner)
@@ -141,7 +151,9 @@ describe("Controller", function () {
 
     // Mint rigs
     tx = await rigs.safeMint(user1.address);
-    await tx.wait();
+    const receipt = await tx.wait();
+    const [mint] = receipt.events ?? [];
+    const rig1TokenId = mint.args?.tokenId;
     tx = await rigs.safeMint(user2.address);
     await tx.wait();
 
@@ -154,14 +166,33 @@ describe("Controller", function () {
     await tx.wait();
 
     // User updates their Rig by setting Badge metadata
+    let event = await runSQLAndReturnEvent(
+      user1,
+      badgesTokenId,
+      `update ${badgesTableName} set position = 1 where id = 0;`
+    );
+    console.log("badge policy", event.policy);
     event = await runSQLAndReturnEvent(
       user1,
       badgesTokenId,
-      `update ${badgesTableName} set position = 1 where id = 0; update ${badgesTableName} set position = 2 where id = 2;`
+      `update ${badgesTableName} set position = 2 where id = 2;`
     );
-    console.log(event);
+    console.log("badge policy", event.policy);
 
+    // Log inserted rows
+    let q = await tbl.query(`select * from ${rigsTableName};`);
+    console.log("Rigs:");
+    logJSON(q);
     q = await tbl.query(`select * from ${badgesTableName};`);
-    console.log(q?.rows);
+    console.log("Badges:");
+    logJSON(q);
+
+    // Get rig1 metadata
+    const tokenUri = await rigs.tokenURI(rig1TokenId);
+    console.log(tokenUri);
   });
 });
+
+const logJSON = (obj: any) => {
+  return JSON.stringify(obj, null, 2);
+};

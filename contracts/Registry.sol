@@ -52,14 +52,19 @@ contract TablelandTables is
         setBaseURI(baseURI);
     }
 
-    event RunSQL(uint256 indexed tokenId, string statement, TablelandControllerLibrary.Policy policy);
+    event RunSQL(
+        address caller,
+        uint256 indexed tokenId,
+        string statement,
+        TablelandControllerLibrary.Policy policy
+    );
 
     function runSQL(address caller, uint256 tokenId, string memory statement) public {
         require(caller == _msgSender(), "Tables: caller must be sender"); // temp, caller must be sender (later msg.sender could be a delegate)
         
         TablelandControllerLibrary.Policy memory policy = _checkController(caller, tokenId);
 
-	    emit RunSQL(tokenId, statement, policy);
+	    emit RunSQL(caller, tokenId, statement, policy);
     }
 
     event SetController(uint256 tokenId, address controller);
