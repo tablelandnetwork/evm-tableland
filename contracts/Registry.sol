@@ -45,7 +45,7 @@ contract TablelandTables is
         setBaseURI(baseURI);
     }
 
-    event RunSQL(string indexed idxtable, string table, address controller, string statement);
+    event RunSQL(string indexed idxtable, string table, address caller, string statement);
 
     function runSQL(string memory table, address  controller, string memory query) public {
 	    emit RunSQL(table, table, controller, query);
@@ -70,14 +70,14 @@ contract TablelandTables is
         _unpause();
     }
 
-    event CreateTable(uint256 tokenId, address controller, string statement);
+    event CreateTable(address caller, uint256 tokenId, string statement);
 
     function createTable(address to, string memory statement) public {
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         _safeMint(to, tokenId);
 
-        emit CreateTable(tokenId, to, statement);
+        emit CreateTable(to, tokenId, statement);
     }
 
     function _beforeTokenTransfer(
