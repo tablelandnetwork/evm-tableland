@@ -70,10 +70,14 @@ contract TablelandTables is
         _unpause();
     }
 
-    function safeMint(address to) public {
+    event CreateTable(uint256 tokenId, address controller, string statement);
+
+    function createTable(address to, string memory statement) public {
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         _safeMint(to, tokenId);
+
+        emit CreateTable(tokenId, to, statement);
     }
 
     function _beforeTokenTransfer(
