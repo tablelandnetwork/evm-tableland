@@ -45,10 +45,10 @@ contract TablelandTables is
         setBaseURI(baseURI);
     }
 
-    event RunSQL(string indexed idxtable, string table, address caller, string statement);
+    event RunSQL(uint256 tableId, address caller, string statement);
 
-    function runSQL(string memory table, address  controller, string memory query) public {
-	    emit RunSQL(table, table, controller, query);
+    function runSQL(uint256 table, address  controller, string memory query) public {
+	    emit RunSQL(table, controller, query);
     }
 
     function setBaseURI(string memory baseURI)
