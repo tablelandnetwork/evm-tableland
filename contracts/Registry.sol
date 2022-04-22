@@ -47,8 +47,8 @@ contract TablelandTables is
 
     event RunSQL(uint256 tableId, address caller, string statement);
 
-    function runSQL(uint256 table, address  controller, string memory query) public {
-	    emit RunSQL(table, controller, query);
+    function runSQL(uint256 tableId, address  controller, string memory query) public {
+	    emit RunSQL(tableId, controller, query);
     }
 
     function setBaseURI(string memory baseURI)
@@ -70,7 +70,7 @@ contract TablelandTables is
         _unpause();
     }
 
-    event CreateTable(address caller, uint256 tokenId, string statement);
+    event CreateTable(address caller, uint256 tableId, string statement);
 
     function createTable(address to, string memory statement) public {
         uint256 tokenId = _tokenIdCounter.current();
