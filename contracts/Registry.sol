@@ -48,7 +48,7 @@ contract TablelandTables is
     event RunSQL(uint256 tableId, address caller, string statement);
 
     function runSQL(uint256 tableId, address  controller, string memory query) public {
-	    emit RunSQL(tableId, controller, query);
+        emit RunSQL(tableId, controller, query);
     }
 
     function setBaseURI(string memory baseURI)
