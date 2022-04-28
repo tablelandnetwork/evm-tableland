@@ -12,7 +12,7 @@ library TablelandControllerLibrary {
         bool allowUpdate;
         bool allowDelete;
         
-        string where;
+        string whereClause;
         string[] updateColumns;
     }
 }
