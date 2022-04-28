@@ -52,14 +52,19 @@ contract TablelandTables is
         setBaseURI(baseURI);
     }
 
-    event RunSQL(uint256 tableId, string statement, address caller, TablelandControllerLibrary.Policy policy);
+    event RunSQL(uint256 tableId, string statement, address caller, bool isOwner, TablelandControllerLibrary.Policy policy);
 
     function runSQL(address caller, uint256 tableId, string memory statement) public {
         //require(caller == _msgSender(), "Tables: caller must be sender"); // temp, caller must be sender (later msg.sender could be a delegate)
         
         TablelandControllerLibrary.Policy memory policy = _checkController(caller, tableId);
 
-	    emit RunSQL(tableId, statement, caller, policy);
+        bool isOwner = false;
+        if (_exists(tableId)) {
+            isOwner = _isApprovedOrOwner(caller, tableId);
+        }
+
+	    emit RunSQL(tableId, statement, caller, isOwner, policy);
     }
 
     event CreateTable(address caller, uint256 tableId, string statement);
