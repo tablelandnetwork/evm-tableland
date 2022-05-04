@@ -52,6 +52,16 @@ contract TablelandTables is
         setBaseURI(baseURI);
     }
 
+    event CreateTable(address caller, uint256 tableId, string statement);
+
+    function createTable(address caller, string memory statement) public {
+        uint256 tokenId = _tokenIdCounter.current();
+        _tokenIdCounter.increment();
+        _safeMint(caller, tokenId);
+
+        emit CreateTable(caller, tokenId, statement);
+    }
+
     event RunSQL(
         address caller,
         uint256 tokenId,
@@ -121,16 +131,6 @@ contract TablelandTables is
 
     function unpause() public onlyRole(PAUSER_ROLE) {
         _unpause();
-    }
-
-    event CreateTable(address caller, uint256 tableId, string statement);
-
-    function createTable(address to, string memory statement) public {
-        uint256 tokenId = _tokenIdCounter.current();
-        _tokenIdCounter.increment();
-        _safeMint(to, tokenId);
-
-        emit CreateTable(to, tokenId, statement);
     }
 
     function _beforeTokenTransfer(

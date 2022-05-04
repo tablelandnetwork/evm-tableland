@@ -39,7 +39,7 @@ abstract contract TablelandController {
 
         // Caller must own at least one token
         uint256 balance = token.balanceOf(caller);
-        require(balance > 0, "requireOneOfERC721: unauthorized");
+        require(balance > 0, "getPolicyForOneOfERC721Enumerable: unauthorized");
 
         // Build in set clause with list of the tokens owned by caller
         bytes memory inSet = bytes.concat(bytes(column), " in (");
