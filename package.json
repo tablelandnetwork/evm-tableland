@@ -10,7 +10,8 @@
   ],
   "scripts": {
     "build": "npx tsc -p ./tsconfig.build.json",
-    "test": "hardhat coverage"
+    "test": "hardhat coverage",
+    "all": "npm install && npx hardhat compile && npm test"
   },
   "publishConfig": {
     "access": "public"

@@ -72,7 +72,7 @@ contract TablelandTables is
         
         TablelandControllerLibrary.Policy memory policy = _checkController(caller, tokenId);
 
-	    emit RunSQL(caller, tokenId, statement, policy);
+        emit RunSQL(caller, tokenId, statement, policy);
     }
 
     event SetController(uint256 tokenId, address controller);
