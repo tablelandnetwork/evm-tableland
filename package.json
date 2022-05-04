@@ -9,7 +9,8 @@
     "typechain/**/*.d.ts"
   ],
   "scripts": {
-    "build": "npx tsc -p ./tsconfig.build.json"
+    "build": "npx tsc -p ./tsconfig.build.json",
+    "test": "hardhat coverage"
   },
   "publishConfig": {
     "access": "public"
