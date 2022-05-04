@@ -53,41 +53,47 @@ contract TablelandTables is
     event CreateTable(address caller, uint256 tableId, string statement);
 
     function createTable(address caller, string memory statement) public {
-        uint256 tokenId = _tokenIdCounter.current();
+        uint256 tableId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
-        _safeMint(caller, tokenId);
+        _safeMint(caller, tableId);
 
-        emit CreateTable(caller, tokenId, statement);
+        emit CreateTable(caller, tableId, statement);
     }
 
     event RunSQL(
         address caller,
-        uint256 tokenId,
+        bool isOwner,
+        uint256 tableId,
         string statement,
         TablelandControllerLibrary.Policy policy
     );
 
-    function runSQL(address caller, uint256 tokenId, string memory statement) public {
+    function runSQL(address caller, uint256 tableId, string memory statement) public {
         require(caller == _msgSender(), "Tables: caller must be sender"); // temp, caller must be sender (later msg.sender could be a delegate)
-        
-        TablelandControllerLibrary.Policy memory policy = _checkController(caller, tokenId);
 
-        emit RunSQL(caller, tokenId, statement, policy);
+        TablelandControllerLibrary.Policy memory policy = _checkController(caller, tableId);
+
+        bool isOwner = false;
+        if (_exists(tableId)) {
+            isOwner = _isApprovedOrOwner(caller, tableId);
+        }
+
+        emit RunSQL(caller, isOwner, tableId, statement, policy);
     }
 
-    event SetController(uint256 tokenId, address controller);
+    event SetController(uint256 tableId, address controller);
 
-    function setController(address caller, uint256 tokenId, address controller) public {
+    function setController(address caller, uint256 tableId, address controller) public {
         require(caller == _msgSender(), "Tables: caller must be sender"); // temp, caller must be sender (later msg.sender could be a delegate)
-        require(_isApprovedOrOwner(caller, tokenId), "ERC721: caller is not owner nor approved");
+        require(_isApprovedOrOwner(caller, tableId), "ERC721: caller is not owner nor approved");
 
-        _controllers[tokenId] = controller;
+        _controllers[tableId] = controller;
 
-        emit SetController(tokenId, controller);
+        emit SetController(tableId, controller);
     }
 
-    function _checkController(address caller, uint256 tokenId) private view returns (TablelandControllerLibrary.Policy memory) {
-        address controller = _controllers[tokenId];
+    function _checkController(address caller, uint256 tableId) private view returns (TablelandControllerLibrary.Policy memory) {
+        address controller = _controllers[tableId];
         if (_isContract(controller)) {
             TablelandController c = TablelandController(controller);
             return c.getPolicy(caller);
@@ -100,7 +106,7 @@ contract TablelandTables is
             allowDelete: true,
             whereClause: "",
             withCheck: "",
-            updatableColumns: new string[](1)
+            updatableColumns: new string[](0)
         });
     }
 
