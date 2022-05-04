@@ -11,11 +11,9 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721Burnab
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
-
 import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "./Controller.sol";
 
-import "hardhat/console.sol";
 
 /// @custom:security-contact security@textile.io
 contract TablelandTables is
