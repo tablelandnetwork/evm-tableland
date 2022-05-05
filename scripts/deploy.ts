@@ -17,14 +17,25 @@ async function main() {
   // );
   // console.log("Testnet proxy deployed to:", testnet.address);
 
+  // const staging = await upgrades.deployProxy(
+  //   TT,
+  //   ["https://staging.tableland.network/tables/"],
+  //   {
+  //     kind: "uups",
+  //   }
+  // );
+  // console.log("Staging proxy deployed to:", staging.address);
+
   const staging = await upgrades.deployProxy(
     TT,
-    ["https://staging.tableland.network/tables/"],
+    // TODO: commenting out and hardcoding these urls feels wrong.
+    //       Maybe we want to import util.ts and sniff out values with (env || default) logic?
+    ["http://127.0.0.1:8080/tables/"],
     {
       kind: "uups",
     }
   );
-  console.log("Staging proxy deployed to:", staging.address);
+  console.log("Local proxy deployed to:", staging.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
