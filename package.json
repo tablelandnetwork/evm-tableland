@@ -9,7 +9,9 @@
     "typechain/**/*.d.ts"
   ],
   "scripts": {
-    "build": "npx tsc -p ./tsconfig.build.json"
+    "build": "npx tsc -p ./tsconfig.build.json",
+    "test": "hardhat coverage",
+    "all": "npm install && npx hardhat compile && npm test"
   },
   "publishConfig": {
     "access": "public"
@@ -38,6 +40,7 @@
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-etherscan": "^2.1.8",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "@openzeppelin/contracts": "^4.5.0",
     "@openzeppelin/contracts-upgradeable": "^4.4.0",
     "@openzeppelin/hardhat-upgrades": "^1.12.0",
     "@typechain/ethers-v5": "^7.2.0",
@@ -50,6 +53,7 @@
     "@typescript-eslint/parser": "^4.33.0",
     "chai": "^4.3.4",
     "dotenv": "^10.0.0",
+    "erc721a": "^3.2.0",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-config-standard": "^16.0.3",
@@ -70,6 +74,10 @@
   },
   "contributors": [
     "Carson Farmer <carson@textile.io>",
-    "Aaron Sutula <aaron@textile.io>"
+    "Aaron Sutula <aaron@textile.io>",
+    "Joe Wagner <joe@textile.io>",
+    "Ignacio Hagopian <ignacio@textile.io>",
+    "Bruno Calza <bruno@textile.io>",
+    "Sander Pick <sander@textile.io>"
   ]
 }

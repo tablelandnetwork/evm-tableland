@@ -6,10 +6,10 @@
 import { ethers, upgrades } from "hardhat";
 
 async function main() {
-  const Registry = await ethers.getContractFactory("TablelandTables");
+  const TT = await ethers.getContractFactory("TablelandTables");
 
   // const testnet = await upgrades.deployProxy(
-  //   Registry,
+  //   TT,
   //   ["https://testnet.tableland.network/tables/"],
   //   {
   //     kind: "uups",
@@ -18,7 +18,7 @@ async function main() {
   // console.log("Testnet proxy deployed to:", testnet.address);
 
   const staging = await upgrades.deployProxy(
-    Registry,
+    TT,
     ["https://staging.tableland.network/tables/"],
     {
       kind: "uups",

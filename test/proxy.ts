@@ -37,7 +37,8 @@ describe("Proxy", function () {
     const totalSupply = await reg1.totalSupply();
     expect(0).to.equal(Number(totalSupply.toString()));
 
-    const tx = await reg1.safeMint(account.address);
+    const createStatement = "create table contract_test_hardhat (int a);";
+    const tx = await reg1.createTable(account.address, createStatement);
     await tx.wait();
 
     const tokenURI = await reg1.tokenURI(0);

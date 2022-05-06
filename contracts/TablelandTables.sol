@@ -11,6 +11,9 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721Burnab
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
+import "./Controller.sol";
+
 
 /// @custom:security-contact security@textile.io
 contract TablelandTables is
@@ -30,6 +33,8 @@ contract TablelandTables is
 
     string private _baseURIString;
 
+    mapping(uint256 => address) private _controllers;
+
     function initialize(string memory baseURI) public initializer {
         __ERC721_init("Tableland Tables", "TABLE");
         __ERC721Enumerable_init();
@@ -45,10 +50,72 @@ contract TablelandTables is
         setBaseURI(baseURI);
     }
 
-    event RunSQL(uint256 tableId, address caller, string statement);
+    event CreateTable(address caller, uint256 tableId, string statement);
 
-    function runSQL(uint256 tableId, address  controller, string memory query) public {
-        emit RunSQL(tableId, controller, query);
+    function createTable(address caller, string memory statement) public {
+        uint256 tableId = _tokenIdCounter.current();
+        _tokenIdCounter.increment();
+        _safeMint(caller, tableId);
+
+        emit CreateTable(caller, tableId, statement);
+    }
+
+    event RunSQL(
+        address caller,
+        bool isOwner,
+        uint256 tableId,
+        string statement,
+        TablelandControllerLibrary.Policy policy
+    );
+
+    function runSQL(address caller, uint256 tableId, string memory statement) public {
+        require(caller == _msgSender(), "Tables: caller must be sender"); // temp, caller must be sender (later msg.sender could be a delegate)
+
+        TablelandControllerLibrary.Policy memory policy = _checkController(caller, tableId);
+
+        bool isOwner = false;
+        if (_exists(tableId)) {
+            isOwner = _isApprovedOrOwner(caller, tableId);
+        }
+
+        emit RunSQL(caller, isOwner, tableId, statement, policy);
+    }
+
+    event SetController(uint256 tableId, address controller);
+
+    function setController(address caller, uint256 tableId, address controller) public {
+        require(caller == _msgSender(), "Tables: caller must be sender"); // temp, caller must be sender (later msg.sender could be a delegate)
+        require(_isApprovedOrOwner(caller, tableId), "ERC721: caller is not owner nor approved");
+
+        _controllers[tableId] = controller;
+
+        emit SetController(tableId, controller);
+    }
+
+    function _checkController(address caller, uint256 tableId) private view returns (TablelandControllerLibrary.Policy memory) {
+        address controller = _controllers[tableId];
+        if (_isContract(controller)) {
+            TablelandController c = TablelandController(controller);
+            return c.getPolicy(caller);
+        }
+        require(controller == address(0) || controller == caller, "Tables: unauthorized");
+
+        return TablelandControllerLibrary.Policy({
+            allowInsert: true,
+            allowUpdate: true,
+            allowDelete: true,
+            whereClause: "",
+            withCheck: "",
+            updatableColumns: new string[](0)
+        });
+    }
+
+    function _isContract(address account) private view returns (bool) {
+        uint256 size;
+        assembly {
+            size := extcodesize(account)
+        }
+        return size > 0;
     }
 
     function setBaseURI(string memory baseURI)
@@ -68,16 +135,6 @@ contract TablelandTables is
 
     function unpause() public onlyRole(PAUSER_ROLE) {
         _unpause();
-    }
-
-    event CreateTable(address caller, uint256 tableId, string statement);
-
-    function createTable(address to, string memory statement) public {
-        uint256 tokenId = _tokenIdCounter.current();
-        _tokenIdCounter.increment();
-        _safeMint(to, tokenId);
-
-        emit CreateTable(to, tokenId, statement);
     }
 
     function _beforeTokenTransfer(
