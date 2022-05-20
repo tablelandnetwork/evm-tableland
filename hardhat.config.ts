@@ -28,6 +28,13 @@ const config: HardhatUserConfig = {
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
+    "arbitrum-rinkeby": {
+      url: `https://arb-rinkeby.g.alchemy.com/v2/${
+        process.env.ALCHEMY_API_KEY ?? ""
+      }`,
+      accounts:
+        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    },
     rinkeby: {
       url: `https://eth-rinkeby.alchemyapi.io/v2/${
         process.env.ALCHEMY_API_KEY ?? ""
