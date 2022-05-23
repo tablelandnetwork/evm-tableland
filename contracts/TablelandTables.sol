@@ -69,7 +69,8 @@ contract TablelandTables is
     );
 
     function runSQL(address caller, uint256 tableId, string memory statement) public {
-        require(caller == _msgSender(), "Tables: caller must be sender"); // temp, caller must be sender (later msg.sender could be a delegate)
+        // temp, caller must be sender or admin (later msg.sender could be a delegate)
+        require(caller != _msgSender() && !hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "Tables: caller must be sender or admin");
 
         TablelandControllerLibrary.Policy memory policy = _checkController(caller, tableId);
 
