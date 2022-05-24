@@ -44,6 +44,38 @@ describe("TablelandTables", function () {
     expect(1).to.equal(Number(totalSupply.toString()));
   });
 
+  it("Should allow owner to call runSQL", async function () {
+    const createStatement = "create table contract_test_hardhat (int a);";
+    const tx = await registry
+      .connect(accounts[4]) // Use connect to test that _anyone_ can mint
+      .createTable(accounts[4].address, createStatement);
+    const receipt = await tx.wait();
+    // Await for receipt and inspect events for token id etc.
+
+    const [mintEvent, createEvent] = receipt.events ?? [];
+
+    expect(mintEvent.args!.tokenId).to.equal(BigNumber.from(0));
+    expect(createEvent.args!.tableId).to.equal(BigNumber.from(0));
+    expect(createEvent.args!.caller).to.equal(accounts[4].address);
+    expect(createEvent.args!.statement).to.equal(createStatement);
+
+    const tableId = createEvent.args!.tableId;
+    const insertStatement = 'insert into contract_test_insert_hardhat';
+
+    const updateTx = await registry
+      .connect(accounts[4]) // Use connect to test that _anyone_ can mint
+      .runSQL(accounts[4].address, tableId, insertStatement);
+
+    const update = await updateTx.wait();
+
+    const [insertEvent] = update.events ?? [];
+
+    expect(insertEvent.args!.caller).to.equal(accounts[4].address);
+    expect(insertEvent.args!.isOwner).to.equal(true);
+    expect(insertEvent.args!.tableId).to.equal(tableId);
+    expect(insertEvent.args!.statement).to.equal(insertStatement);
+  });
+
   it("Should udpate the base URI", async function () {
     let tx = await registry.setBaseURI("https://fake.com/");
     await tx.wait();

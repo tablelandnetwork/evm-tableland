@@ -70,7 +70,7 @@ contract TablelandTables is
 
     function runSQL(address caller, uint256 tableId, string memory statement) public {
         // temp, caller must be sender or admin (later msg.sender could be a delegate)
-        require(caller != _msgSender() && !hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "Tables: caller must be sender or admin");
+        require(caller == _msgSender() || hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "Tables: caller must be sender or admin");
 
         TablelandControllerLibrary.Policy memory policy = _checkController(caller, tableId);
 
@@ -85,7 +85,8 @@ contract TablelandTables is
     event SetController(uint256 tableId, address controller);
 
     function setController(address caller, uint256 tableId, address controller) public {
-        require(caller == _msgSender(), "Tables: caller must be sender"); // temp, caller must be sender (later msg.sender could be a delegate)
+        // temp, caller must be sender or admin (later msg.sender could be a delegate)
+        require(caller == _msgSender() || hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "Tables: caller must be sender or admin");
         require(_isApprovedOrOwner(caller, tableId), "ERC721: caller is not owner nor approved");
 
         _controllers[tableId] = controller;
