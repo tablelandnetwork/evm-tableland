@@ -113,4 +113,37 @@ describe("TablelandTables", function () {
     expect(setEvent.args!.tableId).to.equal(createEvent.args!.tableId);
     expect(setEvent.args!.controller).to.equal(accounts[3].address);
   });
+
+  it("Should emit TableTransfer event when token transferred", async function () {
+    const createStatement = "create table contract_test_hardhat (int a);";
+    const tx = await registry
+      .connect(accounts[4]) // Use connect to test that _anyone_ can mint
+      .createTable(accounts[4].address, createStatement);
+    const receipt = await tx.wait();
+    // Await for receipt and inspect events for token id etc.
+
+    const [mintEvent, createEvent] = receipt.events ?? [];
+
+    expect(mintEvent.args!.tokenId).to.equal(BigNumber.from(0));
+    expect(createEvent.args!.tableId).to.equal(BigNumber.from(0));
+    expect(createEvent.args!.caller).to.equal(accounts[4].address);
+    expect(createEvent.args!.statement).to.equal(createStatement);
+
+    // account 4 is transferring table to account 3
+    const txTransfer = await registry
+      .connect(accounts[4])
+      .transferFrom(
+        accounts[4].address,
+        accounts[3].address,
+        createEvent.args!.tableId,
+      );
+    
+    const transferReceipt = await txTransfer.wait();
+    const [, , tableTransferEvent] = transferReceipt.events ?? [];
+
+    expect(tableTransferEvent.args!.tableId).to.equal(createEvent.args!.tableId);
+    expect(tableTransferEvent.args!.from).to.equal(accounts[4].address);
+    expect(tableTransferEvent.args!.to).to.equal(accounts[3].address);
+  });
+
 });

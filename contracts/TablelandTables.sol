@@ -149,6 +149,24 @@ contract TablelandTables is
         super._beforeTokenTransfer(from, to, tokenId);
     }
 
+    event TableTransfer(address from, address to, uint256 tableId);
+
+    function _afterTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    )
+        internal
+        virtual
+        override(ERC721Upgradeable)
+        whenNotPaused
+    {
+        super._afterTokenTransfer(from, to, tokenId);
+        if (from != address(0)) {
+            emit TableTransfer(from, to, tokenId);
+        }
+    }
+
     function _authorizeUpgrade(address newImplementation)
         internal
         override
