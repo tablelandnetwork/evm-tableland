@@ -26,16 +26,26 @@ async function main() {
   // );
   // console.log("Staging proxy deployed to:", staging.address);
 
-  const staging = await upgrades.deployProxy(
-    TT,
-    // TODO: commenting out and hardcoding these urls feels wrong.
-    //       Maybe we want to import util.ts and sniff out values with (env || default) logic?
-    ["http://127.0.0.1:8080/tables/"],
-    {
-      kind: "uups",
-    }
-  );
-  console.log("Local proxy deployed to:", staging.address);
+  // const contract = await upgrades.deployProxy(
+  //   TT,
+  //   // TODO: commenting out and hardcoding these urls feels wrong.
+  //   //       Maybe we want to import util.ts and sniff out values with (env || default) logic?
+  //   ["http://127.0.0.1:8080/chain/31337/tables/"],
+  //   {
+  //     kind: "uups",
+  //   }
+  // );
+
+
+  // TODO: using upgrades.deployProxy doesn't seem to be calling initialize how I would think
+  //       deploying the contract directly, like the tests, seems to work
+  const contract = await TT.deploy();
+  await contract.deployed();
+  // Manually call initialize because we are "deploying" the contract directly.
+  await contract.initialize("http://127.0.0.1:8080/chain/31337/tables/");
+
+  console.log("Local proxy deployed to:", contract.address);
+
 }
 
 // We recommend this pattern to be able to use async/await everywhere
