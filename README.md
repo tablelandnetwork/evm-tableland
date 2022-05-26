@@ -7,7 +7,7 @@
 
 ![Tests](https://github.com/tablelandnetwork/eth-tableland/workflows/Test/badge.svg)
 
-> On-chain ETH registry and client components for Tableland
+> Tableland Tables contract and client components
 
 # Table of Contents
 
@@ -27,13 +27,13 @@
 
 # Background
 
-This is the proof of concept on-chain ETH registry and client components
-for Tableland. This is the first pass, and is subject to wild changes
-without notice!
+This is the Tableland Tables contract and client components. This is the first pass, and is subject to wild changes without notice!
 
 # Development
 
-Get started with installing and building the project:
+## Building the client
+
+You can build the Typescript client locally:
 
 ```shell
 npm install
@@ -62,19 +62,9 @@ npx solhint 'contracts/**/*.sol'
 npx solhint 'contracts/**/*.sol' --fix
 ```
 
-## Building the client
-
-You can build the Typescript client locally:
-
-```shell
-npm install
-npx hardhat compile
-npm run build
-```
-
 ## Extacting the ABI and Bytecode
 
-Can you grab the assets you need by compiling and then using some jq magic:
+Can you grab the assets you need by compiling and then using some `jq` magic:
 
 ### ABI
 
@@ -99,18 +89,18 @@ abigen --abi ./abi.json --bin ./bytecode.bin --pkg contracts --out gobuild/Regis
 
 ## Etherscan verification
 
-To try out Etherscan verification, you first need to deploy a contract to an Ethereum network that's supported by Etherscan, such as Ropsten.
+To try out Etherscan verification, you first need to deploy a contract to an Ethereum network that's supported by Etherscan, such as Goerli.
 
-In this project, copy the .env.example file to a file named .env, and then edit it to fill in the details. Enter your Etherscan API key, your Rinkeby node URL (e.g., from Alchemy), and the private key of the account which will send the deployment transaction. With a valid .env file in place, first deploy your contract:
+In this project, copy the `.env.example` file to a file named `.env`, and then edit it to fill in the details. Enter your Etherscan API key, your Rinkeby node URL (e.g., from Alchemy), and the private key of the account which will send the deployment transaction. With a valid `.env` file in place, first deploy your contract:
 
 ```shell
-hardhat run --network rinkeby scripts/deploy.ts
+npx hardhat run scripts/deploy.ts --network goerli
 ```
 
 Then, copy the deployment address and paste it in to replace `DEPLOYED_CONTRACT_ADDRESS` in this command:
 
 ```shell
-npx hardhat verify --network rinkeby DEPLOYED_CONTRACT_ADDRESS
+npx hardhat verify DEPLOYED_CONTRACT_ADDRESS --network goerli
 ```
 
 ## Performance optimizations
@@ -120,6 +110,11 @@ For faster runs of your tests and scripts, consider skipping ts-node's type chec
 # Maintainers
 
 [@carsonfarmer](https://github.com/carsonfarmer)
+[@joewagner](https://github.com/joewagner)
+[@brunocalza](https://github.com/brunocalza)
+[@jsign](https://github.com/jsign)
+[@asutula](https://github.com/asutula)
+[@sanderpick](https://github.com/sanderpick)
 
 # Contributing
 

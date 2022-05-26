@@ -8,7 +8,7 @@
     "declarationMap": true
   },
   "include": [
-    "./typechain/**/*",
+    "./typechain-types/**/*",
   ],
   "files": []
 }

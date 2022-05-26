@@ -2,7 +2,7 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { BigNumber } from "ethers";
 import { ethers } from "hardhat";
-import { TablelandTables } from "../typechain/index";
+import { TablelandTables } from "../typechain-types/index";
 
 interface CreateEvent {
   tableId: BigNumber;
@@ -167,15 +167,16 @@ describe("TablelandTables", function () {
       .transferFrom(
         accounts[4].address,
         accounts[3].address,
-        createEvent.args!.tableId,
+        createEvent.args!.tableId
       );
-    
+
     const transferReceipt = await txTransfer.wait();
     const [, , tableTransferEvent] = transferReceipt.events ?? [];
 
-    expect(tableTransferEvent.args!.tableId).to.equal(createEvent.args!.tableId);
+    expect(tableTransferEvent.args!.tableId).to.equal(
+      createEvent.args!.tableId
+    );
     expect(tableTransferEvent.args!.from).to.equal(accounts[4].address);
     expect(tableTransferEvent.args!.to).to.equal(accounts[3].address);
   });
-
 });
