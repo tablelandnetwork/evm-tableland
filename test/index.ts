@@ -60,7 +60,7 @@ describe("TablelandTables", function () {
     expect(createEvent.args!.statement).to.equal(createStatement);
 
     const tableId = createEvent.args!.tableId;
-    const insertStatement = 'insert into contract_test_insert_hardhat';
+    const insertStatement = "insert into contract_test_insert_hardhat";
 
     const updateTx = await registry
       .connect(accounts[4]) // Use connect to test that _anyone_ can mint
@@ -95,7 +95,7 @@ describe("TablelandTables", function () {
     ): Promise<CreateEvent> => {
       const tx = await registry.createTable(address, statement);
       const receipt = await tx.wait();
-      const [mintEvent, createEvent] = receipt.events ?? [];
+      const [, createEvent] = receipt.events ?? [];
       return {
         caller: createEvent.args?.caller,
         tableId: createEvent.args?.tableId,

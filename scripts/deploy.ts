@@ -1,51 +1,55 @@
-// We require the Hardhat Runtime Environment explicitly here. This is optional
-// but useful for running the script in a standalone fashion through `node <script>`.
-//
-// When running the script with `npx hardhat run <script>` you'll find the Hardhat
-// Runtime Environment's members available in the global scope.
 import { ethers, upgrades } from "hardhat";
+import type { TablelandTables } from "../typechain/index";
+import assert from "assert";
 
 async function main() {
+  const [account] = await ethers.getSigners();
+
+  if (account.provider === undefined) {
+    throw Error("missing provider");
+  }
+
   const TT = await ethers.getContractFactory("TablelandTables");
 
-  // const testnet = await upgrades.deployProxy(
-  //   TT,
-  //   ["https://testnet.tableland.network/tables/"],
-  //   {
-  //     kind: "uups",
-  //   }
-  // );
-  // console.log("Testnet proxy deployed to:", testnet.address);
+  const contract = (await upgrades.deployProxy(
+    TT,
+    ["https://testnet.tableland.network/tables/"],
+    {
+      kind: "uups",
+    }
+  )) as TablelandTables;
+  const registry = await contract.deployed();
+  console.log("Proxy deployed to:", registry.address);
 
-  // const staging = await upgrades.deployProxy(
-  //   TT,
-  //   ["https://staging.tableland.network/tables/"],
-  //   {
-  //     kind: "uups",
-  //   }
-  // );
-  // console.log("Staging proxy deployed to:", staging.address);
+  const { chainId } = await account.provider.getNetwork();
 
-  // const contract = await upgrades.deployProxy(
-  //   TT,
-  //   // TODO: commenting out and hardcoding these urls feels wrong.
-  //   //       Maybe we want to import util.ts and sniff out values with (env || default) logic?
-  //   ["http://127.0.0.1:8080/chain/31337/tables/"],
-  //   {
-  //     kind: "uups",
-  //   }
-  // );
+  const createStatement = `create table healthbot_${chainId} (counter bigint);`;
+  const tx = await registry.createTable(account.address, createStatement);
+  const receipt = await tx.wait();
 
+  const [, createEvent] = receipt.events ?? [];
+  const tableId = createEvent.args!.tableId;
 
-  // TODO: using upgrades.deployProxy doesn't seem to be calling initialize how I would think
-  //       deploying the contract directly, like the tests, seems to work
-  const contract = await TT.deploy();
-  await contract.deployed();
-  // Manually call initialize because we are "deploying" the contract directly.
-  await contract.initialize("http://127.0.0.1:8080/chain/31337/tables/");
+  console.log("Healthot table created as:", `healthbot_${chainId}_${tableId}`);
 
-  console.log("Local proxy deployed to:", contract.address);
+  const insertStatement = `insert into healthbot_${chainId}_${tableId} values (1);`;
 
+  const updateTx = await registry.runSQL(
+    account.address,
+    tableId,
+    insertStatement
+  );
+
+  const update = await updateTx.wait();
+
+  const [insertEvent] = update.events ?? [];
+
+  assert(
+    insertEvent.args!.statement === insertStatement,
+    "insert statement mismatch"
+  );
+
+  console.log("Healthbot table updated with:", insertEvent.args?.statement);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
