@@ -6,9 +6,11 @@ import "erc721a-upgradeable/contracts/extensions/ERC721AQueryableUpgradeable.sol
 import "erc721a-upgradeable/contracts/extensions/ERC721ABurnableUpgradeable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
-import "./Controller.sol";
+import "./ITablelandTables.sol";
+import "./ITablelandController.sol";
 
 contract TablelandTables is
+    ITablelandTables,
     ERC721AUpgradeable,
     ERC721ABurnableUpgradeable,
     ERC721AQueryableUpgradeable,
@@ -18,32 +20,22 @@ contract TablelandTables is
     string private _baseURIString;
     mapping(uint256 => address) private _controllers;
 
-    function initialize(string memory baseURI) initializerERC721A public {
+    function initialize(string memory baseURI) public initializerERC721A {
         __ERC721A_init("Tableland Tables", "TABLE");
         setBaseURI(baseURI);
     }
 
-    event CreateTable(address caller, uint256 tableId, string statement);
-
-    function createTable(address caller, string memory statement) public whenNotPaused {
+    function createTable(address owner, string memory statement) public override whenNotPaused {
         uint256 tableId = _nextTokenId();
-        _safeMint(caller, 1);
+        _safeMint(owner, 1);
 
-        emit CreateTable(caller, tableId, statement);
+        emit CreateTable(owner, tableId, statement);
     }
 
-    event RunSQL(
-        address caller,
-        bool isOwner,
-        uint256 tableId,
-        string statement,
-        TablelandControllerLibrary.Policy policy
-    );
-
-    function runSQL(address caller, uint256 tableId, string memory statement) public whenNotPaused {
+    function runSQL(address caller, uint256 tableId, string memory statement) public override whenNotPaused {
         require(caller == _msgSenderERC721A() || caller == owner(), "Tables: caller must be sender or owner");
 
-        TablelandControllerLibrary.Policy memory policy = _checkController(caller, tableId);
+        ITablelandController.Policy memory policy = _checkController(caller, tableId);
 
         bool isOwner = false;
         if (_exists(tableId)) {
@@ -53,9 +45,7 @@ contract TablelandTables is
         emit RunSQL(caller, isOwner, tableId, statement, policy);
     }
 
-    event SetController(uint256 tableId, address controller);
-
-    function setController(address caller, uint256 tableId, address controller) public whenNotPaused {
+    function setController(address caller, uint256 tableId, address controller) public override whenNotPaused {
         require(caller == _msgSenderERC721A(), "Tables: caller must be sender");
         require(ownerOf(tableId) == caller, "Tables: caller is not table owner");
 
@@ -65,16 +55,16 @@ contract TablelandTables is
     }
 
     function _checkController(address caller, uint256 tableId) private view returns (
-        TablelandControllerLibrary.Policy memory
+        ITablelandController.Policy memory
     ) {
         address controller = _controllers[tableId];
         if (_isContract(controller)) {
-            TablelandController c = TablelandController(controller);
+            ITablelandController c = ITablelandController(controller);
             return c.getPolicy(caller);
         }
         require(controller == address(0) || controller == caller, "Tables: unauthorized");
 
-        return TablelandControllerLibrary.Policy({
+        return ITablelandController.Policy({
             allowInsert: true,
             allowUpdate: true,
             allowDelete: true,
@@ -96,7 +86,7 @@ contract TablelandTables is
         return 1;
     }
 
-    function setBaseURI(string memory baseURI) public onlyOwner {
+    function setBaseURI(string memory baseURI) public override onlyOwner {
         _baseURIString = baseURI;
     }
 
@@ -104,15 +94,13 @@ contract TablelandTables is
         return _baseURIString;
     }
 
-    function pause() public onlyOwner {
+    function pause() public override onlyOwner {
         _pause();
     }
 
-    function unpause() public onlyOwner {
+    function unpause() public override onlyOwner {
         _unpause();
     }
-
-    event TableTransfer(address from, address to, uint256 tableId, uint256 quantity);
 
     function _afterTokenTransfers(
         address from,
@@ -122,15 +110,11 @@ contract TablelandTables is
     ) internal override {
         super._afterTokenTransfers(from, to, startTokenId, quantity);
         if (from != address(0)) {
-            emit TableTransfer(from, to, startTokenId, quantity);
+            emit TransferTable(from, to, startTokenId, quantity);
         }
     }
 
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        override (ERC721AUpgradeable)
-        returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view override (ERC721AUpgradeable) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 }
