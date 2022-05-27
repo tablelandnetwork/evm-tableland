@@ -7,7 +7,7 @@ interface ITablelandTables {
 
     event CreateTable(address owner, uint256 tableId, string statement);
 
-    event TransferTable(address from, address to, uint256 tableId, uint256 quantity);
+    event TransferTable(address from, address to, uint256 startTableId, uint256 quantity);
 
     event RunSQL(
         address caller,
