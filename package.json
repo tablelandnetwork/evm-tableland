@@ -13,6 +13,7 @@
   ],
   "scripts": {
     "build": "npx tsc -p ./tsconfig.build.json",
+    "clean": "rm -rf artifacts && rm -rf typechain && rm -rf typechain-types && rm -rf cache",
     "up": "npm install && npx hardhat compile && npm run build && hardhat node",
     "test": "hardhat coverage && istanbul check-coverage ./coverage.json --statements 100 --branches 97 --functions 100 --lines 100",
     "lint": "eslint '**/*.{js,ts}'",
