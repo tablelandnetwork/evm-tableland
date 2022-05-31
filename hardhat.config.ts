@@ -23,24 +23,36 @@ const config: HardhatUserConfig = {
   networks: {
     "optimism-kovan": {
       url: `https://opt-kovan.g.alchemy.com/v2/${
-        process.env.ALCHEMY_API_KEY ?? ""
+        process.env.API_KEY_OPT_KOVAN ?? ""
       }`,
       accounts:
-        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+        process.env.OPT_KOVAN_PK !== undefined
+          ? [process.env.OPT_KOVAN_PK]
+          : [],
     },
-    "arbitrum-rinkeby": {
-      url: `https://arb-rinkeby.g.alchemy.com/v2/${
-        process.env.ALCHEMY_API_KEY ?? ""
+    goerli: {
+      url: `https://eth-goerli.alchemyapi.io/v2/${
+        process.env.API_KEY_ETH_GOERLI ?? ""
       }`,
       accounts:
-        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+        process.env.ETH_GOERLI_PK !== undefined
+          ? [process.env.ETH_GOERLI_PK]
+          : [],
     },
-    rinkeby: {
-      url: `https://eth-rinkeby.alchemyapi.io/v2/${
-        process.env.ALCHEMY_API_KEY ?? ""
+    mumbai: {
+      url: `https://polygon-mumbai.g.alchemy.com/v2/${
+        process.env.API_KEY_POLY_MUMBAI ?? ""
       }`,
       accounts:
-        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+        process.env.POLY_MUMBAI_PK !== undefined
+          ? [process.env.POLY_MUMBAI_PK]
+          : [],
+    },
+    hardhat: {
+      mining: {
+        auto: false,
+        interval: [100, 3000],
+      },
     },
   },
   gasReporter: {

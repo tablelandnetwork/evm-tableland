@@ -17,6 +17,14 @@
 - [Contributing](#contributing)
 - [License](#license)
 
+# Deployments
+
+| network        | chainId | address                                    |
+| -------------- | ------- | ------------------------------------------ |
+| ETH GOERLI     | 5       | 0x8864b95961EdcE0Efe558FbAb55cd5864Be3930a |
+| POLYGON MUMBAI | 80001   | 0x154C1373E155BE4691233B82d8861b884A7F807D |
+| OPTIMISM KOVAN | 69      | 0x9d495C9EeFd9daE0CF9d2C7d847e888FEF364960 |
+
 # Background
 
 This is the proof of concept on-chain ETH registry and client components

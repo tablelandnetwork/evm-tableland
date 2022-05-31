@@ -2,15 +2,15 @@
   "manifestVersion": "3.2",
   "proxies": [
     {
-      "address": "0x847645b7dAA32eFda757d3c10f1c82BFbB7b41D0",
-      "txHash": "0x95540a545c9c95b9adab703c7dfbb6236e0ae25f580f619e77147105df13b15e",
+      "address": "0x8864b95961EdcE0Efe558FbAb55cd5864Be3930a",
+      "txHash": "0x8ab57f0b3d1a99592c35ce5d449224d0c9bcf114d1692223cf2824167f272953",
       "kind": "uups"
     }
   ],
   "impls": {
-    "1dd496c110c76e6c4a09a936d545cf45f37cd15a67321ef4b718e3993a452fd5": {
-      "address": "0xB16B902886ede51F308AB0f31a163F4247FBe122",
-      "txHash": "0x6887c3632a36b2f9bb8597aaf1eec16419c63c25bfda94c1f2da863f63850443",
+    "c351e5d62d754102f4c552b6bdf068be5f43355807bd11dcbe3b9dd85b262251": {
+      "address": "0xEE7155AC4eA81dda2d01F3AFc71286Ed54fD7659",
+      "txHash": "0xaae2c24acd18cb55235b848bc6e6f047232701681a5b95ee0a12a5c8419bbc6c",
       "layout": {
         "storage": [
           {
@@ -155,13 +155,19 @@
             "contract": "TablelandTables",
             "label": "_tokenIdCounter",
             "type": "t_struct(Counter)2859_storage",
-            "src": "contracts/Registry.sol:28"
+            "src": "contracts/TablelandTables.sol:31"
           },
           {
             "contract": "TablelandTables",
             "label": "_baseURIString",
             "type": "t_string_storage",
-            "src": "contracts/Registry.sol:31"
+            "src": "contracts/TablelandTables.sol:34"
+          },
+          {
+            "contract": "TablelandTables",
+            "label": "_controllers",
+            "type": "t_mapping(t_uint256,t_address)",
+            "src": "contracts/TablelandTables.sol:36"
           }
         ],
         "types": {
@@ -179,6 +185,12 @@
           },
           "t_string_storage": {
             "label": "string"
+          },
+          "t_mapping(t_uint256,t_address)": {
+            "label": "mapping(uint256 => address)"
+          },
+          "t_address": {
+            "label": "address"
           },
           "t_array(t_uint256)50_storage": {
             "label": "uint256[50]"
@@ -205,9 +217,6 @@
           "t_mapping(t_address,t_bool)": {
             "label": "mapping(address => bool)"
           },
-          "t_address": {
-            "label": "address"
-          },
           "t_bool": {
             "label": "bool"
           },
@@ -225,9 +234,6 @@
           },
           "t_array(t_uint256)46_storage": {
             "label": "uint256[46]"
-          },
-          "t_mapping(t_uint256,t_address)": {
-            "label": "mapping(uint256 => address)"
           },
           "t_mapping(t_address,t_uint256)": {
             "label": "mapping(address => uint256)"
