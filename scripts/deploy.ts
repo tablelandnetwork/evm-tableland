@@ -1,5 +1,5 @@
 import { ethers, upgrades } from "hardhat";
-import type { TablelandTables } from "../typechain/index";
+import type { TablelandTables } from "../typechain-types/index";
 import assert from "assert";
 
 async function main() {
