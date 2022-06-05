@@ -13,7 +13,6 @@
 
 - [Background](#background)
 - [Development](#development)
-- [Deployments](#deployments)
 - [Maintainers](#maintainers)
 - [Contributing](#contributing)
 - [License](#license)
@@ -36,19 +35,45 @@ npm run build
 
 ## Testing
 
-```shell
-npm test
-REPORT_GAS=true npm test
-```
+Run the test suite:
 
 ```shell
-npx eslint '**/*.{js,ts}'
-npx eslint '**/*.{js,ts}' --fix
+npm test
+```
+
+Test with gas reporting:
+
+```shell
+REPORT_GAS=true npx hardhat test
 ```
 
 ## Deploying
 
+Deployments are handled on a per-network basis:
+
+```shell
+npx hardhat run scripts/deploy.ts --network optimism
+```
+
+Network names may include context for the target Tableland network:
+
+```shell
+npx hardhat run scripts/deploy.ts --network optimism-kovan-staging
+```
+
+Where `optimism-kovan-staging` indicates a deployment to the Optimism Kovan testnet for the Tableland staging network.
+
+Refer to the `proxies` entry in `hardhat.config.js` for the list of current deployments.
+
 ## Upgrading
+
+The Tableland contracts are currently upgradeable at this early stage of development. Upgrades are handled much like deployments:
+
+```shell
+npx hardhat run scripts/upgrade.ts --network optimism
+```
+
+Upgrading on a network only works if a previous deployment already exists, referenced by a corresponding proxy address in the `proxies` entry in `hardhat.config.js`.
 
 ## Extacting the ABI and Bytecode
 
@@ -94,10 +119,6 @@ npx hardhat verify DEPLOYED_CONTRACT_ADDRESS --network ethereum-goerli
 ## Performance optimizations
 
 For faster runs of your tests and scripts, consider skipping ts-node's type checking by setting the environment variable `TS_NODE_TRANSPILE_ONLY` to `1` in hardhat's environment. For more details see [the documentation](https://hardhat.org/guides/typescript.html#performance-optimizations).
-
-# Deployments
-
-Refer to the `proxies` entry in `hardhat.config.js` for the list of current deployments.
 
 # Maintainers
 
