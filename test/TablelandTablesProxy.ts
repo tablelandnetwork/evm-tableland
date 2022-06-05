@@ -30,7 +30,7 @@ describe("TablelandTablesProxy", function () {
 
   it("Should not re-deploy proxy or implementation if unchanged", async function () {
     const tables1 = await deploy(Factory, "https://foo.xyz/");
-    const tables2 = (await update(tables1, Factory)) as TablelandTables;
+    const tables2 = await update(tables1, Factory);
     expect(
       await upgrades.erc1967.getImplementationAddress(tables1.address)
     ).to.equal(
@@ -72,7 +72,7 @@ describe("TablelandTablesProxy", function () {
     const Factory2 = await ethers.getContractFactory(
       "TestTablelandTablesUpgrade"
     );
-    const tables2 = (await update(tables1, Factory2)) as TablelandTables;
+    const tables2 = await update(tables1, Factory2);
     const impl2 = await upgrades.erc1967.getImplementationAddress(
       tables2.address
     );
@@ -147,7 +147,7 @@ describe("TablelandTablesProxy", function () {
     const Factory2 = await ethers.getContractFactory(
       "TestTablelandTablesUpgrade"
     );
-    const tables2 = (await update(tables1, Factory2)) as TablelandTables;
+    const tables2 = await update(tables1, Factory2);
 
     // Run sql again against new tables implementation
     tx = await tables2
@@ -177,17 +177,15 @@ async function deploy(
   const tables = (await upgrades.deployProxy(Factory, [baseURI], {
     kind: "uups",
   })) as TablelandTables;
-  await tables.deployed();
-  return tables;
+  return await tables.deployed();
 }
 
 async function update(
   proxy: Contract,
   Factory: ContractFactory
-): Promise<Contract> {
-  const tables = await upgrades.upgradeProxy(proxy.address, Factory, {
+): Promise<TablelandTables> {
+  const tables = (await upgrades.upgradeProxy(proxy.address, Factory, {
     kind: "uups",
-  });
-  await tables.deployed();
-  return tables;
+  })) as TablelandTables;
+  return await tables.deployed();
 }
