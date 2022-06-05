@@ -39,7 +39,7 @@ jobs:
         run: npm run build
 
       - name: Lint 🙈
-        run: npm run lint
+        run: npm run prettier && npm run lint
 
       - name: Test 🧪
         run: npm test

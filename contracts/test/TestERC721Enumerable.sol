@@ -12,6 +12,7 @@ contract TestERC721Enumerable is ERC721, ERC721Enumerable, Ownable {
 
     Counters.Counter private _tokenIdCounter;
 
+    // solhint-disable-next-line no-empty-blocks
     constructor() ERC721("TestERC721Enumerable", "FOO") {}
 
     function mint() external payable {

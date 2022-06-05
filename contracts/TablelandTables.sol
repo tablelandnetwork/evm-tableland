@@ -100,6 +100,7 @@ contract TablelandTables is
 
     function _isContract(address account) private view returns (bool) {
         uint256 size;
+        // solhint-disable-next-line no-inline-assembly
         assembly {
             size := extcodesize(account)
         }
@@ -152,5 +153,6 @@ contract TablelandTables is
         }
     }
 
+    // solhint-disable-next-line no-empty-blocks
     function _authorizeUpgrade(address) internal view override onlyOwner {}
 }

@@ -37,7 +37,7 @@ contract TestTablelandTablesUpgrade is
         payable
         override
         whenNotPaused
-    {}
+    {} // solhint-disable no-empty-blocks
 
     function runSQL(
         address caller,
@@ -90,6 +90,7 @@ contract TestTablelandTablesUpgrade is
 
     function _isContract(address account) private view returns (bool) {
         uint256 size;
+        // solhint-disable-next-line no-inline-assembly
         assembly {
             size := extcodesize(account)
         }
@@ -100,15 +101,20 @@ contract TestTablelandTablesUpgrade is
         address,
         uint256,
         address
-    ) external override whenNotPaused {}
+    ) external override whenNotPaused {} // solhint-disable no-empty-blocks
 
+    // solhint-disable-next-line no-empty-blocks
     function setBaseURI(string memory) external override onlyOwner {}
 
+    // solhint-disable-next-line no-empty-blocks
     function _baseURI() internal view override returns (string memory) {}
 
+    // solhint-disable-next-line no-empty-blocks
     function pause() external override onlyOwner {}
 
+    // solhint-disable-next-line no-empty-blocks
     function unpause() external override onlyOwner {}
 
+    // solhint-disable-next-line no-empty-blocks
     function _authorizeUpgrade(address) internal view override onlyOwner {}
 }

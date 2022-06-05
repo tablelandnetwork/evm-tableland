@@ -12,6 +12,7 @@ contract TestERC721AQueryable is
     ERC721AQueryable,
     Ownable
 {
+    // solhint-disable-next-line no-empty-blocks
     constructor() ERC721A("TestERC721AQueryable", "BAR") {}
 
     function mint() external payable {
@@ -20,14 +21,5 @@ contract TestERC721AQueryable is
 
     function _baseURI() internal pure override returns (string memory) {
         return "https://bar.xyz/";
-    }
-
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        override(ERC721A)
-        returns (bool)
-    {
-        return super.supportsInterface(interfaceId);
     }
 }

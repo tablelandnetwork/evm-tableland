@@ -10,9 +10,13 @@
   ],
   "scripts": {
     "build": "npx tsc -p ./tsconfig.build.json",
+    "up": "npm install && npx hardhat compile && npm run build && hardhat node",
     "test": "hardhat coverage",
-    "lint": "solhint 'contracts/**/*.sol'",
-    "up": "npm install && npx hardhat compile && npm run build && hardhat node"
+    "lint": "eslint '**/*.{js,ts}'",
+    "lint:fix": "npm run lint -- --fix",
+    "prettier": "prettier '**/*.{ts,json,sol,md}' --check",
+    "prettier:fix": "npm run prettier -- --write",
+    "format": "npm run prettier:fix && npm run lint:fix"
   },
   "publishConfig": {
     "access": "public"

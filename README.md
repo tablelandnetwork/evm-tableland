@@ -44,8 +44,6 @@ REPORT_GAS=true npm test
 ```shell
 npx eslint '**/*.{js,ts}'
 npx eslint '**/*.{js,ts}' --fix
-npx prettier '**/*.{json,sol,md}' --check
-npx prettier '**/*.{json,sol,md}' --write
 ```
 
 ## Deploying

@@ -8,9 +8,13 @@ abi.json
 bytecode.bin
 gobuild
 
-#Hardhat files
+# Hardhat files
 cache
 artifacts
 
-#Openzeppelin files
+# Openzeppelin files
 .openzeppelin/unknown-*.json
+
+# IDEs
+.idea
+.vscode
