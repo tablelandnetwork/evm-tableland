@@ -7,8 +7,8 @@ import type {
   TestERC721Enumerable,
   TestERC721AQueryable,
   TestTablelandController,
-  TestBypassTablelandController,
-} from "../typechain-types/index";
+  TestAllowAllTablelandController,
+} from "../typechain-types";
 
 chai.use(chaiAsPromised);
 const expect = chai.expect;
@@ -19,7 +19,7 @@ describe("ITablelandController", function () {
   let foos: TestERC721Enumerable;
   let bars: TestERC721AQueryable;
   let controller: TestTablelandController;
-  let bypassController: TestBypassTablelandController;
+  let allowAllController: TestAllowAllTablelandController;
 
   beforeEach(async function () {
     accounts = await ethers.getSigners();
@@ -29,7 +29,7 @@ describe("ITablelandController", function () {
       await ethers.getContractFactory("TablelandTables")
     ).deploy()) as TablelandTables;
     await tables.deployed();
-    await tables.initialize("https://website.com/");
+    await (await tables.initialize("https://foo.xyz/")).wait();
 
     // Deploy test erc721 contracts
     foos = (await (
@@ -47,17 +47,17 @@ describe("ITablelandController", function () {
     ).deploy()) as TestTablelandController;
     await controller.deployed();
 
-    bypassController = (await (
-      await ethers.getContractFactory("TestBypassTablelandController")
-    ).deploy()) as TestBypassTablelandController;
-    await bypassController.deployed();
+    allowAllController = (await (
+      await ethers.getContractFactory("TestAllowAllTablelandController")
+    ).deploy()) as TestAllowAllTablelandController;
+    await allowAllController.deployed();
 
-    // Setup non-bypass controller
+    // Setup controller
     await (await controller.setFoos(foos.address)).wait();
     await (await controller.setBars(bars.address)).wait();
   });
 
-  it.skip("Should set controller for a table", async function () {
+  it("Should set controller for a table", async function () {
     const owner = accounts[4];
     let tx = await tables.createTable(
       owner.address,
@@ -80,42 +80,48 @@ describe("ITablelandController", function () {
       .connect(owner)
       .setController(owner.address, tableId, eoaController.address);
     receipt = await tx.wait();
-    let [setEvent] = receipt.events ?? [];
-    expect(setEvent.args!.tableId).to.equal(createEvent.args!.tableId);
-    expect(setEvent.args!.controller).to.equal(eoaController.address);
+    let [setControllerEvent] = receipt.events ?? [];
+    expect(setControllerEvent.args!.tableId).to.equal(
+      createEvent.args!.tableId
+    );
+    expect(setControllerEvent.args!.controller).to.equal(eoaController.address);
 
     // Test that runSQL is now locked down to this EOA address
     // (not even owner should be able to run SQL now)
-    const insertStatement = "insert into testing values (0);";
+    const runStatement = "insert into testing values (0);";
     tx = await tables
       .connect(owner)
-      .runSQL(owner.address, tableId, insertStatement);
+      .runSQL(owner.address, tableId, runStatement);
     await expect(tx.wait()).to.be.rejectedWith(Error);
     tx = await tables
       .connect(eoaController)
-      .runSQL(eoaController.address, tableId, insertStatement);
+      .runSQL(eoaController.address, tableId, runStatement);
     await tx.wait();
 
     // Test setting controller to a contract address
     tx = await tables
       .connect(owner)
-      .setController(owner.address, tableId, bypassController.address);
+      .setController(owner.address, tableId, allowAllController.address);
     receipt = await tx.wait();
-    [setEvent] = receipt.events ?? [];
-    expect(setEvent.args!.tableId).to.equal(createEvent.args!.tableId);
-    expect(setEvent.args!.controller).to.equal(bypassController.address);
+    [setControllerEvent] = receipt.events ?? [];
+    expect(setControllerEvent.args!.tableId).to.equal(
+      createEvent.args!.tableId
+    );
+    expect(setControllerEvent.args!.controller).to.equal(
+      allowAllController.address
+    );
 
     // Test that anyone can run SQL through contract controller
     const caller = accounts[7];
     tx = await tables
       .connect(caller)
-      .runSQL(caller.address, tableId, insertStatement);
+      .runSQL(caller.address, tableId, runStatement);
     receipt = await tx.wait();
     const [runEvent] = receipt.events ?? [];
     expect(runEvent.args!.caller).to.equal(caller.address);
     expect(runEvent.args!.isOwner).to.equal(false);
     expect(runEvent.args!.tableId).to.equal(tableId);
-    expect(runEvent.args!.statement).to.equal(insertStatement);
+    expect(runEvent.args!.statement).to.equal(runStatement);
     expect(runEvent.args!.policy.allowInsert).to.equal(true);
     expect(runEvent.args!.policy.allowUpdate).to.equal(true);
     expect(runEvent.args!.policy.allowDelete).to.equal(true);
@@ -140,11 +146,11 @@ describe("ITablelandController", function () {
     await tx.wait();
 
     // Test that run SQL on table is gated by Foo and Bar ownership
-    const insertStatement = "insert into testing values (0);";
+    const runStatement = "insert into testing values (0);";
     const caller = accounts[5];
     tx = await tables
       .connect(caller)
-      .runSQL(caller.address, tableId, insertStatement);
+      .runSQL(caller.address, tableId, runStatement);
     await expect(tx.wait()).to.be.rejectedWith(Error);
 
     // Mint a Foo
@@ -154,7 +160,7 @@ describe("ITablelandController", function () {
     // Still gated (need a Bar too)
     tx = await tables
       .connect(caller)
-      .runSQL(caller.address, tableId, insertStatement);
+      .runSQL(caller.address, tableId, runStatement);
     await expect(tx.wait()).to.be.rejectedWith(Error);
 
     // Mint a Bar
@@ -164,13 +170,13 @@ describe("ITablelandController", function () {
     // Caller should be able to run SQL now
     tx = await tables
       .connect(caller)
-      .runSQL(caller.address, tableId, insertStatement);
+      .runSQL(caller.address, tableId, runStatement);
     receipt = await tx.wait();
     let [runEvent] = receipt.events ?? [];
     expect(runEvent.args!.caller).to.equal(caller.address);
     expect(runEvent.args!.isOwner).to.equal(false);
     expect(runEvent.args!.tableId).to.equal(tableId);
-    expect(runEvent.args!.statement).to.equal(insertStatement);
+    expect(runEvent.args!.statement).to.equal(runStatement);
     expect(runEvent.args!.policy.allowInsert).to.equal(false);
     expect(runEvent.args!.policy.allowUpdate).to.equal(true);
     expect(runEvent.args!.policy.allowDelete).to.equal(false);
@@ -192,13 +198,13 @@ describe("ITablelandController", function () {
     // Where clause should reflect all owned tokens
     tx = await tables
       .connect(caller)
-      .runSQL(caller.address, tableId, insertStatement);
+      .runSQL(caller.address, tableId, runStatement);
     receipt = await tx.wait();
     [runEvent] = receipt.events ?? [];
     expect(runEvent.args!.caller).to.equal(caller.address);
     expect(runEvent.args!.isOwner).to.equal(false);
     expect(runEvent.args!.tableId).to.equal(tableId);
-    expect(runEvent.args!.statement).to.equal(insertStatement);
+    expect(runEvent.args!.statement).to.equal(runStatement);
     expect(runEvent.args!.policy.allowInsert).to.equal(false);
     expect(runEvent.args!.policy.allowUpdate).to.equal(true);
     expect(runEvent.args!.policy.allowDelete).to.equal(false);

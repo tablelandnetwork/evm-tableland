@@ -13,4 +13,4 @@ cache
 artifacts
 
 #Openzeppelin files
-.openzeppelin/unknown-*1337.json
+.openzeppelin/unknown-*.json

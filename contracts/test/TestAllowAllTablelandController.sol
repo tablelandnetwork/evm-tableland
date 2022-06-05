@@ -6,9 +6,7 @@ import "../utils/Policies.sol";
 import "../utils/ERC721EnumerablePolicies.sol";
 import "../utils/ERC721AQueryablePolicies.sol";
 
-import "hardhat/console.sol";
-
-contract TestBypassTablelandController is ITablelandController {
+contract TestAllowAllTablelandController is ITablelandController {
 
     function getPolicy(address) public pure override returns(ITablelandController.Policy memory) {
         // Return allow-all policy
@@ -16,8 +14,8 @@ contract TestBypassTablelandController is ITablelandController {
             allowInsert: true,
             allowUpdate: true,
             allowDelete: true,
-            whereClause: "",
-            withCheck: "",
+            whereClause: Policies.joinClauses(new string[](0)),
+            withCheck: Policies.joinClauses(new string[](0)),
             updatableColumns: new string[](0)
         });
     }
