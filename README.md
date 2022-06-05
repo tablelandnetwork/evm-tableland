@@ -13,17 +13,10 @@
 
 - [Background](#background)
 - [Development](#development)
+- [Deployments](#deployments)
 - [Maintainers](#maintainers)
 - [Contributing](#contributing)
 - [License](#license)
-
-# Deployments
-
-| network        | chainId | address                                    |
-| -------------- | ------- | ------------------------------------------ |
-| ETH GOERLI     | 5       | 0x8864b95961EdcE0Efe558FbAb55cd5864Be3930a |
-| POLYGON MUMBAI | 80001   | 0x154C1373E155BE4691233B82d8861b884A7F807D |
-| OPTIMISM KOVAN | 69      | 0x9d495C9EeFd9daE0CF9d2C7d847e888FEF364960 |
 
 # Background
 
@@ -41,26 +34,26 @@ npx hardhat compile
 npm run build
 ```
 
-Try running some of the following tasks:
+## Testing
 
 ```shell
-npx hardhat accounts
-npx hardhat compile
-npx hardhat clean
-npx hardhat test
-npx hardhat node
-npx hardhat help
-REPORT_GAS=true npx hardhat test
-npx hardhat coverage
-npx hardhat run scripts/deploy.ts
-TS_NODE_FILES=true npx ts-node scripts/deploy.ts
+npm test
+REPORT_GAS=true npm test
+```
+
+
+
+```shell
 npx eslint '**/*.{js,ts}'
 npx eslint '**/*.{js,ts}' --fix
 npx prettier '**/*.{json,sol,md}' --check
 npx prettier '**/*.{json,sol,md}' --write
-npx solhint 'contracts/**/*.sol'
-npx solhint 'contracts/**/*.sol' --fix
 ```
+
+## Deploying
+
+
+## Upgrading
 
 ## Extacting the ABI and Bytecode
 
@@ -94,18 +87,22 @@ To try out Etherscan verification, you first need to deploy a contract to an Eth
 In this project, copy the `.env.example` file to a file named `.env`, and then edit it to fill in the details. Enter your Etherscan API key, your Rinkeby node URL (e.g., from Alchemy), and the private key of the account which will send the deployment transaction. With a valid `.env` file in place, first deploy your contract:
 
 ```shell
-npx hardhat run scripts/deploy.ts --network goerli
+npx hardhat run scripts/deploy.ts --network ethereum-goerli
 ```
 
 Then, copy the deployment address and paste it in to replace `DEPLOYED_CONTRACT_ADDRESS` in this command:
 
 ```shell
-npx hardhat verify DEPLOYED_CONTRACT_ADDRESS --network goerli
+npx hardhat verify DEPLOYED_CONTRACT_ADDRESS --network ethereum-goerli
 ```
 
 ## Performance optimizations
 
 For faster runs of your tests and scripts, consider skipping ts-node's type checking by setting the environment variable `TS_NODE_TRANSPILE_ONLY` to `1` in hardhat's environment. For more details see [the documentation](https://hardhat.org/guides/typescript.html#performance-optimizations).
+
+# Deployments
+
+Refer to the `proxies` entry in `hardhat.config.js` for the list of current deployments.
 
 # Maintainers
 

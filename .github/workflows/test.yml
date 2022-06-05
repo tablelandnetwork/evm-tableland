@@ -38,11 +38,11 @@ jobs:
       - name: Build ⚒️
         run: npm run build
 
-      - name: Test 🧪
-        run: npx hardhat test
+      - name: Lint 🙈
+        run: npm run lint
 
-      - name: Coverage 🙈
-        run: npx hardhat coverage
+      - name: Test 🧪
+        run: npm test
 
       - name: Deploy 🚀
         run: |
