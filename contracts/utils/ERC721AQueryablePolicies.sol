@@ -5,10 +5,13 @@ import "erc721a/contracts/extensions/ERC721AQueryable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
 
 library ERC721AQueryablePolicies {
-
     error ERC721AQueryablePoliciesUnauthorized();
 
-    function getClauseForRequireOneOf(address caller, address target, string memory column) internal view returns(string memory) {
+    function getClauseForRequireOneOf(
+        address caller,
+        address target,
+        string memory column
+    ) internal view returns (string memory) {
         // Get target contract
         ERC721AQueryable token = ERC721AQueryable(target);
 

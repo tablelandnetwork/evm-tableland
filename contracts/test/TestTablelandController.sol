@@ -8,19 +8,31 @@ import "../utils/ERC721EnumerablePolicies.sol";
 import "../utils/ERC721AQueryablePolicies.sol";
 
 contract TestTablelandController is ITablelandController, Ownable {
-
     address private _foos;
     address private _bars;
 
-    function getPolicy(address caller) public view override returns(ITablelandController.Policy memory) {
+    function getPolicy(address caller)
+        public
+        view
+        override
+        returns (ITablelandController.Policy memory)
+    {
         string[] memory whereClauses = new string[](2);
         string[] memory withChecks = new string[](3);
 
         // Require one of FOO
-        whereClauses[0] = ERC721EnumerablePolicies.getClauseForRequireOneOf(caller, _foos, "foo_id");
+        whereClauses[0] = ERC721EnumerablePolicies.getClauseForRequireOneOf(
+            caller,
+            _foos,
+            "foo_id"
+        );
 
         // Require one of BAR
-        whereClauses[1] = ERC721AQueryablePolicies.getClauseForRequireOneOf(caller, _bars, "bar_id");
+        whereClauses[1] = ERC721AQueryablePolicies.getClauseForRequireOneOf(
+            caller,
+            _bars,
+            "bar_id"
+        );
 
         // Restrict updates to a single column
         string[] memory updatableColumns = new string[](1);
@@ -32,14 +44,15 @@ contract TestTablelandController is ITablelandController, Ownable {
         withChecks[2] = ""; // included to filter in Policies.joinClauses
 
         // Return policy
-        return ITablelandController.Policy({
-            allowInsert: false,
-            allowUpdate: true,
-            allowDelete: false,
-            whereClause: Policies.joinClauses(whereClauses),
-            withCheck: Policies.joinClauses(withChecks),
-            updatableColumns: updatableColumns
-        });
+        return
+            ITablelandController.Policy({
+                allowInsert: false,
+                allowUpdate: true,
+                allowDelete: false,
+                whereClause: Policies.joinClauses(whereClauses),
+                withCheck: Policies.joinClauses(withChecks),
+                updatableColumns: updatableColumns
+            });
     }
 
     function setFoos(address foos) external onlyOwner {

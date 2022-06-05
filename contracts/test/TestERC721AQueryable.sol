@@ -10,8 +10,8 @@ contract TestERC721AQueryable is
     ERC721A,
     ERC721ABurnable,
     ERC721AQueryable,
-    Ownable {
-
+    Ownable
+{
     constructor() ERC721A("TestERC721AQueryable", "BAR") {}
 
     function mint() external payable {
@@ -25,8 +25,9 @@ contract TestERC721AQueryable is
     function supportsInterface(bytes4 interfaceId)
         public
         view
-        override (ERC721A)
-        returns (bool) {
+        override(ERC721A)
+        returns (bool)
+    {
         return super.supportsInterface(interfaceId);
     }
 }

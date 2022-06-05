@@ -24,10 +24,11 @@ contract TestERC721Enumerable is ERC721, ERC721Enumerable, Ownable {
         return "https://foo.xyz/";
     }
 
-    function _beforeTokenTransfer(address from, address to, uint256 tokenId)
-        internal
-        override(ERC721, ERC721Enumerable)
-    {
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal override(ERC721, ERC721Enumerable) {
         super._beforeTokenTransfer(from, to, tokenId);
     }
 
@@ -35,7 +36,8 @@ contract TestERC721Enumerable is ERC721, ERC721Enumerable, Ownable {
         public
         view
         override(ERC721, ERC721Enumerable)
-        returns (bool) {
+        returns (bool)
+    {
         return super.supportsInterface(interfaceId);
     }
 }

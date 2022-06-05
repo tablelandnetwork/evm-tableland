@@ -17,8 +17,8 @@ contract TestTablelandTablesUpgrade is
     ERC721AQueryableUpgradeable,
     OwnableUpgradeable,
     PausableUpgradeable,
-    UUPSUpgradeable {
-
+    UUPSUpgradeable
+{
     string private _baseURIString;
     mapping(uint256 => address) private _controllers;
     mapping(uint256 => address) private _dummyStorage;
@@ -32,14 +32,28 @@ contract TestTablelandTablesUpgrade is
         __UUPSUpgradeable_init();
     }
 
-    function createTable(address, string memory) external payable override whenNotPaused {}
+    function createTable(address, string memory)
+        external
+        payable
+        override
+        whenNotPaused
+    {}
 
-    function runSQL(address caller, uint256 tableId, string memory statement) external override whenNotPaused {
-        if (!(caller == _msgSenderERC721A() || owner() == _msgSenderERC721A())) {
+    function runSQL(
+        address caller,
+        uint256 tableId,
+        string memory statement
+    ) external override whenNotPaused {
+        if (
+            !(caller == _msgSenderERC721A() || owner() == _msgSenderERC721A())
+        ) {
             revert Unauthorized();
         }
 
-        ITablelandController.Policy memory policy = _checkController(caller, tableId);
+        ITablelandController.Policy memory policy = _checkController(
+            caller,
+            tableId
+        );
 
         bool isOwner = false;
         if (_exists(tableId)) {
@@ -49,9 +63,11 @@ contract TestTablelandTablesUpgrade is
         emit RunSQL(caller, isOwner, tableId, statement, policy);
     }
 
-    function _checkController(address caller, uint256 tableId) private view returns (
-        ITablelandController.Policy memory
-    ) {
+    function _checkController(address caller, uint256 tableId)
+        private
+        view
+        returns (ITablelandController.Policy memory)
+    {
         address controller = _controllers[tableId];
         if (_isContract(controller)) {
             ITablelandController c = ITablelandController(controller);
@@ -61,14 +77,15 @@ contract TestTablelandTablesUpgrade is
             revert Unauthorized();
         }
 
-        return ITablelandController.Policy({
-            allowInsert: true,
-            allowUpdate: true,
-            allowDelete: true,
-            whereClause: "",
-            withCheck: "",
-            updatableColumns: new string[](0)
-        });
+        return
+            ITablelandController.Policy({
+                allowInsert: true,
+                allowUpdate: true,
+                allowDelete: true,
+                whereClause: "",
+                withCheck: "",
+                updatableColumns: new string[](0)
+            });
     }
 
     function _isContract(address account) private view returns (bool) {
@@ -79,7 +96,11 @@ contract TestTablelandTablesUpgrade is
         return size > 0;
     }
 
-    function setController(address, uint256, address) external override whenNotPaused {}
+    function setController(
+        address,
+        uint256,
+        address
+    ) external override whenNotPaused {}
 
     function setBaseURI(string memory) external override onlyOwner {}
 

@@ -5,10 +5,13 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
 
 library ERC721EnumerablePolicies {
-    
     error ERC721EnumerablePoliciesUnauthorized();
 
-    function getClauseForRequireOneOf(address caller, address target, string memory column) internal view returns(string memory) {
+    function getClauseForRequireOneOf(
+        address caller,
+        address target,
+        string memory column
+    ) internal view returns (string memory) {
         // Get target contract
         ERC721Enumerable token = ERC721Enumerable(target);
 
@@ -21,7 +24,11 @@ library ERC721EnumerablePolicies {
         // Build in set clause with list of the tokens owned by caller
         bytes memory inSet = bytes.concat(bytes(column), " in (");
         for (uint256 i = 0; i < balance; i++) {
-            bytes memory id = bytes(StringsUpgradeable.toString(token.tokenOfOwnerByIndex(caller, i)));
+            bytes memory id = bytes(
+                StringsUpgradeable.toString(
+                    token.tokenOfOwnerByIndex(caller, i)
+                )
+            );
             if (i == 0) {
                 inSet = bytes.concat(inSet, id);
             } else {

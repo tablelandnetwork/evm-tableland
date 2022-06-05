@@ -5,11 +5,14 @@ pragma solidity ^0.8.4;
  * @dev Policy operations.
  */
 library Policies {
-
     /**
      * @dev Joins multiple SQL clauses into a single clause for Policy `whereClause` and `withCheck` fields.
      */
-    function joinClauses(string[] memory clauses) internal pure returns(string memory) {
+    function joinClauses(string[] memory clauses)
+        internal
+        pure
+        returns (string memory)
+    {
         bytes memory clause;
         for (uint256 i = 0; i < clauses.length; i++) {
             if (bytes(clauses[i]).length == 0) {

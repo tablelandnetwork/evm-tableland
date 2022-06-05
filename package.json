@@ -33,7 +33,7 @@
   },
   "homepage": "https://github.com/tablelandnetwork/eth-tableland#readme",
   "dependencies": {
-    "@ethersproject/providers": "^5.6.8",    
+    "@ethersproject/providers": "^5.6.8",
     "ethers": "^5.6.8"
   },
   "devDependencies": {
