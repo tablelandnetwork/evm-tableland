@@ -1,4 +1,6 @@
+// @ts-ignore-start
 import { ethers, upgrades, network, proxy } from "hardhat"
+// @ts-ignore-end
 import type { TablelandTables } from "../typechain-types"
 import assert from "assert"
 

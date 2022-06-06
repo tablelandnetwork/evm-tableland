@@ -1,7 +1,9 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers"
 import chai from "chai"
 import chaiAsPromised from "chai-as-promised"
+// @ts-ignore-start
 import { ethers, upgrades } from "hardhat"
+// @ts-ignore-end
 import { BigNumber, Contract, ContractFactory } from "ethers"
 import type {
   TablelandTables,

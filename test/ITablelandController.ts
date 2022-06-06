@@ -1,7 +1,9 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers"
 import chai from "chai"
 import chaiAsPromised from "chai-as-promised"
+// @ts-ignore-start
 import { ethers } from "hardhat"
+// @ts-ignore-end
 import type {
   TablelandTables,
   TestERC721Enumerable,

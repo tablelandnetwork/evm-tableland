@@ -2,6 +2,9 @@
   "name": "@tableland/eth",
   "version": "0.0.2",
   "description": "Tableland Tables contract and client components",
+  "engines": {
+    "node": ">=14.0.0"
+  },
   "main": "typechain-types/index.js",
   "types": "typechain-types/index.d.ts",
   "files": [
