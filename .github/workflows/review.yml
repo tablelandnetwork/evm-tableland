@@ -1,4 +1,4 @@
-name: Test
+name: Review
 on:
   push:
     branches:
@@ -6,11 +6,11 @@ on:
   pull_request:
 
 concurrency:
-  group: test-${{github.ref}}
+  group: review-${{github.ref}}
   cancel-in-progress: true
 
 jobs:
-  test:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout 🛎️
@@ -35,16 +35,5 @@ jobs:
       - name: Install 🔧
         run: npm install
 
-      - name: Compile 🛠
-        run: npx hardhat compile
-
-      - name: Build ⚒️
-        run: npm run build
-
-      - name: Test 🧪
-        run: npm test
-
-      - name: Deploy 🚀
-        run: |
-          npx hardhat node &
-          npx hardhat run scripts/deploy.ts --network localhost
+      - name: Lint 🙈
+        run: npm run prettier && npm run lint
