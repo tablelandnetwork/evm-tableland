@@ -197,4 +197,23 @@ describe("TablelandTables", function () {
     tx = await tables.connect(owner).createTable(owner.address, createStatement)
     await tx.wait()
   })
+
+  it("Big query execution should fail", async function () {
+    const owner = accounts[4]
+    const createStatement = "create table testing (int a);"
+    let tx = await tables
+      .connect(owner)
+      .createTable(owner.address, createStatement)
+    const receipt = await tx.wait()
+    const [, createEvent] = receipt.events ?? []
+    const tableId = createEvent.args!.tableId
+
+    // Creating a fake statement greater than 35000 bytes
+    const runStatement = Array(35001).fill("a").join("")
+
+    tx = await tables
+      .connect(owner)
+      .runSQL(owner.address, tableId, runStatement)
+    await expect(tx.wait()).to.be.rejectedWith("transaction failed")
+  })
 })

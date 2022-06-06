@@ -26,6 +26,8 @@ contract TablelandTables is
     string private _baseURIString;
     // A mapping of table ids to table controller addresses.
     mapping(uint256 => address) private _controllers;
+    // The maximum size allowed for a query.
+    uint256 private constant QUERY_MAX_SIZE = 35000;
 
     function initialize(string memory baseURI)
         public
@@ -69,6 +71,10 @@ contract TablelandTables is
             !(caller == _msgSenderERC721A() || owner() == _msgSenderERC721A())
         ) {
             revert Unauthorized();
+        }
+
+        if (bytes(statement).length > QUERY_MAX_SIZE) {
+            revert("query size greater than maximum");
         }
 
         ITablelandController.Policy memory policy = _getPolicy(caller, tableId);
