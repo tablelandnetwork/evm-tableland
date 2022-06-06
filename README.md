@@ -122,12 +122,12 @@ For faster runs of your tests and scripts, consider skipping ts-node's type chec
 
 # Maintainers
 
-[@carsonfarmer](https://github.com/carsonfarmer)
-[@joewagner](https://github.com/joewagner)
-[@brunocalza](https://github.com/brunocalza)
-[@jsign](https://github.com/jsign)
-[@asutula](https://github.com/asutula)
-[@sanderpick](https://github.com/sanderpick)
+- [@carsonfarmer](https://github.com/carsonfarmer)
+- [@joewagner](https://github.com/joewagner)
+- [@brunocalza](https://github.com/brunocalza)
+- [@jsign](https://github.com/jsign)
+- [@asutula](https://github.com/asutula)
+- [@sanderpick](https://github.com/sanderpick)
 
 # Contributing
 
