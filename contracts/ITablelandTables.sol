@@ -3,11 +3,33 @@ pragma solidity ^0.8.4;
 
 import "./ITablelandController.sol";
 
+/**
+ * @dev Interface of a TablelandTables compliant contract.
+ */
 interface ITablelandTables {
+    /**
+     * The caller is not authorized.
+     */
     error Unauthorized();
 
+    /**
+     * @dev Emitted when `owner` creates a new table.
+     *
+     * owner - the to-be owner of the table
+     * tableId - the table id of the new table
+     * statement - the SQL statement used to create the table
+     */
     event CreateTable(address owner, uint256 tableId, string statement);
 
+    /**
+     * @dev Emitted when a set of serially-ordered table ids are transferred from `from` to `to`.
+     *
+     * Not emmitted when a table is created.
+     * Also emitted after a table has been burned.
+     *
+     * startTokenId - the first token id to be transferred
+     * quantity - the amount to be transferred
+     */
     event TransferTable(
         address from,
         address to,
@@ -15,6 +37,15 @@ interface ITablelandTables {
         uint256 quantity
     );
 
+    /**
+     * @dev Emitted when `caller` runs a SQL statement.
+     *
+     * caller - the address that is running the SQL statement
+     * isOwner - whether or not the caller is the table owner
+     * tableId - the id of the target table
+     * statement - the SQL statement to run
+     * policy - an object describing how `caller` can interact with the table (see {ITablelandController.Policy})
+     */
     event RunSQL(
         address caller,
         bool isOwner,
@@ -23,27 +54,94 @@ interface ITablelandTables {
         ITablelandController.Policy policy
     );
 
+    /**
+     * @dev Emitted when a table's controller is set.
+     *
+     * tableId - the id of the target table
+     * controller - the address of the controller (EOA or contract)
+     */
     event SetController(uint256 tableId, address controller);
 
+    /**
+     * @dev Creates a new table owned by `owner` using `statement`.
+     *
+     * owner - the to-be owner of the new table
+     * statement - the SQL statement used to create the table
+     *
+     * Requirements:
+     *
+     * - contract must be unpaused
+     */
     function createTable(address owner, string memory statement)
         external
         payable;
 
+    /**
+     * @dev Runs a SQL statement for `caller` using `statement`.
+     *
+     * caller - the address that is running the SQL statement
+     * tableId - the id of the target table
+     * statement - the SQL statement to run
+     *
+     * Requirements:
+     *
+     * - contract must be unpaused
+     * - `msg.sender` must be `caller` or contract owner
+     * - `tableId` must exist
+     * - `caller` must be authorized by the table controller
+     */
     function runSQL(
         address caller,
         uint256 tableId,
         string memory statement
     ) external;
 
+    /**
+     * @dev Sets the controller for a table. Controller can be an EOA or contract address.
+     *
+     * caller - the address that is setting the controller
+     * tableId - the id of the target table
+     * controller - the address of the controller (EOA or contract)
+     *
+     * Requirements:
+     *
+     * - contract must be unpaused
+     * - `msg.sender` must be `caller` and owner of `tableId`
+     * - `tableId` must exist
+     */
     function setController(
         address caller,
         uint256 tableId,
         address controller
     ) external;
 
+    /**
+     * @dev Sets the contract base URI.
+     *
+     * Requirements:
+     *
+     * - `msg.sender` must be contract owner
+     * - contract must be paused
+     */
     function setBaseURI(string memory baseURI) external;
 
+    /**
+     * @dev Pauses the contract.
+     *
+     * Requirements:
+     *
+     * - `msg.sender` must be contract owner
+     * - contract must be unpaused
+     */
     function pause() external;
 
+    /**
+     * @dev Unpauses the contract.
+     *
+     * Requirements:
+     *
+     * - `msg.sender` must be contract owner
+     * - contract must be paused
+     */
     function unpause() external;
 }

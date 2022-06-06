@@ -50,10 +50,7 @@ contract TestTablelandTablesUpgrade is
             revert Unauthorized();
         }
 
-        ITablelandController.Policy memory policy = _checkController(
-            caller,
-            tableId
-        );
+        ITablelandController.Policy memory policy = _getPolicy(caller, tableId);
 
         bool isOwner = false;
         if (_exists(tableId)) {
@@ -63,7 +60,7 @@ contract TestTablelandTablesUpgrade is
         emit RunSQL(caller, isOwner, tableId, statement, policy);
     }
 
-    function _checkController(address caller, uint256 tableId)
+    function _getPolicy(address caller, uint256 tableId)
         private
         view
         returns (ITablelandController.Policy memory)
