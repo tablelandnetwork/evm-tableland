@@ -40,7 +40,7 @@ contract TestTablelandController is ITablelandController, Ownable {
 
         // Include a check on the incoming data
         withChecks[0] = ""; // included to filter in Policies.joinClauses
-        withChecks[1] = "where baz > 0";
+        withChecks[1] = "baz > 0";
         withChecks[2] = ""; // included to filter in Policies.joinClauses
 
         // Return policy

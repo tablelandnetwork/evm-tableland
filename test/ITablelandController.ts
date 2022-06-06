@@ -179,7 +179,7 @@ describe("ITablelandController", function () {
     expect(runEvent.args!.policy.whereClause).to.equal(
       "foo_id in (0) and bar_id in (0)"
     )
-    expect(runEvent.args!.policy.withCheck).to.equal("where baz > 0")
+    expect(runEvent.args!.policy.withCheck).to.equal("baz > 0")
     expect(runEvent.args!.policy.updatableColumns.length).to.equal(1)
     expect(runEvent.args!.policy.updatableColumns).to.include("baz")
 
@@ -207,7 +207,7 @@ describe("ITablelandController", function () {
     expect(runEvent.args!.policy.whereClause).to.equal(
       "foo_id in (0,1) and bar_id in (0,1,2)"
     )
-    expect(runEvent.args!.policy.withCheck).to.equal("where baz > 0")
+    expect(runEvent.args!.policy.withCheck).to.equal("baz > 0")
     expect(runEvent.args!.policy.updatableColumns.length).to.equal(1)
     expect(runEvent.args!.policy.updatableColumns).to.include("baz")
   })
