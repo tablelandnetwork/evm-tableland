@@ -77,7 +77,7 @@ Upgrading on a network only works if a previous deployment already exists, refer
 
 ## Extacting the ABI and Bytecode
 
-Can you grab the assets you need by compiling and then using some `jq` magic:
+You can you grab the assets you need by compiling and then using some `jq` magic:
 
 ### ABI
 
