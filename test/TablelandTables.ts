@@ -141,10 +141,7 @@ describe("TablelandTables", function () {
     const [, transferTableEvent] = receipt.events ?? []
     expect(transferTableEvent.args!.from).to.equal(owner.address)
     expect(transferTableEvent.args!.to).to.equal(newOwner.address)
-    expect(transferTableEvent.args!.startTableId).to.equal(
-      createEvent.args!.tableId
-    )
-    expect(transferTableEvent.args!.quantity).to.equal(BigNumber.from(1))
+    expect(transferTableEvent.args!.tableId).to.equal(createEvent.args!.tableId)
   })
 
   it("Should udpate the base URI", async function () {

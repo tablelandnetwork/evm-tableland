@@ -22,20 +22,16 @@ interface ITablelandTables {
     event CreateTable(address owner, uint256 tableId, string statement);
 
     /**
-     * @dev Emitted when a set of serially-ordered table ids are transferred from `from` to `to`.
+     * @dev Emitted when a table is transferred from `from` to `to`.
      *
      * Not emmitted when a table is created.
      * Also emitted after a table has been burned.
      *
-     * startTokenId - the first token id to be transferred
-     * quantity - the amount to be transferred
+     * from - the address that transfered the table
+     * to - the address that received the table
+     * tableId - the table id that was transferred
      */
-    event TransferTable(
-        address from,
-        address to,
-        uint256 startTableId,
-        uint256 quantity
-    );
+    event TransferTable(address from, address to, uint256 tableId);
 
     /**
      * @dev Emitted when `caller` runs a SQL statement.
@@ -117,6 +113,8 @@ interface ITablelandTables {
 
     /**
      * @dev Sets the contract base URI.
+     *
+     * baseURI - the new base URI
      *
      * Requirements:
      *

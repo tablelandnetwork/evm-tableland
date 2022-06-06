@@ -191,7 +191,8 @@ contract TablelandTables is
     ) internal override {
         super._afterTokenTransfers(from, to, startTokenId, quantity);
         if (from != address(0)) {
-            emit TransferTable(from, to, startTokenId, quantity);
+            // quantity is only > 1 after bulk minting when from == address(0)
+            emit TransferTable(from, to, startTokenId);
         }
     }
 
