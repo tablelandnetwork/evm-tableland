@@ -13,6 +13,11 @@ interface ITablelandTables {
     error Unauthorized();
 
     /**
+     * RunSQL was called with a query length greater than maximum allowed.
+     */
+    error MaxQuerySizeExceeded(uint256 querySize, uint256 maxQuerySize);
+
+    /**
      * @dev Emitted when `owner` creates a new table.
      *
      * owner - the to-be owner of the table
@@ -85,6 +90,7 @@ interface ITablelandTables {
      * - `msg.sender` must be `caller` or contract owner
      * - `tableId` must exist
      * - `caller` must be authorized by the table controller
+     * - `statement` must be less than or equal to 35000 bytes
      */
     function runSQL(
         address caller,
