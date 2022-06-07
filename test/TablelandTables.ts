@@ -2,9 +2,7 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers"
 import chai from "chai"
 import chaiAsPromised from "chai-as-promised"
 import { BigNumber } from "ethers"
-// @ts-ignore-start
 import { ethers } from "hardhat"
-// @ts-ignore-end
 import { TablelandTables } from "../typechain-types"
 
 chai.use(chaiAsPromised)
@@ -20,6 +18,12 @@ describe("TablelandTables", function () {
     tables = (await Factory.deploy()) as TablelandTables
     await tables.deployed()
     await (await tables.initialize("https://foo.xyz/")).wait()
+  })
+
+  it("Should not be initializable more than once", async function () {
+    await expect(tables.initialize("https://foo.xyz/")).to.be.revertedWith(
+      "ERC721A__Initializable: contract is already initialized"
+    )
   })
 
   it("Should have set owner to deployer address", async function () {
@@ -63,7 +67,15 @@ describe("TablelandTables", function () {
   })
 
   it("Should be able to run SQL", async function () {
+    // Test run SQL fails if table does not exist
     const owner = accounts[4]
+    const runStatement = "insert into testing values (0);"
+    await expect(
+      tables
+        .connect(owner)
+        .runSQL(owner.address, BigNumber.from(1), runStatement)
+    ).to.be.revertedWith("Unauthorized")
+
     const createStatement = "create table testing (int a);"
     let tx = await tables
       .connect(owner)
@@ -73,7 +85,6 @@ describe("TablelandTables", function () {
     const tableId = createEvent.args!.tableId
 
     // Test owner can run SQL on table
-    const runStatement = "insert into testing values (0);"
     tx = await tables
       .connect(owner)
       .runSQL(owner.address, tableId, runStatement)
@@ -101,10 +112,9 @@ describe("TablelandTables", function () {
     // Test others cannot run SQL on behalf of another account
     const sender = accounts[5]
     const caller = accounts[6]
-    tx = await tables
-      .connect(sender)
-      .runSQL(caller.address, tableId, runStatement)
-    await expect(tx.wait()).to.be.rejectedWith(Error)
+    await expect(
+      tables.connect(sender).runSQL(caller.address, tableId, runStatement)
+    ).to.be.revertedWith("Unauthorized")
 
     // Test contract owner can run SQL on behalf of another account
     const contractOwner = accounts[0]
@@ -149,11 +159,12 @@ describe("TablelandTables", function () {
   it("Should udpate the base URI", async function () {
     // Test only contact owner can set base URI
     const owner = accounts[4]
-    let tx = await tables.connect(owner).setBaseURI("https://fake.com/")
-    await expect(tx.wait()).to.be.rejectedWith(Error)
+    await expect(
+      tables.connect(owner).setBaseURI("https://fake.com/")
+    ).to.be.revertedWith("Ownable: caller is not the owner")
 
     const contractOwner = accounts[0]
-    tx = await tables.connect(contractOwner).setBaseURI("https://fake.com/")
+    let tx = await tables.connect(contractOwner).setBaseURI("https://fake.com/")
     await tx.wait()
 
     tx = await tables
@@ -173,8 +184,9 @@ describe("TablelandTables", function () {
     await tx.wait()
 
     // Test only contract owner can pause
-    tx = await tables.connect(owner).pause()
-    await expect(tx.wait()).to.be.rejectedWith(Error)
+    expect(tables.connect(owner).pause()).to.be.revertedWith(
+      "Ownable: caller is not the owner"
+    )
 
     // Pause with contract owner
     const contractOwner = accounts[0]
@@ -182,12 +194,32 @@ describe("TablelandTables", function () {
     await tx.wait()
 
     // Test creating tables is paused
-    tx = await tables.connect(owner).createTable(owner.address, createStatement)
-    await expect(tx.wait()).to.be.rejectedWith(Error)
+    await expect(
+      tables.connect(owner).createTable(owner.address, createStatement)
+    ).to.be.revertedWith("Pausable: paused")
+
+    // Test running SQL is paused
+    await expect(
+      tables
+        .connect(owner)
+        .runSQL(
+          owner.address,
+          BigNumber.from(1),
+          "insert into testing values (0);"
+        )
+    ).to.be.revertedWith("Pausable: paused")
+
+    // Test setting controller is paused
+    await expect(
+      tables
+        .connect(owner)
+        .setController(owner.address, BigNumber.from(1), accounts[5].address)
+    ).to.be.revertedWith("Pausable: paused")
 
     // Test only contract owner can unpause
-    tx = await tables.connect(owner).unpause()
-    await expect(tx.wait()).to.be.rejectedWith(Error)
+    await expect(tables.connect(owner).unpause()).to.be.revertedWith(
+      "Ownable: caller is not the owner"
+    )
 
     // Unpause with contract owner
     tx = await tables.connect(contractOwner).unpause()
@@ -198,10 +230,10 @@ describe("TablelandTables", function () {
     await tx.wait()
   })
 
-  it("Big query execution should fail", async function () {
+  it("Should reject big statements when running SQL", async function () {
     const owner = accounts[4]
     const createStatement = "create table testing (int a);"
-    let tx = await tables
+    const tx = await tables
       .connect(owner)
       .createTable(owner.address, createStatement)
     const receipt = await tx.wait()
@@ -211,9 +243,8 @@ describe("TablelandTables", function () {
     // Creating a fake statement greater than 35000 bytes
     const runStatement = Array(35001).fill("a").join("")
 
-    tx = await tables
-      .connect(owner)
-      .runSQL(owner.address, tableId, runStatement)
-    await expect(tx.wait()).to.be.reverted
+    await expect(
+      tables.connect(owner).runSQL(owner.address, tableId, runStatement)
+    ).to.be.revertedWith("MaxQuerySizeExceeded")
   })
 })

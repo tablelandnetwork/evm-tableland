@@ -14,7 +14,7 @@
   "scripts": {
     "build": "npx tsc -p ./tsconfig.build.json",
     "up": "npm install && npx hardhat compile && npm run build && hardhat node",
-    "test": "hardhat coverage",
+    "test": "hardhat coverage && istanbul check-coverage ./coverage.json --statements 100 --branches 90 --functions 100 --lines 100",
     "lint": "eslint '**/*.{js,ts}'",
     "lint:fix": "npm run lint -- --fix",
     "prettier": "prettier '**/*.{ts,json,sol,md}' --check",
@@ -39,11 +39,9 @@
     "url": "https://github.com/tablelandnetwork/eth-tableland/issues"
   },
   "homepage": "https://github.com/tablelandnetwork/eth-tableland#readme",
-  "dependencies": {
-    "@ethersproject/providers": "^5.6.8",
-    "ethers": "^5.6.8"
-  },
+  "dependencies": {},
   "devDependencies": {
+    "@ethersproject/providers": "^5.6.8",
     "@nomiclabs/hardhat-ethers": "^2.0.6",
     "@nomiclabs/hardhat-etherscan": "^3.0.3",
     "@nomiclabs/hardhat-waffle": "^2.0.3",
@@ -70,6 +68,7 @@
     "eslint-plugin-n": "^15.2.1",
     "eslint-plugin-promise": "^6.0.0",
     "ethereum-waffle": "^3.4.4",
+    "ethers": "^5.6.8",
     "hardhat": "^2.9.6",
     "hardhat-contract-sizer": "^2.5.1",
     "hardhat-gas-reporter": "^1.0.8",

@@ -1,9 +1,8 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers"
 import chai from "chai"
 import chaiAsPromised from "chai-as-promised"
-// @ts-ignore-start
+import { BigNumber } from "ethers"
 import { ethers } from "hardhat"
-// @ts-ignore-end
 import type {
   TablelandTables,
   TestERC721Enumerable,
@@ -60,7 +59,14 @@ describe("ITablelandController", function () {
   })
 
   it("Should set controller for a table", async function () {
+    // Test setting controller fails if table does not exist
     const owner = accounts[4]
+    await expect(
+      tables
+        .connect(owner)
+        .setController(owner.address, BigNumber.from(1), accounts[3].address)
+    ).to.be.revertedWith("Unauthorized")
+
     let tx = await tables.createTable(
       owner.address,
       "create table testing (int a);"
@@ -71,10 +77,11 @@ describe("ITablelandController", function () {
 
     // Test only owner can set controller
     const sender = accounts[5]
-    tx = await tables
-      .connect(sender)
-      .setController(owner.address, tableId, accounts[3].address)
-    await expect(tx.wait()).to.be.rejectedWith(Error)
+    await expect(
+      tables
+        .connect(sender)
+        .setController(owner.address, tableId, accounts[3].address)
+    ).to.be.revertedWith("Unauthorized")
 
     // Test setting controller to an EOA address
     const eoaController = accounts[6]
@@ -89,10 +96,9 @@ describe("ITablelandController", function () {
     // Test that runSQL is now locked down to this EOA address
     // (not even owner should be able to run SQL now)
     const runStatement = "insert into testing values (0);"
-    tx = await tables
-      .connect(owner)
-      .runSQL(owner.address, tableId, runStatement)
-    await expect(tx.wait()).to.be.rejectedWith(Error)
+    await expect(
+      tables.connect(owner).runSQL(owner.address, tableId, runStatement)
+    ).to.be.revertedWith("Unauthorized")
     tx = await tables
       .connect(eoaController)
       .runSQL(eoaController.address, tableId, runStatement)
@@ -129,7 +135,6 @@ describe("ITablelandController", function () {
   })
 
   it("Should be able to gate run SQL with controller contract", async function () {
-    this.timeout(120000)
     const owner = accounts[4]
     let tx = await tables.createTable(
       owner.address,
@@ -146,20 +151,18 @@ describe("ITablelandController", function () {
     // Test that run SQL on table is gated by Foo and Bar ownership
     const runStatement = "insert into testing values (0);"
     const caller = accounts[5]
-    tx = await tables
-      .connect(caller)
-      .runSQL(caller.address, tableId, runStatement)
-    await expect(tx.wait()).to.be.rejectedWith(Error)
+    await expect(
+      tables.connect(caller).runSQL(caller.address, tableId, runStatement)
+    ).to.be.revertedWith("Unauthorized")
 
     // Mint a Foo
     tx = await foos.connect(caller).mint()
     await tx.wait()
 
     // Still gated (need a Bar too)
-    tx = await tables
-      .connect(caller)
-      .runSQL(caller.address, tableId, runStatement)
-    await expect(tx.wait()).to.be.rejectedWith(Error)
+    await expect(
+      tables.connect(caller).runSQL(caller.address, tableId, runStatement)
+    ).to.be.revertedWith("Unauthorized")
 
     // Mint a Bar
     tx = await bars.connect(caller).mint()

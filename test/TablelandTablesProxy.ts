@@ -1,9 +1,7 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers"
 import chai from "chai"
 import chaiAsPromised from "chai-as-promised"
-// @ts-ignore-start
 import { ethers, upgrades } from "hardhat"
-// @ts-ignore-end
 import { BigNumber, Contract, ContractFactory } from "ethers"
 import type {
   TablelandTables,
@@ -28,6 +26,13 @@ describe("TablelandTablesProxy", function () {
     const tables = await deploy(Factory, "https://foo.xyz/")
     const owner = await tables.owner()
     expect(owner).to.equal(accounts[0].address)
+  })
+
+  it("Should only allow owner to upgrade", async function () {
+    const tables1 = await deploy(Factory, "https://foo.xyz/")
+    const badUpdater = accounts[1]
+    const Factory2 = await ethers.getContractFactory("TablelandTables", badUpdater)
+    await expect(update(tables1, Factory2)).to.be.revertedWith("Ownable: caller is not the owner")
   })
 
   it("Should not re-deploy proxy or implementation if unchanged", async function () {
@@ -86,7 +91,6 @@ describe("TablelandTablesProxy", function () {
   })
 
   it("Should allow existing controllers to function after upgrade", async function () {
-    this.timeout(120000)
     const tables1 = await deploy(Factory, "https://foo.xyz/")
 
     // Deploy test erc721 contracts
@@ -163,10 +167,9 @@ describe("TablelandTablesProxy", function () {
 
     // Run sql one more time with caller that does not own required tokens
     const caller2 = accounts[3]
-    tx = await tables2
-      .connect(caller2)
-      .runSQL(caller2.address, tableId, runStatement)
-    await expect(tx.wait()).to.be.rejectedWith(Error)
+    await expect(
+      tables2.connect(caller2).runSQL(caller2.address, tableId, runStatement)
+    ).to.be.revertedWith("Unauthorized")
   })
 })
 

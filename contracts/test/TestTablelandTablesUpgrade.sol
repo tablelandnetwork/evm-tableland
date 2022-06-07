@@ -23,13 +23,19 @@ contract TestTablelandTablesUpgrade is
     mapping(uint256 => address) private _controllers;
     mapping(uint256 => address) private _dummyStorage;
 
-    function initialize(string memory) public initializerERC721A initializer {
+    function initialize(string memory baseURI)
+        public
+        initializerERC721A
+        initializer
+    {
         __ERC721A_init("Tableland Tables", "TABLE");
         __ERC721ABurnable_init();
         __ERC721AQueryable_init();
         __Ownable_init();
         __Pausable_init();
         __UUPSUpgradeable_init();
+
+        _baseURIString = baseURI;
     }
 
     function createTable(address, string memory)
@@ -45,19 +51,19 @@ contract TestTablelandTablesUpgrade is
         string memory statement
     ) external override whenNotPaused {
         if (
+            !_exists(tableId) ||
             !(caller == _msgSenderERC721A() || owner() == _msgSenderERC721A())
         ) {
             revert Unauthorized();
         }
 
-        ITablelandController.Policy memory policy = _getPolicy(caller, tableId);
-
-        bool isOwner = false;
-        if (_exists(tableId)) {
-            isOwner = ownerOf(tableId) == caller;
-        }
-
-        emit RunSQL(caller, isOwner, tableId, statement, policy);
+        emit RunSQL(
+            caller,
+            ownerOf(tableId) == caller,
+            tableId,
+            statement,
+            _getPolicy(caller, tableId)
+        );
     }
 
     function _getPolicy(address caller, uint256 tableId)
@@ -67,8 +73,7 @@ contract TestTablelandTablesUpgrade is
     {
         address controller = _controllers[tableId];
         if (_isContract(controller)) {
-            ITablelandController c = ITablelandController(controller);
-            return c.getPolicy(caller);
+            return ITablelandController(controller).getPolicy(caller);
         }
         if (!(controller == address(0) || controller == caller)) {
             revert Unauthorized();

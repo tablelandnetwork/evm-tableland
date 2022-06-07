@@ -106,7 +106,7 @@ const config: HardhatUserConfig = {
     },
     hardhat: {
       mining: {
-        auto: false,
+        auto: !(process.env.HARDHAT_DISABLE_AUTO_MINING === "true"),
         interval: [100, 3000],
       },
     },

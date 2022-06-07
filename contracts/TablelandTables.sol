@@ -68,6 +68,7 @@ contract TablelandTables is
         string memory statement
     ) external override whenNotPaused {
         if (
+            !_exists(tableId) ||
             !(caller == _msgSenderERC721A() || owner() == _msgSenderERC721A())
         ) {
             revert Unauthorized();
@@ -78,14 +79,13 @@ contract TablelandTables is
             revert MaxQuerySizeExceeded(querySize, QUERY_MAX_SIZE);
         }
 
-        ITablelandController.Policy memory policy = _getPolicy(caller, tableId);
-
-        bool isOwner = false;
-        if (_exists(tableId)) {
-            isOwner = ownerOf(tableId) == caller;
-        }
-
-        emit RunSQL(caller, isOwner, tableId, statement, policy);
+        emit RunSQL(
+            caller,
+            ownerOf(tableId) == caller,
+            tableId,
+            statement,
+            _getPolicy(caller, tableId)
+        );
     }
 
     /**
@@ -105,8 +105,7 @@ contract TablelandTables is
     {
         address controller = _controllers[tableId];
         if (_isContract(controller)) {
-            ITablelandController c = ITablelandController(controller);
-            return c.getPolicy(caller);
+            return ITablelandController(controller).getPolicy(caller);
         }
         if (!(controller == address(0) || controller == caller)) {
             revert Unauthorized();
@@ -143,7 +142,10 @@ contract TablelandTables is
         uint256 tableId,
         address controller
     ) external override whenNotPaused {
-        if (!(caller == _msgSenderERC721A() && caller == ownerOf(tableId))) {
+        if (
+            !_exists(tableId) ||
+            !(caller == _msgSenderERC721A() && caller == ownerOf(tableId))
+        ) {
             revert Unauthorized();
         }
 
