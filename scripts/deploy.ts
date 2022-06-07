@@ -1,35 +1,64 @@
-// We require the Hardhat Runtime Environment explicitly here. This is optional
-// but useful for running the script in a standalone fashion through `node <script>`.
-//
-// When running the script with `npx hardhat run <script>` you'll find the Hardhat
-// Runtime Environment's members available in the global scope.
-import { ethers, upgrades } from "hardhat";
+import { ethers, upgrades, network, baseURI, proxy } from "hardhat"
+import type { TablelandTables } from "../typechain-types"
+import assert from "assert"
 
 async function main() {
-  const Registry = await ethers.getContractFactory("TablelandTables");
+  console.log(`\nDeploying new proxy to '${network.name}'...`)
 
-  // const testnet = await upgrades.deployProxy(
-  //   Registry,
-  //   ["https://testnet.tableland.network/tables/"],
-  //   {
-  //     kind: "uups",
-  //   }
-  // );
-  // console.log("Testnet proxy deployed to:", testnet.address);
+  // Get proxy owner account
+  const [account] = await ethers.getSigners()
+  if (account.provider === undefined) {
+    throw Error("missing provider")
+  }
 
-  const staging = await upgrades.deployProxy(
-    Registry,
-    ["https://staging.tableland.network/tables/"],
-    {
+  // Get base URI
+  if (baseURI === undefined || baseURI === "") {
+    throw Error(`missing baseURIs entry for '${network.name}'`)
+  }
+  console.log(`Using base URI '${baseURI}'`)
+
+  // Don't allow multiple proxies per network
+  if (proxy !== "") {
+    throw Error(`proxy already deployed to '${network.name}'`)
+  }
+
+  // Deploy proxy
+  const Factory = await ethers.getContractFactory("TablelandTables")
+  const tables = await (
+    (await upgrades.deployProxy(Factory, [baseURI], {
       kind: "uups",
-    }
-  );
-  console.log("Staging proxy deployed to:", staging.address);
+    })) as TablelandTables
+  ).deployed()
+  console.log("New proxy address:", tables.address)
+
+  // Check new implementation
+  const impl = await upgrades.erc1967.getImplementationAddress(tables.address)
+  console.log("New implementation address:", impl)
+
+  // Create health bot table
+  const { chainId } = await account.provider.getNetwork()
+  const createStatement = `create table healthbot_${chainId} (counter bigint);`
+  let tx = await tables.createTable(account.address, createStatement)
+  let receipt = await tx.wait()
+  const [, createEvent] = receipt.events ?? []
+  const tableId = createEvent.args!.tableId
+  console.log("Healthbot table created as:", `healthbot_${chainId}_${tableId}`)
+
+  // Insert first row into health bot table
+  const runStatement = `insert into healthbot_${chainId}_${tableId} values (1);`
+  tx = await tables.runSQL(account.address, tableId, runStatement)
+  receipt = await tx.wait()
+  const [runEvent] = receipt.events ?? []
+  assert(runEvent.args!.statement === runStatement, "insert statement mismatch")
+  console.log("Healthbot table updated with:", runEvent.args?.statement)
+
+  // Warn that proxy address needs to be saved in config
+  console.warn(
+    `\nSave 'proxies.${network.name}: "${tables.address}"' in the hardhat config!`
+  )
 }
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
 main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+  console.error(error)
+  process.exitCode = 1
+})

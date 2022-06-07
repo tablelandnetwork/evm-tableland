@@ -3,13 +3,18 @@ node_modules
 coverage
 coverage.json
 typechain
+typechain-types
 abi.json
 bytecode.bin
 gobuild
 
-#Hardhat files
+# Hardhat files
 cache
 artifacts
 
-#Openzeppelin files
-.openzeppelin/unknown-*1337.json
+# Openzeppelin files
+.openzeppelin/unknown-*.json
+
+# IDEs
+.idea
+.vscode

@@ -1,15 +1,25 @@
 {
   "name": "@tableland/eth",
   "version": "0.0.2",
-  "description": "On-chain ETH registry and client components for Tableland",
-  "main": "typechain/index.js",
-  "types": "typechain/index.d.ts",
+  "description": "Tableland Tables contract and client components",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "main": "typechain-types/index.js",
+  "types": "typechain-types/index.d.ts",
   "files": [
-    "typechain/**/*.js?(.map)",
-    "typechain/**/*.d.ts"
+    "typechain-types/**/*.js?(.map)",
+    "typechain-types/**/*.d.ts"
   ],
   "scripts": {
-    "build": "npx tsc -p ./tsconfig.build.json"
+    "build": "npx tsc -p ./tsconfig.build.json",
+    "up": "npm install && npx hardhat compile && npm run build && hardhat node",
+    "test": "hardhat coverage && istanbul check-coverage ./coverage.json --statements 100 --branches 97 --functions 100 --lines 100",
+    "lint": "eslint '**/*.{js,ts}'",
+    "lint:fix": "npm run lint -- --fix",
+    "prettier": "prettier '**/*.{ts,json,sol,md}' --check",
+    "prettier:fix": "npm run prettier -- --write",
+    "format": "npm run prettier:fix && npm run lint:fix"
   },
   "publishConfig": {
     "access": "public"
@@ -20,56 +30,62 @@
   },
   "keywords": [
     "tableland",
-    "eth",
-    "smart",
-    "contract",
-    "textile"
+    "ethereum",
+    "smart contract",
+    "sql"
   ],
   "license": "MIT AND Apache-2.0",
   "bugs": {
     "url": "https://github.com/tablelandnetwork/eth-tableland/issues"
   },
   "homepage": "https://github.com/tablelandnetwork/eth-tableland#readme",
-  "dependencies": {
-    "@ethersproject/providers": "^5.5.0",
-    "ethers": "^5.5.1"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "@nomiclabs/hardhat-ethers": "^2.0.2",
-    "@nomiclabs/hardhat-etherscan": "^2.1.8",
-    "@nomiclabs/hardhat-waffle": "^2.0.1",
-    "@openzeppelin/contracts-upgradeable": "^4.4.0",
-    "@openzeppelin/hardhat-upgrades": "^1.12.0",
-    "@typechain/ethers-v5": "^7.2.0",
-    "@typechain/hardhat": "^2.3.1",
-    "@types/chai": "^4.2.22",
-    "@types/mocha": "^9.0.0",
-    "@types/node": "^16.11.10",
-    "@types/uuid": "^8.3.3",
-    "@typescript-eslint/eslint-plugin": "^4.33.0",
-    "@typescript-eslint/parser": "^4.33.0",
-    "chai": "^4.3.4",
-    "dotenv": "^10.0.0",
-    "eslint": "^7.32.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-config-standard": "^16.0.3",
-    "eslint-plugin-import": "^2.25.3",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-prettier": "^3.4.1",
-    "eslint-plugin-promise": "^5.1.1",
-    "ethereum-waffle": "^3.4.0",
-    "hardhat": "^2.7.0",
-    "hardhat-gas-reporter": "^1.0.4",
-    "prettier": "^2.5.0",
-    "prettier-plugin-solidity": "^1.0.0-beta.13",
-    "solhint": "^3.3.6",
-    "solidity-coverage": "^0.7.17",
-    "ts-node": "^10.4.0",
-    "typechain": "^5.2.0",
-    "typescript": "^4.5.2"
+    "@ethersproject/providers": "^5.6.8",
+    "@nomiclabs/hardhat-ethers": "^2.0.6",
+    "@nomiclabs/hardhat-etherscan": "^3.0.3",
+    "@nomiclabs/hardhat-waffle": "^2.0.3",
+    "@openzeppelin/contracts": "^4.6.0",
+    "@openzeppelin/contracts-upgradeable": "^4.6.0",
+    "@openzeppelin/hardhat-upgrades": "^1.17.0",
+    "@typechain/ethers-v5": "^10.0.0",
+    "@typechain/hardhat": "^6.0.0",
+    "@types/chai": "^4.3.1",
+    "@types/chai-as-promised": "^7.1.5",
+    "@types/mocha": "^9.1.1",
+    "@types/node": "^17.0.35",
+    "@typescript-eslint/eslint-plugin": "^5.26.0",
+    "@typescript-eslint/parser": "^5.26.0",
+    "chai": "^4.3.6",
+    "chai-as-promised": "^7.1.1",
+    "dotenv": "^16.0.1",
+    "erc721a": "^4.0.0",
+    "erc721a-upgradeable": "^4.0.0",
+    "eslint": "^8.17.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-n": "^15.2.1",
+    "eslint-plugin-promise": "^6.0.0",
+    "ethereum-waffle": "^3.4.4",
+    "ethers": "^5.6.8",
+    "hardhat": "^2.9.6",
+    "hardhat-contract-sizer": "^2.5.1",
+    "hardhat-gas-reporter": "^1.0.8",
+    "prettier": "^2.6.2",
+    "prettier-plugin-solidity": "^1.0.0-beta.19",
+    "solhint": "^3.3.7",
+    "solidity-coverage": "^0.8.0-beta.1",
+    "ts-node": "^10.8.0",
+    "typechain": "^8.0.0",
+    "typescript": "^4.7.2"
   },
   "contributors": [
     "Carson Farmer <carson@textile.io>",
-    "Aaron Sutula <aaron@textile.io>"
+    "Aaron Sutula <aaron@textile.io>",
+    "Joe Wagner <joe@textile.io>",
+    "Ignacio Hagopian <ignacio@textile.io>",
+    "Bruno Calza <bruno@textile.io>",
+    "Sander Pick <sander@textile.io>"
   ]
 }

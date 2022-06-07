@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# TablelandTables.sol
+cat artifacts/contracts/TablelandTables.sol/TablelandTables.json | jq '.abi' > ../go-tableland/pkg/tables/impl/ethereum/abi.json
+cat artifacts/contracts/TablelandTables.sol/TablelandTables.json | jq -r '.bytecode' > ../go-tableland/pkg/tables/impl/ethereum/bytecode.bin
+
+# TestTablelandController.sol
+cat artifacts/contracts/test/TestTablelandController.sol/TestTablelandController.json | jq '.abi' > ../go-tableland/pkg/tables/impl/ethereum/test/controller/abi.json
+cat artifacts/contracts/test/TestTablelandController.sol/TestTablelandController.json | jq -r '.bytecode' > ../go-tableland/pkg/tables/impl/ethereum/test/controller/bytecode.bin
+
+# TestERC721Enumerable.sol
+cat artifacts/contracts/test/TestERC721Enumerable.sol/TestERC721Enumerable.json | jq '.abi' > ../go-tableland/pkg/tables/impl/ethereum/test/erc721Enumerable/abi.json
+cat artifacts/contracts/test/TestERC721Enumerable.sol/TestERC721Enumerable.json | jq -r '.bytecode' > ../go-tableland/pkg/tables/impl/ethereum/test/erc721Enumerable/bytecode.bin
+
+# TestERC721AQueryable.sol
+cat artifacts/contracts/test/TestERC721AQueryable.sol/TestERC721AQueryable.json | jq '.abi' > ../go-tableland/pkg/tables/impl/ethereum/test/erc721aQueryable/abi.json
+cat artifacts/contracts/test/TestERC721AQueryable.sol/TestERC721AQueryable.json | jq -r '.bytecode' > ../go-tableland/pkg/tables/impl/ethereum/test/erc721aQueryable/bytecode.bin
