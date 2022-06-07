@@ -155,6 +155,18 @@ contract TablelandTables is
     }
 
     /**
+     * @dev See {ITablelandTables-getController}.
+     */
+    function getController(uint256 tableId)
+        external
+        view
+        override
+        returns (address)
+    {
+        return _controllers[tableId];
+    }
+
+    /**
      * @dev See {ITablelandTables-setBaseURI}.
      */
     function setBaseURI(string memory baseURI) external override onlyOwner {

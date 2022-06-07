@@ -118,6 +118,13 @@ interface ITablelandTables {
     ) external;
 
     /**
+     * @dev Returns the controller for a table.
+     *
+     * tableId - the id of the target table
+     */
+    function getController(uint256 tableId) external returns (address);
+
+    /**
      * @dev Sets the contract base URI.
      *
      * baseURI - the new base URI

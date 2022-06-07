@@ -21,6 +21,7 @@ contract TestTablelandTablesUpgrade is
 {
     string private _baseURIString;
     mapping(uint256 => address) private _controllers;
+    uint256 private constant QUERY_MAX_SIZE = 45000;
     mapping(uint256 => address) private _dummyStorage;
 
     function initialize(string memory baseURI)
@@ -104,6 +105,13 @@ contract TestTablelandTablesUpgrade is
         uint256,
         address
     ) external override whenNotPaused {} // solhint-disable no-empty-blocks
+
+    function getController(uint256 tableId)
+        external
+        view
+        override
+        returns (address)
+    {} // solhint-disable no-empty-blocks
 
     // solhint-disable-next-line no-empty-blocks
     function setBaseURI(string memory) external override onlyOwner {}

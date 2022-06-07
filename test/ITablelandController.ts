@@ -14,6 +14,8 @@ import type {
 chai.use(chaiAsPromised)
 const expect = chai.expect
 
+const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
+
 describe("ITablelandController", function () {
   let accounts: SignerWithAddress[]
   let tables: TablelandTables
@@ -132,6 +134,52 @@ describe("ITablelandController", function () {
     expect(runEvent.args!.policy.whereClause).to.equal("")
     expect(runEvent.args!.policy.withCheck).to.equal("")
     expect(runEvent.args!.policy.updatableColumns.length).to.equal(0)
+  })
+
+  it("Should get controller for a table", async function () {
+    const owner = accounts[4]
+    let tx = await tables.createTable(
+      owner.address,
+      "create table testing (int a);"
+    )
+    const receipt = await tx.wait()
+    const [, createEvent] = receipt.events ?? []
+    const tableId = createEvent.args!.tableId
+
+    const eoaController = accounts[6]
+    tx = await tables
+      .connect(owner)
+      .setController(owner.address, tableId, eoaController.address)
+    await tx.wait()
+
+    expect(await tables.getController(tableId)).to.equal(eoaController.address)
+  })
+
+  it("Should unset controller for a table", async function () {
+    const owner = accounts[4]
+    let tx = await tables.createTable(
+      owner.address,
+      "create table testing (int a);"
+    )
+    let receipt = await tx.wait()
+    const [, createEvent] = receipt.events ?? []
+    const tableId = createEvent.args!.tableId
+
+    const eoaController = accounts[6]
+    tx = await tables
+      .connect(owner)
+      .setController(owner.address, tableId, eoaController.address)
+    await tx.wait()
+    expect(await tables.getController(tableId)).to.equal(eoaController.address)
+
+    tx = await tables
+      .connect(owner)
+      .setController(owner.address, tableId, ZERO_ADDRESS)
+    receipt = await tx.wait()
+    const [setControllerEvent] = receipt.events ?? []
+    expect(setControllerEvent.args!.controller).to.equal(ZERO_ADDRESS)
+
+    expect(await tables.getController(tableId)).to.equal(ZERO_ADDRESS)
   })
 
   it("Should be able to gate run SQL with controller contract", async function () {

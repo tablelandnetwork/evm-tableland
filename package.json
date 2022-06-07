@@ -14,7 +14,7 @@
   "scripts": {
     "build": "npx tsc -p ./tsconfig.build.json",
     "up": "npm install && npx hardhat compile && npm run build && hardhat node",
-    "test": "hardhat coverage && istanbul check-coverage ./coverage.json --statements 100 --branches 90 --functions 100 --lines 100",
+    "test": "hardhat coverage && istanbul check-coverage ./coverage.json --statements 100 --branches 97 --functions 100 --lines 100",
     "lint": "eslint '**/*.{js,ts}'",
     "lint:fix": "npm run lint -- --fix",
     "prettier": "prettier '**/*.{ts,json,sol,md}' --check",
