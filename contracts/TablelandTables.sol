@@ -73,8 +73,9 @@ contract TablelandTables is
             revert Unauthorized();
         }
 
-        if (bytes(statement).length > QUERY_MAX_SIZE) {
-            revert("query size greater than maximum");
+        uint256 querySize = bytes(statement).length;
+        if (querySize > QUERY_MAX_SIZE) {
+            revert MaxQuerySizeExceeded(querySize, QUERY_MAX_SIZE);
         }
 
         ITablelandController.Policy memory policy = _getPolicy(caller, tableId);

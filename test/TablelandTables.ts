@@ -214,6 +214,6 @@ describe("TablelandTables", function () {
     tx = await tables
       .connect(owner)
       .runSQL(owner.address, tableId, runStatement)
-    await expect(tx.wait()).to.be.rejectedWith("transaction failed")
+    await expect(tx.wait()).to.be.reverted
   })
 })
