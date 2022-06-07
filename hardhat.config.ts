@@ -113,18 +113,18 @@ const config: HardhatUserConfig = {
   },
   baseURIs: {
     // mainnets
-    ethereum: "https://tableland.network/tables/",
-    optimism: "https://tableland.network/tables/",
-    polygon: "https://tableland.network/tables/",
+    ethereum: "https://tableland.network/chain/1/tables/",
+    optimism: "https://tableland.network/chain/10/tables/",
+    polygon: "https://tableland.network/chain/137/tables/",
     // testnets
     "ethereum-rinkeby": "",
-    "ethereum-goerli": "https://testnet.tableland.network/tables/",
-    "optimism-kovan": "https://testnet.tableland.network/tables/",
-    "polygon-mumbai": "https://testnet.tableland.network/tables/",
+    "ethereum-goerli": "https://testnet.tableland.network/chain/5/tables/",
+    "optimism-kovan": "https://testnet.tableland.network/chain/69/tables/",
+    "polygon-mumbai": "https://testnet.tableland.network/chain/80001/tables/",
     // devnets
     "ethereum-rinkeby-staging": "",
-    "optimism-kovan-staging": "https://staging.tableland.network/tables/",
-    localhost: "http://localhost:8080/tables/",
+    "optimism-kovan-staging": "https://staging.tableland.network/chain/69/tables/",
+    localhost: "http://localhost:8080/chain/31337/tables/",
   },
   proxies: {
     // tableland mainnet mainnets
