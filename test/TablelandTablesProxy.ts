@@ -31,8 +31,13 @@ describe("TablelandTablesProxy", function () {
   it("Should only allow owner to upgrade", async function () {
     const tables1 = await deploy(Factory, "https://foo.xyz/")
     const badUpdater = accounts[1]
-    const Factory2 = await ethers.getContractFactory("TablelandTables", badUpdater)
-    await expect(update(tables1, Factory2)).to.be.revertedWith("Ownable: caller is not the owner")
+    const Factory2 = await ethers.getContractFactory(
+      "TablelandTables",
+      badUpdater
+    )
+    await expect(update(tables1, Factory2)).to.be.revertedWith(
+      "Ownable: caller is not the owner"
+    )
   })
 
   it("Should not re-deploy proxy or implementation if unchanged", async function () {

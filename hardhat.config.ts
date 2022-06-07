@@ -123,7 +123,8 @@ const config: HardhatUserConfig = {
     "polygon-mumbai": "https://testnet.tableland.network/chain/80001/tables/",
     // devnets
     "ethereum-rinkeby-staging": "",
-    "optimism-kovan-staging": "https://staging.tableland.network/chain/69/tables/",
+    "optimism-kovan-staging":
+      "https://staging.tableland.network/chain/69/tables/",
     localhost: "http://localhost:8080/chain/31337/tables/",
   },
   proxies: {
