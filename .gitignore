@@ -13,7 +13,7 @@ cache
 artifacts
 
 # Openzeppelin files
-.openzeppelin/unknown-*.json
+.openzeppelin/unknown-*1337.json
 
 # IDEs
 .idea
