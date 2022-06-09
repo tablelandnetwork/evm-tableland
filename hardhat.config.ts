@@ -118,9 +118,9 @@ const config: HardhatUserConfig = {
     polygon: "https://tableland.network/chain/137/tables/",
     // testnets
     "ethereum-rinkeby": "",
-    "ethereum-goerli": "https://testnet.tableland.network/chain/5/tables/",
-    "optimism-kovan": "https://testnet.tableland.network/chain/69/tables/",
-    "polygon-mumbai": "https://testnet.tableland.network/chain/80001/tables/",
+    "ethereum-goerli": "https://testnetv2.tableland.network/chain/5/tables/",
+    "optimism-kovan": "https://testnetv2.tableland.network/chain/69/tables/",
+    "polygon-mumbai": "https://testnetv2.tableland.network/chain/80001/tables/",
     // devnets
     "ethereum-rinkeby-staging": "",
     "optimism-kovan-staging":
