@@ -3,7 +3,6 @@ pragma solidity ^0.8.4;
 
 import "erc721a-upgradeable/contracts/ERC721AUpgradeable.sol";
 import "erc721a-upgradeable/contracts/extensions/ERC721AQueryableUpgradeable.sol";
-import "erc721a-upgradeable/contracts/extensions/ERC721ABurnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
@@ -16,7 +15,6 @@ import "./ITablelandController.sol";
 contract TablelandTables is
     ITablelandTables,
     ERC721AUpgradeable,
-    ERC721ABurnableUpgradeable,
     ERC721AQueryableUpgradeable,
     OwnableUpgradeable,
     PausableUpgradeable,
@@ -35,7 +33,6 @@ contract TablelandTables is
         initializer
     {
         __ERC721A_init("Tableland Tables", "TABLE");
-        __ERC721ABurnable_init();
         __ERC721AQueryable_init();
         __Ownable_init();
         __Pausable_init();
@@ -164,6 +161,24 @@ contract TablelandTables is
         returns (address)
     {
         return _controllers[tableId];
+    }
+
+    /**
+     * @dev See {ITablelandTables-lock}.
+     */
+    function lock(address caller, uint256 tableId)
+        external
+        override
+        whenNotPaused
+    {
+        if (
+            !_exists(tableId) ||
+            !(caller == _msgSenderERC721A() && caller == ownerOf(tableId))
+        ) {
+            revert Unauthorized();
+        }
+
+        transferFrom(caller, address(this), tableId);
     }
 
     /**

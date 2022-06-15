@@ -92,9 +92,7 @@ describe("ITablelandController", function () {
       .setController(owner.address, tableId, eoaController.address);
     receipt = await tx.wait();
     let [setControllerEvent] = receipt.events ?? [];
-    expect(setControllerEvent.args!.tableId).to.equal(
-      createEvent.args!.tableId
-    );
+    expect(setControllerEvent.args!.tableId).to.equal(tableId);
     expect(setControllerEvent.args!.controller).to.equal(eoaController.address);
 
     // Test that runSQL is now locked down to this EOA address
@@ -114,9 +112,7 @@ describe("ITablelandController", function () {
       .setController(owner.address, tableId, allowAllController.address);
     receipt = await tx.wait();
     [setControllerEvent] = receipt.events ?? [];
-    expect(setControllerEvent.args!.tableId).to.equal(
-      createEvent.args!.tableId
-    );
+    expect(setControllerEvent.args!.tableId).to.equal(tableId);
     expect(setControllerEvent.args!.controller).to.equal(
       allowAllController.address
     );
@@ -230,7 +226,7 @@ describe("ITablelandController", function () {
     expect(runEvent.args!.isOwner).to.equal(false);
     expect(runEvent.args!.tableId).to.equal(tableId);
     expect(runEvent.args!.statement).to.equal(runStatement);
-    expect(runEvent.args!.policy.allowInsert).to.equal(false);
+    expect(runEvent.args!.policy.allowInsert).to.equal(true);
     expect(runEvent.args!.policy.allowUpdate).to.equal(true);
     expect(runEvent.args!.policy.allowDelete).to.equal(false);
     expect(runEvent.args!.policy.whereClause).to.equal(
@@ -258,7 +254,7 @@ describe("ITablelandController", function () {
     expect(runEvent.args!.isOwner).to.equal(false);
     expect(runEvent.args!.tableId).to.equal(tableId);
     expect(runEvent.args!.statement).to.equal(runStatement);
-    expect(runEvent.args!.policy.allowInsert).to.equal(false);
+    expect(runEvent.args!.policy.allowInsert).to.equal(true);
     expect(runEvent.args!.policy.allowUpdate).to.equal(true);
     expect(runEvent.args!.policy.allowDelete).to.equal(false);
     expect(runEvent.args!.policy.whereClause).to.equal(

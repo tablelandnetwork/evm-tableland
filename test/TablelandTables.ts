@@ -153,9 +153,45 @@ describe("TablelandTables", function () {
     const [, transferTableEvent] = receipt.events ?? [];
     expect(transferTableEvent.args!.from).to.equal(owner.address);
     expect(transferTableEvent.args!.to).to.equal(newOwner.address);
-    expect(transferTableEvent.args!.tableId).to.equal(
-      createEvent.args!.tableId
+    expect(transferTableEvent.args!.tableId).to.equal(tableId);
+  });
+
+  it("Should lock a table", async function () {
+    // Test lock fails if table does not exist
+    const owner = accounts[4];
+    await expect(
+      tables.connect(owner).lock(owner.address, BigNumber.from(1))
+    ).to.be.revertedWith("Unauthorized");
+
+    let tx = await tables.createTable(
+      owner.address,
+      "create table testing (int a);"
     );
+    let receipt = await tx.wait();
+    const [, createEvent] = receipt.events ?? [];
+    const tableId = createEvent.args!.tableId;
+
+    // Test only owner can lock
+    const sender = accounts[5];
+    await expect(
+      tables.connect(sender).lock(owner.address, tableId)
+    ).to.be.revertedWith("Unauthorized");
+
+    tx = await tables.connect(owner).lock(owner.address, tableId);
+    receipt = await tx.wait();
+    const [, transferTableEvent] = receipt.events ?? [];
+    expect(transferTableEvent.args!.from).to.equal(owner.address);
+    expect(transferTableEvent.args!.to).to.equal(tables.address);
+    expect(transferTableEvent.args!.tableId).to.equal(tableId);
+
+    // Test that new owner is now the lock address
+    expect(await tables.ownerOf(tableId)).to.equal(tables.address);
+
+    // Test table is still operational
+    tx = await tables
+      .connect(owner)
+      .runSQL(owner.address, tableId, "insert into testing values (0);");
+    await tx.wait();
   });
 
   it("Should udpate the base URI", async function () {
@@ -218,6 +254,11 @@ describe("TablelandTables", function () {
       tables
         .connect(owner)
         .setController(owner.address, BigNumber.from(1), accounts[5].address)
+    ).to.be.revertedWith("Pausable: paused");
+
+    // Test locking is paused
+    await expect(
+      tables.connect(owner).lock(owner.address, BigNumber.from(1))
     ).to.be.revertedWith("Pausable: paused");
 
     // Test only contract owner can unpause

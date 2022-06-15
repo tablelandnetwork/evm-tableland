@@ -39,14 +39,14 @@ contract TestTablelandController is ITablelandController, Ownable {
         updatableColumns[0] = "baz";
 
         // Include a check on the incoming data
-        withChecks[0] = ""; // included to filter in Policies.joinClauses
+        withChecks[0] = ""; // included to touch all code branches in Policies.joinClauses
         withChecks[1] = "baz > 0";
-        withChecks[2] = ""; // included to filter in Policies.joinClauses
+        withChecks[2] = ""; // included to touch all code branches in Policies.joinClauses
 
         // Return policy
         return
             ITablelandController.Policy({
-                allowInsert: false,
+                allowInsert: true,
                 allowUpdate: true,
                 allowDelete: false,
                 whereClause: Policies.joinClauses(whereClauses),

@@ -125,6 +125,20 @@ interface ITablelandTables {
     function getController(uint256 tableId) external returns (address);
 
     /**
+     * @dev Locks table ownership and access control _forever_.
+     *
+     * caller - the address that is locking the table
+     * tableId - the id of the target table
+     *
+     * Requirements:
+     *
+     * - contract must be unpaused
+     * - `msg.sender` must be `caller` and owner of `tableId`
+     * - `tableId` must exist
+     */
+    function lock(address caller, uint256 tableId) external;
+
+    /**
      * @dev Sets the contract base URI.
      *
      * baseURI - the new base URI
