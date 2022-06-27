@@ -204,9 +204,7 @@ describe("ITablelandController", function () {
     // Test only owner can lock controller
     const sender = accounts[5];
     await expect(
-      tables
-        .connect(sender)
-        .lockController(owner.address, tableId)
+      tables.connect(sender).lockController(owner.address, tableId)
     ).to.be.revertedWith("Unauthorized");
 
     const eoaController = accounts[6];

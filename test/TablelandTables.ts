@@ -222,9 +222,7 @@ describe("TablelandTables", function () {
 
     // Test locking controller is paused
     await expect(
-      tables
-        .connect(owner)
-        .lockController(owner.address, BigNumber.from(1))
+      tables.connect(owner).lockController(owner.address, BigNumber.from(1))
     ).to.be.revertedWith("Pausable: paused");
 
     // Test only contract owner can unpause
