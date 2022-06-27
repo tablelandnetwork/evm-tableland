@@ -7,6 +7,8 @@ import "erc721a-upgradeable/contracts/extensions/ERC721ABurnableUpgradeable.sol"
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "./ITablelandTables.sol";
 import "./ITablelandController.sol";
 
@@ -20,6 +22,7 @@ contract TablelandTables is
     ERC721AQueryableUpgradeable,
     OwnableUpgradeable,
     PausableUpgradeable,
+    ReentrancyGuardUpgradeable,
     UUPSUpgradeable
 {
     // A URI used to reference off-chain table metadata.
@@ -40,6 +43,7 @@ contract TablelandTables is
         __Ownable_init();
         __Pausable_init();
         __UUPSUpgradeable_init();
+        __ReentrancyGuard_init();
 
         _baseURIString = baseURI;
     }
@@ -66,7 +70,7 @@ contract TablelandTables is
         address caller,
         uint256 tableId,
         string memory statement
-    ) external override whenNotPaused {
+    ) external payable override whenNotPaused nonReentrant {
         if (
             !_exists(tableId) ||
             !(caller == _msgSenderERC721A() || owner() == _msgSenderERC721A())
@@ -100,12 +104,14 @@ contract TablelandTables is
      */
     function _getPolicy(address caller, uint256 tableId)
         private
-        view
         returns (ITablelandController.Policy memory)
     {
         address controller = _controllers[tableId];
         if (_isContract(controller)) {
-            return ITablelandController(controller).getPolicy(caller);
+            return
+                ITablelandController(controller).getPolicy{value: msg.value}(
+                    caller
+                );
         }
         if (!(controller == address(0) || controller == caller)) {
             revert Unauthorized();
@@ -126,12 +132,7 @@ contract TablelandTables is
      * @dev Returns whether or not `account` is a contract address.
      */
     function _isContract(address account) private view returns (bool) {
-        uint256 size;
-        // solhint-disable-next-line no-inline-assembly
-        assembly {
-            size := extcodesize(account)
-        }
-        return size > 0;
+        return account.code.length > 0;
     }
 
     /**

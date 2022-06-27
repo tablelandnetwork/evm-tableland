@@ -96,7 +96,7 @@ interface ITablelandTables {
         address caller,
         uint256 tableId,
         string memory statement
-    ) external;
+    ) external payable;
 
     /**
      * @dev Sets the controller for a table. Controller can be an EOA or contract address.

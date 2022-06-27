@@ -186,7 +186,7 @@ describe("ITablelandController", function () {
     expect(await tables.getController(tableId)).to.equal(ZERO_ADDRESS);
   });
 
-  it("Should be able to gate run SQL with controller contract", async function () {
+  it.only("Should be able to gate run SQL with controller contract", async function () {
     const owner = accounts[4];
     let tx = await tables.createTable(
       owner.address,
@@ -200,12 +200,28 @@ describe("ITablelandController", function () {
       .setController(owner.address, tableId, controller.address);
     await tx.wait();
 
-    // Test that run SQL on table is gated by Foo and Bar ownership
+    // Test that run SQL on table is gated by ether
     const runStatement = "insert into testing values (0);";
     const caller = accounts[5];
     await expect(
       tables.connect(caller).runSQL(caller.address, tableId, runStatement)
+    ).to.be.revertedWith("InsufficientValue");
+
+    // Test that run SQL on table is gated by Foo and Bar ownership
+    const value = ethers.utils.parseEther("1");
+    await expect(
+      tables.connect(caller).runSQL(caller.address, tableId, runStatement, {
+        value,
+      })
     ).to.be.revertedWith("Unauthorized");
+
+    // Test balance was reverted
+    expect(await ethers.provider.getBalance(tables.address)).to.equal(
+      BigNumber.from(0)
+    );
+    expect(await ethers.provider.getBalance(controller.address)).to.equal(
+      BigNumber.from(0)
+    );
 
     // Mint a Foo
     tx = await foos.connect(caller).mint();
@@ -213,7 +229,9 @@ describe("ITablelandController", function () {
 
     // Still gated (need a Bar too)
     await expect(
-      tables.connect(caller).runSQL(caller.address, tableId, runStatement)
+      tables.connect(caller).runSQL(caller.address, tableId, runStatement, {
+        value,
+      })
     ).to.be.revertedWith("Unauthorized");
 
     // Mint a Bar
@@ -223,7 +241,7 @@ describe("ITablelandController", function () {
     // Caller should be able to run SQL now
     tx = await tables
       .connect(caller)
-      .runSQL(caller.address, tableId, runStatement);
+      .runSQL(caller.address, tableId, runStatement, { value });
     receipt = await tx.wait();
     let [runEvent] = receipt.events ?? [];
     expect(runEvent.args!.caller).to.equal(caller.address);
@@ -240,6 +258,14 @@ describe("ITablelandController", function () {
     expect(runEvent.args!.policy.updatableColumns.length).to.equal(1);
     expect(runEvent.args!.policy.updatableColumns).to.include("baz");
 
+    // Test balance was taken by controller
+    expect(await ethers.provider.getBalance(tables.address)).to.equal(
+      BigNumber.from(0)
+    );
+    expect(await ethers.provider.getBalance(controller.address)).to.equal(
+      value
+    );
+
     // Mint some more
     tx = await foos.connect(caller).mint();
     await tx.wait();
@@ -251,7 +277,7 @@ describe("ITablelandController", function () {
     // Where clause should reflect all owned tokens
     tx = await tables
       .connect(caller)
-      .runSQL(caller.address, tableId, runStatement);
+      .runSQL(caller.address, tableId, runStatement, { value });
     receipt = await tx.wait();
     [runEvent] = receipt.events ?? [];
     expect(runEvent.args!.caller).to.equal(caller.address);

@@ -9,7 +9,7 @@ import "../utils/ERC721AQueryablePolicies.sol";
 contract TestAllowAllTablelandController is ITablelandController {
     function getPolicy(address)
         public
-        pure
+        payable
         override
         returns (ITablelandController.Policy memory)
     {
