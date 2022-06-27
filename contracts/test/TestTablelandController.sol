@@ -3,9 +3,9 @@ pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "../ITablelandController.sol";
-import "../utils/Policies.sol";
-import "../utils/ERC721EnumerablePolicies.sol";
-import "../utils/ERC721AQueryablePolicies.sol";
+import "../policies/Policies.sol";
+import "../policies/ERC721EnumerablePolicies.sol";
+import "../policies/ERC721AQueryablePolicies.sol";
 
 contract TestTablelandController is ITablelandController, Ownable {
     error InsufficientValue(uint256 receivedValue, uint256 requiredValue);

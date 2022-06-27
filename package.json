@@ -9,6 +9,7 @@
   "types": "typechain-types/index.d.ts",
   "files": [
     "contracts",
+    "!contracts/test",
     "typechain-types/**/*.js?(.map)",
     "typechain-types/**/*.d.ts"
   ],
@@ -28,7 +29,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tablelandnetwork/eth-tableland.git"
+    "url": "git+https://github.com/tablelandnetwork/evm-tableland.git"
   },
   "keywords": [
     "tableland",
@@ -37,9 +38,9 @@
   ],
   "license": "MIT AND Apache-2.0",
   "bugs": {
-    "url": "https://github.com/tablelandnetwork/eth-tableland/issues"
+    "url": "https://github.com/tablelandnetwork/evm-tableland/issues"
   },
-  "homepage": "https://github.com/tablelandnetwork/eth-tableland#readme",
+  "homepage": "https://github.com/tablelandnetwork/evm-tableland#readme",
   "dependencies": {},
   "devDependencies": {
     "@ethersproject/providers": "^5.6.8",
