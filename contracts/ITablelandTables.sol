@@ -101,6 +101,16 @@ interface ITablelandTables {
     /**
      * @dev Sets the controller for a table. Controller can be an EOA or contract address.
      *
+     * When a table is created, it's controller is set to the zero address, which means that the
+     * contract will not enforce write access control. In this situation, validators will not accept
+     * transactions from non-owners unless explicitly granted access with "GRANT" SQL statements.
+     *
+     * When a controller address is set for a table, validators assume write access control is
+     * handled at the contract level, and will accept all transactions.
+     *
+     * You can unset a controller address for a table by setting it back to the zero address.
+     * This will cause validators to revert back to honoring owner and GRANT bases write access control.
+     *
      * caller - the address that is setting the controller
      * tableId - the id of the target table
      * controller - the address of the controller (EOA or contract)
@@ -110,6 +120,7 @@ interface ITablelandTables {
      * - contract must be unpaused
      * - `msg.sender` must be `caller` and owner of `tableId`
      * - `tableId` must exist
+     * - `tableId` controller must not be locked
      */
     function setController(
         address caller,
@@ -125,6 +136,23 @@ interface ITablelandTables {
     function getController(uint256 tableId) external returns (address);
 
     /**
+     * @dev Locks the controller for a table _forever_. Controller can be an EOA or contract address.
+     *
+     * Although not very useful, it is possible to lock a table controller that is set to the zero address.
+     *
+     * caller - the address that is locking the controller
+     * tableId - the id of the target table
+     *
+     * Requirements:
+     *
+     * - contract must be unpaused
+     * - `msg.sender` must be `caller` and owner of `tableId`
+     * - `tableId` must exist
+     * - `tableId` controller must not be locked
+     */
+    function lockController(address caller, uint256 tableId) external;
+
+    /**
      * @dev Sets the contract base URI.
      *
      * baseURI - the new base URI
@@ -132,7 +160,6 @@ interface ITablelandTables {
      * Requirements:
      *
      * - `msg.sender` must be contract owner
-     * - contract must be paused
      */
     function setBaseURI(string memory baseURI) external;
 

@@ -220,6 +220,13 @@ describe("TablelandTables", function () {
         .setController(owner.address, BigNumber.from(1), accounts[5].address)
     ).to.be.revertedWith("Pausable: paused");
 
+    // Test locking controller is paused
+    await expect(
+      tables
+        .connect(owner)
+        .lockController(owner.address, BigNumber.from(1))
+    ).to.be.revertedWith("Pausable: paused");
+
     // Test only contract owner can unpause
     await expect(tables.connect(owner).unpause()).to.be.revertedWith(
       "Ownable: caller is not the owner"

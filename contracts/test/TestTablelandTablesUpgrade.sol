@@ -23,6 +23,7 @@ contract TestTablelandTablesUpgrade is
 {
     string private _baseURIString;
     mapping(uint256 => address) private _controllers;
+    mapping(uint256 => bool) private _locks;
     uint256 private constant QUERY_MAX_SIZE = 45000;
     mapping(uint256 => address) private _dummyStorage;
 
@@ -111,6 +112,12 @@ contract TestTablelandTablesUpgrade is
         view
         override
         returns (address)
+    {} // solhint-disable no-empty-blocks
+
+    function lockController(address caller, uint256 tableId)
+        external
+        override
+        whenNotPaused
     {} // solhint-disable no-empty-blocks
 
     // solhint-disable-next-line no-empty-blocks

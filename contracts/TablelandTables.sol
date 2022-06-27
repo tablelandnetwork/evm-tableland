@@ -29,6 +29,8 @@ contract TablelandTables is
     string private _baseURIString;
     // A mapping of table ids to table controller addresses.
     mapping(uint256 => address) private _controllers;
+    // A mapping of table controller addresses to lock status.
+    mapping(uint256 => bool) private _locks;
     // The maximum size allowed for a query.
     uint256 private constant QUERY_MAX_SIZE = 35000;
 
@@ -145,7 +147,8 @@ contract TablelandTables is
     ) external override whenNotPaused {
         if (
             !_exists(tableId) ||
-            !(caller == _msgSenderERC721A() && caller == ownerOf(tableId))
+            !(caller == _msgSenderERC721A() && caller == ownerOf(tableId)) ||
+            _locks[tableId]
         ) {
             revert Unauthorized();
         }
@@ -165,6 +168,25 @@ contract TablelandTables is
         returns (address)
     {
         return _controllers[tableId];
+    }
+
+    /**
+     * @dev See {ITablelandTables-lockController}.
+     */
+    function lockController(address caller, uint256 tableId)
+        external
+        override
+        whenNotPaused
+    {
+        if (
+            !_exists(tableId) ||
+            !(caller == _msgSenderERC721A() && caller == ownerOf(tableId)) ||
+            _locks[tableId]
+        ) {
+            revert Unauthorized();
+        }
+
+        _locks[tableId] = true;
     }
 
     /**
