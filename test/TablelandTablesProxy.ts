@@ -144,9 +144,10 @@ describe("TablelandTablesProxy", function () {
 
     // Run sql
     const runStatement = "insert into testing values (0);";
+    const value = ethers.utils.parseEther("1");
     tx = await tables1
       .connect(caller)
-      .runSQL(caller.address, tableId, runStatement);
+      .runSQL(caller.address, tableId, runStatement, { value });
     receipt = await tx.wait();
     let [runEvent] = receipt.events ?? [];
     expect(runEvent.args!.caller).to.equal(caller.address);
@@ -163,7 +164,7 @@ describe("TablelandTablesProxy", function () {
     // Run sql again against new tables implementation
     tx = await tables2
       .connect(caller)
-      .runSQL(caller.address, tableId, runStatement);
+      .runSQL(caller.address, tableId, runStatement, { value });
     receipt = await tx.wait();
     [runEvent] = receipt.events ?? [];
     expect(runEvent.args!.caller).to.equal(caller.address);
@@ -175,7 +176,9 @@ describe("TablelandTablesProxy", function () {
     // Run sql one more time with caller that does not own required tokens
     const caller2 = accounts[3];
     await expect(
-      tables2.connect(caller2).runSQL(caller2.address, tableId, runStatement)
+      tables2
+        .connect(caller2)
+        .runSQL(caller2.address, tableId, runStatement, { value })
     ).to.be.revertedWith("Unauthorized");
   });
 });

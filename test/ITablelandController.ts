@@ -186,7 +186,7 @@ describe("ITablelandController", function () {
     expect(await tables.getController(tableId)).to.equal(ZERO_ADDRESS);
   });
 
-  it.only("Should be able to gate run SQL with controller contract", async function () {
+  it("Should be able to gate run SQL with controller contract", async function () {
     const owner = accounts[4];
     let tx = await tables.createTable(
       owner.address,
