@@ -1,13 +1,13 @@
-# @tableland/eth
+# @tableland/evm
 
-[![GitHub license](https://img.shields.io/github/license/tablelandnetwork/eth-tableland.svg)](./LICENSE)
-[![GitHub package.json version](https://img.shields.io/github/package-json/v/tablelandnetwork/eth-tableland.svg)](./package.json)
-[![Release](https://img.shields.io/github/release/tablelandnetwork/eth-tableland.svg)](https://github.com/tablelandnetwork/eth-tableland/releases/latest)
+[![GitHub license](https://img.shields.io/github/license/tablelandnetwork/evm-tableland.svg)](./LICENSE)
+[![GitHub package.json version](https://img.shields.io/github/package-json/v/tablelandnetwork/evm-tableland.svg)](./package.json)
+[![Release](https://img.shields.io/github/release/tablelandnetwork/evm-tableland.svg)](https://github.com/tablelandnetwork/evm-tableland/releases/latest)
 [![standard-readme compliant](https://img.shields.io/badge/standard--readme-OK-green.svg)](https://github.com/RichardLitt/standard-readme)
 
-![Tests](https://github.com/tablelandnetwork/eth-tableland/workflows/Test/badge.svg)
+![Tests](https://github.com/tablelandnetwork/evm-tableland/workflows/Test/badge.svg)
 
-> Tableland Tables contract and client components
+> Tableland Tables EVM contracts and client components
 
 # Table of Contents
 
@@ -19,7 +19,7 @@
 
 # Background
 
-This is the Tableland Tables contract and client components. This is the first pass, and is subject to wild changes without notice!
+This is the Tableland Tables EVM contracts and client components.
 
 # Development
 
@@ -102,9 +102,7 @@ abigen --abi ./abi.json --bin ./bytecode.bin --pkg contracts --out gobuild/Regis
 
 ## Etherscan verification
 
-To try out Etherscan verification, you first need to deploy a contract to an Ethereum network that's supported by Etherscan, such as Goerli.
-
-In this project, copy the `.env.example` file to a file named `.env`, and then edit it to fill in the details. Enter your Etherscan API key, your Goerli node URL (e.g., from Alchemy), and the private key of the account which will send the deployment transaction. With a valid `.env` file in place, first deploy your contract:
+To perform Etherscan verification, you first need to deploy a contract to an Ethereum network that's supported by Etherscan, such as Goerli:
 
 ```shell
 npx hardhat run scripts/deploy.ts --network ethereum-goerli
@@ -116,18 +114,9 @@ Then, copy the deployment address and paste it in to replace `DEPLOYED_CONTRACT_
 npx hardhat verify DEPLOYED_CONTRACT_ADDRESS --network ethereum-goerli
 ```
 
-## Performance optimizations
+## Speedier tests
 
 For faster runs of your tests and scripts, consider skipping ts-node's type checking by setting the environment variable `TS_NODE_TRANSPILE_ONLY` to `1` in hardhat's environment. For more details see [the documentation](https://hardhat.org/guides/typescript.html#performance-optimizations).
-
-# Maintainers
-
-- [@carsonfarmer](https://github.com/carsonfarmer)
-- [@joewagner](https://github.com/joewagner)
-- [@brunocalza](https://github.com/brunocalza)
-- [@jsign](https://github.com/jsign)
-- [@asutula](https://github.com/asutula)
-- [@sanderpick](https://github.com/sanderpick)
 
 # Contributing
 

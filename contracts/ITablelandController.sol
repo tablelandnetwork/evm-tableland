@@ -39,5 +39,5 @@ interface ITablelandController {
     /**
      * @dev Returns a {Policy} struct defining how a table can be accessed by `caller`.
      */
-    function getPolicy(address caller) external view returns (Policy memory);
+    function getPolicy(address caller) external payable returns (Policy memory);
 }

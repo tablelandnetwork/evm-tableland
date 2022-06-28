@@ -3,24 +3,25 @@ pragma solidity ^0.8.4;
 
 import "erc721a-upgradeable/contracts/ERC721AUpgradeable.sol";
 import "erc721a-upgradeable/contracts/extensions/ERC721AQueryableUpgradeable.sol";
-import "erc721a-upgradeable/contracts/extensions/ERC721ABurnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "../ITablelandTables.sol";
 import "../ITablelandController.sol";
 
 contract TestTablelandTablesUpgrade is
     ITablelandTables,
     ERC721AUpgradeable,
-    ERC721ABurnableUpgradeable,
     ERC721AQueryableUpgradeable,
     OwnableUpgradeable,
     PausableUpgradeable,
+    ReentrancyGuardUpgradeable,
     UUPSUpgradeable
 {
     string private _baseURIString;
     mapping(uint256 => address) private _controllers;
+    mapping(uint256 => bool) private _locks;
     uint256 private constant QUERY_MAX_SIZE = 45000;
     mapping(uint256 => address) private _dummyStorage;
 
@@ -30,11 +31,11 @@ contract TestTablelandTablesUpgrade is
         initializer
     {
         __ERC721A_init("Tableland Tables", "TABLE");
-        __ERC721ABurnable_init();
         __ERC721AQueryable_init();
         __Ownable_init();
         __Pausable_init();
         __UUPSUpgradeable_init();
+        __ReentrancyGuard_init();
 
         _baseURIString = baseURI;
     }
@@ -50,7 +51,7 @@ contract TestTablelandTablesUpgrade is
         address caller,
         uint256 tableId,
         string memory statement
-    ) external override whenNotPaused {
+    ) external payable override whenNotPaused nonReentrant {
         if (
             !_exists(tableId) ||
             !(caller == _msgSenderERC721A() || owner() == _msgSenderERC721A())
@@ -69,12 +70,14 @@ contract TestTablelandTablesUpgrade is
 
     function _getPolicy(address caller, uint256 tableId)
         private
-        view
         returns (ITablelandController.Policy memory)
     {
         address controller = _controllers[tableId];
         if (_isContract(controller)) {
-            return ITablelandController(controller).getPolicy(caller);
+            return
+                ITablelandController(controller).getPolicy{value: msg.value}(
+                    caller
+                );
         }
         if (!(controller == address(0) || controller == caller)) {
             revert Unauthorized();
@@ -92,12 +95,7 @@ contract TestTablelandTablesUpgrade is
     }
 
     function _isContract(address account) private view returns (bool) {
-        uint256 size;
-        // solhint-disable-next-line no-inline-assembly
-        assembly {
-            size := extcodesize(account)
-        }
-        return size > 0;
+        return account.code.length > 0;
     }
 
     function setController(
@@ -111,6 +109,12 @@ contract TestTablelandTablesUpgrade is
         view
         override
         returns (address)
+    {} // solhint-disable no-empty-blocks
+
+    function lockController(address caller, uint256 tableId)
+        external
+        override
+        whenNotPaused
     {} // solhint-disable no-empty-blocks
 
     // solhint-disable-next-line no-empty-blocks

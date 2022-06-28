@@ -3,10 +3,11 @@ pragma solidity ^0.8.4;
 
 import "erc721a-upgradeable/contracts/ERC721AUpgradeable.sol";
 import "erc721a-upgradeable/contracts/extensions/ERC721AQueryableUpgradeable.sol";
-import "erc721a-upgradeable/contracts/extensions/ERC721ABurnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "./ITablelandTables.sol";
 import "./ITablelandController.sol";
 
@@ -16,16 +17,18 @@ import "./ITablelandController.sol";
 contract TablelandTables is
     ITablelandTables,
     ERC721AUpgradeable,
-    ERC721ABurnableUpgradeable,
     ERC721AQueryableUpgradeable,
     OwnableUpgradeable,
     PausableUpgradeable,
+    ReentrancyGuardUpgradeable,
     UUPSUpgradeable
 {
     // A URI used to reference off-chain table metadata.
     string private _baseURIString;
     // A mapping of table ids to table controller addresses.
     mapping(uint256 => address) private _controllers;
+    // A mapping of table controller addresses to lock status.
+    mapping(uint256 => bool) private _locks;
     // The maximum size allowed for a query.
     uint256 private constant QUERY_MAX_SIZE = 35000;
 
@@ -35,11 +38,11 @@ contract TablelandTables is
         initializer
     {
         __ERC721A_init("Tableland Tables", "TABLE");
-        __ERC721ABurnable_init();
         __ERC721AQueryable_init();
         __Ownable_init();
         __Pausable_init();
         __UUPSUpgradeable_init();
+        __ReentrancyGuard_init();
 
         _baseURIString = baseURI;
     }
@@ -66,7 +69,7 @@ contract TablelandTables is
         address caller,
         uint256 tableId,
         string memory statement
-    ) external override whenNotPaused {
+    ) external payable override whenNotPaused nonReentrant {
         if (
             !_exists(tableId) ||
             !(caller == _msgSenderERC721A() || owner() == _msgSenderERC721A())
@@ -100,12 +103,14 @@ contract TablelandTables is
      */
     function _getPolicy(address caller, uint256 tableId)
         private
-        view
         returns (ITablelandController.Policy memory)
     {
         address controller = _controllers[tableId];
         if (_isContract(controller)) {
-            return ITablelandController(controller).getPolicy(caller);
+            return
+                ITablelandController(controller).getPolicy{value: msg.value}(
+                    caller
+                );
         }
         if (!(controller == address(0) || controller == caller)) {
             revert Unauthorized();
@@ -126,12 +131,7 @@ contract TablelandTables is
      * @dev Returns whether or not `account` is a contract address.
      */
     function _isContract(address account) private view returns (bool) {
-        uint256 size;
-        // solhint-disable-next-line no-inline-assembly
-        assembly {
-            size := extcodesize(account)
-        }
-        return size > 0;
+        return account.code.length > 0;
     }
 
     /**
@@ -144,7 +144,8 @@ contract TablelandTables is
     ) external override whenNotPaused {
         if (
             !_exists(tableId) ||
-            !(caller == _msgSenderERC721A() && caller == ownerOf(tableId))
+            !(caller == _msgSenderERC721A() && caller == ownerOf(tableId)) ||
+            _locks[tableId]
         ) {
             revert Unauthorized();
         }
@@ -164,6 +165,25 @@ contract TablelandTables is
         returns (address)
     {
         return _controllers[tableId];
+    }
+
+    /**
+     * @dev See {ITablelandTables-lockController}.
+     */
+    function lockController(address caller, uint256 tableId)
+        external
+        override
+        whenNotPaused
+    {
+        if (
+            !_exists(tableId) ||
+            !(caller == _msgSenderERC721A() && caller == ownerOf(tableId)) ||
+            _locks[tableId]
+        ) {
+            revert Unauthorized();
+        }
+
+        _locks[tableId] = true;
     }
 
     /**
