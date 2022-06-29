@@ -104,6 +104,15 @@ const config: HardhatUserConfig = {
           ? [process.env.OPTIMISM_KOVAN_STAGING_PRIVATE_KEY]
           : [],
     },
+    "optimism-kovan-staging-sqlite": {
+      url: `https://opt-kovan.g.alchemy.com/v2/${
+        process.env.OPTIMISM_KOVAN_STAGING_API_KEY ?? ""
+      }`,
+      accounts:
+        process.env.OPTIMISM_KOVAN_STAGING_PRIVATE_KEY !== undefined
+          ? [process.env.OPTIMISM_KOVAN_STAGING_PRIVATE_KEY]
+          : [],
+    },
     hardhat: {
       mining: {
         auto: !(process.env.HARDHAT_DISABLE_AUTO_MINING === "true"),
@@ -125,6 +134,8 @@ const config: HardhatUserConfig = {
     "ethereum-rinkeby-staging": "",
     "optimism-kovan-staging":
       "https://staging.tableland.network/chain/69/tables/",
+    "optimism-kovan-staging-sqlite":
+      "https://staging-sqlite.tableland.network/chain/69/tables/",
     localhost: "http://localhost:8080/chain/31337/tables/",
   },
   proxies: {
@@ -140,6 +151,7 @@ const config: HardhatUserConfig = {
     // tableland staging testnets
     "ethereum-rinkeby-staging": "0x847645b7dAA32eFda757d3c10f1c82BFbB7b41D0", // deprecating: do not upgrade!
     "optimism-kovan-staging": "0x322F01e81c38B4211529f334864fA630F6aeA408",
+    "optimism-kovan-staging-sqlite": "0xEb64cA7F57729ac64a6eD3dc8F7bb03b570baeAD",
     localhost: "",
   },
 };
@@ -159,6 +171,7 @@ interface TablelandNetworkConfig {
   // devnets
   "ethereum-rinkeby-staging": string; // deprecating
   "optimism-kovan-staging": string;
+  "optimism-kovan-staging-sqlite": string;
   localhost: string; // hardhat
 }
 
