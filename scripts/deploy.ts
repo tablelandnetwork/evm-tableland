@@ -37,7 +37,7 @@ async function main() {
 
   // Create health bot table
   const { chainId } = await account.provider.getNetwork();
-  const createStatement = `create table healthbot_${chainId} (counter bigint);`;
+  const createStatement = `create table healthbot_${chainId} (counter integer);`;
   let tx = await tables.createTable(account.address, createStatement);
   let receipt = await tx.wait();
   const [, createEvent] = receipt.events ?? [];
