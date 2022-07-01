@@ -9,7 +9,6 @@
   "types": "typechain-types/index.d.ts",
   "files": [
     "contracts",
-    "!contracts/test",
     "typechain-types/**/*.js?(.map)",
     "typechain-types/**/*.d.ts"
   ],

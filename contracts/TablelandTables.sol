@@ -12,26 +12,30 @@ import "./ITablelandTables.sol";
 import "./ITablelandController.sol";
 
 /**
- * @dev Implementation of {ITablelandTables}.
+ * @dev V1 storage layout.
  */
-contract TablelandTables is
+abstract contract TablelandTablesV1Storage is
     ITablelandTables,
     ERC721AUpgradeable,
     ERC721AQueryableUpgradeable,
     OwnableUpgradeable,
     PausableUpgradeable,
-    ReentrancyGuardUpgradeable,
     UUPSUpgradeable
 {
     // A URI used to reference off-chain table metadata.
-    string private _baseURIString;
+    string internal _baseURIString;
     // A mapping of table ids to table controller addresses.
-    mapping(uint256 => address) private _controllers;
+    mapping(uint256 => address) internal _controllers;
     // A mapping of table controller addresses to lock status.
-    mapping(uint256 => bool) private _locks;
+    mapping(uint256 => bool) internal _locks;
     // The maximum size allowed for a query.
-    uint256 private constant QUERY_MAX_SIZE = 35000;
+    uint256 internal constant QUERY_MAX_SIZE = 35000;
+}
 
+/**
+ * @dev Implementation of {ITablelandTables}.
+ */
+contract TablelandTables is TablelandTablesV1Storage, ReentrancyGuardUpgradeable {
     function initialize(string memory baseURI)
         public
         initializerERC721A
