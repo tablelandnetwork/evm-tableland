@@ -55,9 +55,9 @@ contract TablelandTables is
         payable
         override
         whenNotPaused
-        returns (uint256)
+        returns (uint256 tableId)
     {
-        uint256 tableId = _nextTokenId();
+        tableId = _nextTokenId();
         _safeMint(owner, 1);
 
         emit CreateTable(owner, tableId, statement);
