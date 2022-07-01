@@ -35,7 +35,19 @@ const config: HardhatUserConfig = {
     currency: "USD",
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY || "",
+    apiKey: {
+      // ethereum
+      mainnet: process.env.ETHERSCAN_API_KEY || "",
+      goerli: process.env.ETHERSCAN_API_KEY || "",
+
+      // optimism
+      optimisticEthereum: process.env.OPTIMISM_ETHERSCAN_API_KEY || "",
+      optimisticKovan: process.env.OPTIMISM_ETHERSCAN_API_KEY || "",
+
+      // polygon
+      polygon: process.env.POLYSCAN_API_KEY || "",
+      polygonMumbai: process.env.POLYSCAN_API_KEY || "",
+    },
   },
   networks: {
     // mainnets

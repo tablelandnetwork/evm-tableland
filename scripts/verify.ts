@@ -1,12 +1,7 @@
-import { run, ethers, upgrades, network, baseURI, proxy } from "hardhat";
+import { run, ethers, upgrades, network, proxy } from "hardhat";
 
 async function main() {
   console.log(`\nVerifying on '${network.name}'...`);
-
-  // Get base URI
-  if (baseURI === undefined || baseURI === "") {
-    throw Error(`missing baseURIs entry for '${network.name}'`);
-  }
 
   // Ensure deployments
   if (proxy === "") {
