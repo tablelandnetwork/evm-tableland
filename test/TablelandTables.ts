@@ -264,13 +264,11 @@ describe("TablelandTables", function () {
     // supply the address of the registry contract
     const contract = await Factory.deploy(tables.address);
     await contract.deployed();
-    const createTx = await contract.create('test_table');
+    const createTx = await contract.create("test_table");
     await createTx.wait();
-    const tableId = await contract.tables('test_table');
+    const tableId = await contract.tables("test_table");
 
     await expect(tableId instanceof BigNumber).to.equal(true);
     await expect(tableId.toNumber()).to.equal(1);
   });
-
-
 });
