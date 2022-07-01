@@ -45,6 +45,7 @@ contract TestTablelandTablesUpgrade is
         payable
         override
         whenNotPaused
+        returns (uint256)
     {} // solhint-disable no-empty-blocks
 
     function runSQL(
