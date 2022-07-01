@@ -20,7 +20,6 @@ async function main() {
   const impl = await upgrades.erc1967.getImplementationAddress(tables.address);
   await run("verify:verify", {
     address: impl,
-    constructorArguments: [baseURI],
   });
 }
 
