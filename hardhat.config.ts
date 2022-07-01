@@ -106,11 +106,11 @@ const config: HardhatUserConfig = {
     },
     "optimism-kovan-staging-sqlite": {
       url: `https://opt-kovan.g.alchemy.com/v2/${
-        process.env.OPTIMISM_KOVAN_STAGING_API_KEY ?? ""
+        process.env.OPTIMISM_KOVAN_STAGING_SQLITE_API_KEY ?? ""
       }`,
       accounts:
-        process.env.OPTIMISM_KOVAN_STAGING_PRIVATE_KEY !== undefined
-          ? [process.env.OPTIMISM_KOVAN_STAGING_PRIVATE_KEY]
+        process.env.OPTIMISM_KOVAN_STAGING_SQLITE_PRIVATE_KEY !== undefined
+          ? [process.env.OPTIMISM_KOVAN_STAGING_SQLITE_PRIVATE_KEY]
           : [],
     },
     hardhat: {
