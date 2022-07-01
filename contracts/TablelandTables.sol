@@ -35,7 +35,10 @@ abstract contract TablelandTablesV1Storage is
 /**
  * @dev Implementation of {ITablelandTables}.
  */
-contract TablelandTables is TablelandTablesV1Storage, ReentrancyGuardUpgradeable {
+contract TablelandTables is
+    TablelandTablesV1Storage,
+    ReentrancyGuardUpgradeable
+{
     function initialize(string memory baseURI)
         public
         initializerERC721A
