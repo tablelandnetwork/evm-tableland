@@ -9,6 +9,7 @@ declare const _default: {
     "ethereum-rinkeby-staging": string;
     "optimism-kovan-staging": string;
     "optimism-kovan-staging-sqlite": string;
+    localhost: string;
 };
 export default _default;
 //# sourceMappingURL=proxies.d.ts.map

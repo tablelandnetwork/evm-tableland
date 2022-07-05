@@ -15,8 +15,9 @@ contract TestCreateFromContract is ERC721, Ownable {
         _tableland = ITablelandTables(registry);
     }
 
-    function create(string memory name) public payable returns (uint256) {
-        require(tables[name] <= 0, "name already exists");
+    function create(string memory name) public payable {
+        require(tables[name] == 0, "name already exists");
+
         // Make sure we can get table_id back from calling createTable
         uint256 tableId = _tableland.createTable(
             msg.sender,
