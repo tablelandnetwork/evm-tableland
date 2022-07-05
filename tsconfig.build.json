@@ -8,5 +8,5 @@
     "declarationMap": true
   },
   "include": ["./typechain-types/**/*"],
-  "files": []
+  "files": ["proxies.ts"]
 }

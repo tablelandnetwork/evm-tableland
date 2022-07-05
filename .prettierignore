@@ -4,3 +4,5 @@ artifacts
 cache
 coverage*
 gasReporterOutput.json
+proxies.d.ts
+proxies.js
