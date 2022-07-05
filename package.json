@@ -9,6 +9,7 @@
   "types": "typechain-types/index.d.ts",
   "files": [
     "hardhat.config.ts",
+    "proxies.js",
     "contracts",
     "typechain-types/**/*.js?(.map)",
     "typechain-types/**/*.d.ts"

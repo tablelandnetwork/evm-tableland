@@ -3,3 +3,5 @@ typechain-types
 artifacts
 cache
 coverage
+proxies.d.ts
+proxies.js
