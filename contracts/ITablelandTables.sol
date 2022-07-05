@@ -75,7 +75,8 @@ interface ITablelandTables {
      */
     function createTable(address owner, string memory statement)
         external
-        payable;
+        payable
+        returns (uint256);
 
     /**
      * @dev Runs a SQL statement for `caller` using `statement`.
