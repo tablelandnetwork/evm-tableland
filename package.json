@@ -8,6 +8,7 @@
   "main": "typechain-types/index.js",
   "types": "typechain-types/index.d.ts",
   "files": [
+    "hardhat.config.ts",
     "contracts",
     "typechain-types/**/*.js?(.map)",
     "typechain-types/**/*.d.ts"
