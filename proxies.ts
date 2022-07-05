@@ -12,5 +12,5 @@ export default {
   "ethereum-rinkeby-staging": "0x847645b7dAA32eFda757d3c10f1c82BFbB7b41D0", // deprecating: do not upgrade!
   "optimism-kovan-staging": "0x322F01e81c38B4211529f334864fA630F6aeA408",
   "optimism-kovan-staging-sqlite": "0x2b51D72F210A96B6aB8EfB02dF8802363dcC83Dd",
-  localhost: ""
+  localhost: "",
 };
