@@ -10,24 +10,20 @@ import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.
 import "../ITablelandTables.sol";
 import "../ITablelandController.sol";
 
-abstract contract TestTablelandTablesV1StorageUpgrade is
+contract TestTablelandTablesUpgrade is
     ITablelandTables,
     ERC721AUpgradeable,
     ERC721AQueryableUpgradeable,
     OwnableUpgradeable,
     PausableUpgradeable,
+    ReentrancyGuardUpgradeable,
     UUPSUpgradeable
 {
     string internal _baseURIString;
     mapping(uint256 => address) internal _controllers;
     mapping(uint256 => bool) internal _locks;
     uint256 internal constant QUERY_MAX_SIZE = 35000;
-}
 
-contract TestTablelandTablesUpgrade is
-    TestTablelandTablesV1StorageUpgrade,
-    ReentrancyGuardUpgradeable
-{
     mapping(uint256 => address) private _dummyStorage;
 
     function initialize(string memory baseURI)
@@ -39,8 +35,8 @@ contract TestTablelandTablesUpgrade is
         __ERC721AQueryable_init();
         __Ownable_init();
         __Pausable_init();
-        __UUPSUpgradeable_init();
         __ReentrancyGuard_init();
+        __UUPSUpgradeable_init();
 
         _baseURIString = baseURI;
     }
