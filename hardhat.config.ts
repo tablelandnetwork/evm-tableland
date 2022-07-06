@@ -130,12 +130,10 @@ const config: HardhatUserConfig = {
     optimism: "https://tableland.network/chain/10/tables/",
     polygon: "https://tableland.network/chain/137/tables/",
     // testnets
-    "ethereum-rinkeby": "",
     "ethereum-goerli": "https://testnet.tableland.network/chain/5/tables/",
     "optimism-kovan": "https://testnet.tableland.network/chain/69/tables/",
     "polygon-mumbai": "https://testnet.tableland.network/chain/80001/tables/",
     // devnets
-    "ethereum-rinkeby-staging": "",
     "optimism-kovan-staging":
       "https://staging.tableland.network/chain/69/tables/",
     localhost: "http://localhost:8080/chain/31337/tables/",
@@ -150,13 +148,11 @@ interface TablelandNetworkConfig {
   polygon: string;
 
   // testnets
-  "ethereum-rinkeby": string; // deprecating
   "ethereum-goerli": string;
   "optimism-kovan": string;
   "polygon-mumbai": string;
 
   // devnets
-  "ethereum-rinkeby-staging": string; // deprecating
   "optimism-kovan-staging": string;
   localhost: string; // hardhat
 }

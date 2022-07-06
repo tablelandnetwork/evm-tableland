@@ -4,13 +4,10 @@ export default {
   optimism: "",
   polygon: "",
   // tableland testnet testnets
-  "ethereum-rinkeby": "0x30867AD98A520287CCc28Cde70fCF63E3Cdb9c3C", // deprecating: do not upgrade!
-  "ethereum-goerli": "0xa4b0729f02C6dB01ADe92d247b7425953d1DbA25",
-  "optimism-kovan": "0xf9C3530C03D335a00163382366a72cc1Ebbd39fF",
-  "polygon-mumbai": "0x70364D26743851d4FE43eCb065811402D06bf4AD",
+  "ethereum-goerli": "0xDA8EA22d092307874f30A1F277D1388dca0BA97a",
+  "optimism-kovan": "0xf2C9Fc73884A9c6e6Db58778176Ab67989139D06",
+  "polygon-mumbai": "0x4b48841d4b32C4650E4ABc117A03FE8B51f38F68",
   // tableland staging testnets
-  "ethereum-rinkeby-staging": "0x847645b7dAA32eFda757d3c10f1c82BFbB7b41D0", // deprecating: do not upgrade!
-  "optimism-kovan-staging": "0x322F01e81c38B4211529f334864fA630F6aeA408",
-  "optimism-kovan-staging-sqlite": "0x2b51D72F210A96B6aB8EfB02dF8802363dcC83Dd",
+  "optimism-kovan-staging": "0x7E57BaA6724c7742de6843094002c4e58FF6c7c3",
   localhost: "",
 };
