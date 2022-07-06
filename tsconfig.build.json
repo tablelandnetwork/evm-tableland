@@ -5,7 +5,8 @@
     "outDir": null,
     "declaration": true,
     "sourceMap": true,
-    "declarationMap": true
+    "declarationMap": true,
+    "skipLibCheck": true
   },
   "include": ["./typechain-types/**/*"],
   "files": ["proxies.ts"]
