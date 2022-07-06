@@ -1,6 +1,6 @@
 {
   "name": "@tableland/evm",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Tableland Tables EVM contracts and client components",
   "engines": {
     "node": ">=14.0.0"
@@ -8,7 +8,7 @@
   "main": "typechain-types/index.js",
   "types": "typechain-types/index.d.ts",
   "files": [
-    "proxies.js",
+    "proxies.*",
     "contracts",
     "typechain-types/**/*.js?(.map)",
     "typechain-types/**/*.d.ts"
