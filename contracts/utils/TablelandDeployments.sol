@@ -14,13 +14,13 @@ library TablelandDeployments {
 
     // TablelandTables address on Ethereum Goerli.
     address internal constant GOERLI =
-        0xa4b0729f02C6dB01ADe92d247b7425953d1DbA25;
+        0xDA8EA22d092307874f30A1F277D1388dca0BA97a;
     // TablelandTables address on Optimism Kovan.
     address internal constant OPTIMISTIC_KOVAN =
-        0xf9C3530C03D335a00163382366a72cc1Ebbd39fF;
+        0xf2C9Fc73884A9c6e6Db58778176Ab67989139D06;
     // TablelandTables address on Polygon Mumbai.
     address internal constant POLYGON_MUMBAI =
-        0x70364D26743851d4FE43eCb065811402D06bf4AD;
+        0x4b48841d4b32C4650E4ABc117A03FE8B51f38F68;
 
     /**
      * @dev Returns an interface to Tableland for the currently executing EVM chain.
