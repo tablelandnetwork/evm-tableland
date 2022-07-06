@@ -64,7 +64,7 @@ interface ITablelandTables {
     event SetController(uint256 tableId, address controller);
 
     /**
-     * @dev Creates a new table owned by `owner` using `statement`.
+     * @dev Creates a new table owned by `owner` using `statement` and returns its `tableId`.
      *
      * owner - the to-be owner of the new table
      * statement - the SQL statement used to create the table
