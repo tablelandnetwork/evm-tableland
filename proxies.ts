@@ -1,5 +1,5 @@
 export interface ProxyAddresses {
-  [key: string]: string
+  [key: string]: string;
 }
 
 export const proxies: ProxyAddresses = {
