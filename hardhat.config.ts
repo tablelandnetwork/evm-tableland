@@ -10,7 +10,7 @@ import "@typechain/hardhat";
 import "hardhat-gas-reporter";
 import "hardhat-contract-sizer";
 import "solidity-coverage";
-import proxies from "./proxies";
+import { proxies, ProxyAddresses } from "./proxies";
 
 dotenv.config();
 
@@ -161,7 +161,7 @@ declare module "hardhat/types/config" {
   // eslint-disable-next-line no-unused-vars
   interface HardhatUserConfig {
     baseURIs: TablelandNetworkConfig;
-    proxies: TablelandNetworkConfig;
+    proxies: ProxyAddresses;
   }
 }
 
