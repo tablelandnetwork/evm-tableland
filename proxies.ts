@@ -1,4 +1,8 @@
-export default {
+export interface ProxyAddresses {
+  [key: string]: string;
+}
+
+export const proxies: ProxyAddresses = {
   // tableland mainnet mainnets
   ethereum: "",
   optimism: "",

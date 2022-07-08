@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = {
+exports.proxies = void 0;
+exports.proxies = {
     // tableland mainnet mainnets
     ethereum: "",
     optimism: "",
