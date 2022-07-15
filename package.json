@@ -13,6 +13,11 @@
     "typechain-types/**/*.js?(.map)",
     "typechain-types/**/*.d.ts"
   ],
+  "exports": {
+    ".": "./typechain-types/index.js",
+    "./proxies.js": "./proxies.js",
+    "./contracts/": "./contracts/"
+  },
   "scripts": {
     "build": "npx tsc -p ./tsconfig.build.json",
     "clean": "rm -rf artifacts && rm -rf typechain-types && rm -rf cache && rm -rf coverage && rm -f coverage.json",
