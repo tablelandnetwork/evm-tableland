@@ -146,8 +146,14 @@ contract TablelandTables is
         address controller
     ) external override whenNotPaused {
         if (
+            // table doesn't exist or
             !_exists(tableId) ||
-            !(caller == _msgSenderERC721A() && caller == ownerOf(tableId)) ||
+            // message sender is not (caller or contract owner) or
+            !(caller == _msgSenderERC721A() ||
+                owner() == _msgSenderERC721A()) ||
+            // caller is not table owner or
+            caller != ownerOf(tableId) ||
+            // table is locked
             _locks[tableId]
         ) {
             revert Unauthorized();
@@ -179,8 +185,14 @@ contract TablelandTables is
         whenNotPaused
     {
         if (
+            // table doesn't exist or
             !_exists(tableId) ||
-            !(caller == _msgSenderERC721A() && caller == ownerOf(tableId)) ||
+            // message sender is not (caller or contract owner) or
+            !(caller == _msgSenderERC721A() ||
+                owner() == _msgSenderERC721A()) ||
+            // caller is not table owner or
+            caller != ownerOf(tableId) ||
+            // table is locked
             _locks[tableId]
         ) {
             revert Unauthorized();
