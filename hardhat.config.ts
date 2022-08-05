@@ -98,6 +98,15 @@ const config: HardhatUserConfig = {
           ? [process.env.OPTIMISM_KOVAN_PRIVATE_KEY]
           : [],
     },
+    "optimism-goerli": {
+      url: `https://opt-goerli.g.alchemy.com/v2/${
+        process.env.OPTIMISM_GOERLI_API_KEY ?? ""
+      }`,
+      accounts:
+        process.env.OPTIMISM_GOERLI_PRIVATE_KEY !== undefined
+          ? [process.env.OPTIMISM_GOERLI_PRIVATE_KEY]
+          : [],
+    },
     "polygon-mumbai": {
       url: `https://polygon-mumbai.g.alchemy.com/v2/${
         process.env.POLYGON_MUMBAI_API_KEY ?? ""
@@ -117,6 +126,15 @@ const config: HardhatUserConfig = {
           ? [process.env.OPTIMISM_KOVAN_STAGING_PRIVATE_KEY]
           : [],
     },
+    "optimism-goerli-staging": {
+      url: `https://opt-goerli.g.alchemy.com/v2/${
+        process.env.OPTIMISM_GOERLI_STAGING_API_KEY ?? ""
+      }`,
+      accounts:
+        process.env.OPTIMISM_GOERLI_STAGING_PRIVATE_KEY !== undefined
+          ? [process.env.OPTIMISM_GOERLI_STAGING_PRIVATE_KEY]
+          : [],
+    },
     hardhat: {
       mining: {
         auto: !(process.env.HARDHAT_DISABLE_AUTO_MINING === "true"),
@@ -132,10 +150,13 @@ const config: HardhatUserConfig = {
     // testnets
     "ethereum-goerli": "https://testnet.tableland.network/chain/5/tables/",
     "optimism-kovan": "https://testnet.tableland.network/chain/69/tables/",
+    "optimism-goerli": "https://testnet.tableland.network/chain/420/tables/",
     "polygon-mumbai": "https://testnet.tableland.network/chain/80001/tables/",
     // devnets
     "optimism-kovan-staging":
       "https://staging.tableland.network/chain/69/tables/",
+    "optimism-goerli-staging":
+      "https://staging.tableland.network/chain/420/tables/",
     localhost: "http://localhost:8080/chain/31337/tables/",
   },
   proxies,
@@ -150,10 +171,12 @@ interface TablelandNetworkConfig {
   // testnets
   "ethereum-goerli": string;
   "optimism-kovan": string;
+  "optimism-goerli": string;
   "polygon-mumbai": string;
 
   // devnets
   "optimism-kovan-staging": string;
+  "optimism-goerli-staging": string;
   localhost: string; // hardhat
 }
 

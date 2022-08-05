@@ -18,7 +18,7 @@ async function main() {
   console.log(`Using base URI '${baseURI}'`);
 
   // Don't allow multiple proxies per network
-  if (proxy !== "") {
+  if (proxy !== "" && proxy !== undefined) {
     throw Error(`proxy already deployed to '${network.name}'`);
   }
 
