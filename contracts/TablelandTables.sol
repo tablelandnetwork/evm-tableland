@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
+import "hardhat/console.sol";
 import "erc721a-upgradeable/contracts/ERC721AUpgradeable.sol";
 import "erc721a-upgradeable/contracts/extensions/ERC721AQueryableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
@@ -145,11 +146,22 @@ contract TablelandTables is
         uint256 tableId,
         address controller
     ) external override whenNotPaused {
+        // table doesn't exist or
+        if (!_exists(tableId)) {
+            revert Unauthorized();
+        }
+        // message sender is not (caller or contract owner) or
         if (
-            !_exists(tableId) ||
-            !(caller == _msgSenderERC721A() && caller == ownerOf(tableId)) ||
-            _locks[tableId]
+            !(caller == _msgSenderERC721A() || owner() == _msgSenderERC721A())
         ) {
+            revert Unauthorized();
+        }
+        // caller is not table owner or
+        if (caller != ownerOf(tableId)) {
+            revert Unauthorized();
+        }
+        // table is locked
+        if (_locks[tableId]) {
             revert Unauthorized();
         }
 
@@ -178,11 +190,22 @@ contract TablelandTables is
         override
         whenNotPaused
     {
+        // table doesn't exist or
+        if (!_exists(tableId)) {
+            revert Unauthorized();
+        }
+        // message sender is not (caller or contract owner) or
         if (
-            !_exists(tableId) ||
-            !(caller == _msgSenderERC721A() && caller == ownerOf(tableId)) ||
-            _locks[tableId]
+            !(caller == _msgSenderERC721A() || owner() == _msgSenderERC721A())
         ) {
+            revert Unauthorized();
+        }
+        // caller is not table owner or
+        if (caller != ownerOf(tableId)) {
+            revert Unauthorized();
+        }
+        // table is locked
+        if (_locks[tableId]) {
             revert Unauthorized();
         }
 
