@@ -2,7 +2,6 @@
 pragma solidity >=0.8.4 <0.9.0;
 
 import "@openzeppelin/contracts/utils/Strings.sol";
-import "../ITablelandTables.sol";
 
 /**
  * @dev Library of helpers for generating SQL statements from common parameters.
