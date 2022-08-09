@@ -45,6 +45,10 @@ const config: HardhatUserConfig = {
       optimisticEthereum: process.env.OPTIMISM_ETHERSCAN_API_KEY || "",
       optimisticKovan: process.env.OPTIMISM_ETHERSCAN_API_KEY || "",
 
+      // arbitrum
+      arbitrumOne: process.env.ARBISCAN_API_KEY || "",
+      arbitrumGoerli: process.env.ARBISCAN_API_KEY || "",
+
       // polygon
       polygon: process.env.POLYSCAN_API_KEY || "",
       polygonMumbai: process.env.POLYSCAN_API_KEY || "",
@@ -70,6 +74,15 @@ const config: HardhatUserConfig = {
           ? [process.env.OPTIMISM_PRIVATE_KEY]
           : [],
     },
+    arbitrum: {
+      url: `https://arb-mainnet.g.alchemy.com/v2/${
+        process.env.ARBITRUM_API_KEY ?? ""
+      }`,
+      accounts:
+        process.env.ARBITRUM_PRIVATE_KEY !== undefined
+          ? [process.env.ARBITRUM_PRIVATE_KEY]
+          : [],
+    },
     polygon: {
       url: `https://polygon-mainnet.g.alchemy.com/v2/${
         process.env.POLYGON_API_KEY ?? ""
@@ -89,15 +102,6 @@ const config: HardhatUserConfig = {
           ? [process.env.ETHEREUM_GOERLI_PRIVATE_KEY]
           : [],
     },
-    "optimism-kovan": {
-      url: `https://opt-kovan.g.alchemy.com/v2/${
-        process.env.OPTIMISM_KOVAN_API_KEY ?? ""
-      }`,
-      accounts:
-        process.env.OPTIMISM_KOVAN_PRIVATE_KEY !== undefined
-          ? [process.env.OPTIMISM_KOVAN_PRIVATE_KEY]
-          : [],
-    },
     "optimism-goerli": {
       url: `https://opt-goerli.g.alchemy.com/v2/${
         process.env.OPTIMISM_GOERLI_API_KEY ?? ""
@@ -105,6 +109,15 @@ const config: HardhatUserConfig = {
       accounts:
         process.env.OPTIMISM_GOERLI_PRIVATE_KEY !== undefined
           ? [process.env.OPTIMISM_GOERLI_PRIVATE_KEY]
+          : [],
+    },
+    "arbitrum-goerli": {
+      url: `https://arb-goerli.g.alchemy.com/v2/${
+        process.env.ARBITRUM_GOERLI_API_KEY ?? ""
+      }`,
+      accounts:
+        process.env.ARBITRUM_GOERLI_PRIVATE_KEY !== undefined
+          ? [process.env.ARBITRUM_GOERLI_PRIVATE_KEY]
           : [],
     },
     "polygon-mumbai": {
@@ -117,15 +130,6 @@ const config: HardhatUserConfig = {
           : [],
     },
     // devnets
-    "optimism-kovan-staging": {
-      url: `https://opt-kovan.g.alchemy.com/v2/${
-        process.env.OPTIMISM_KOVAN_STAGING_API_KEY ?? ""
-      }`,
-      accounts:
-        process.env.OPTIMISM_KOVAN_STAGING_PRIVATE_KEY !== undefined
-          ? [process.env.OPTIMISM_KOVAN_STAGING_PRIVATE_KEY]
-          : [],
-    },
     "optimism-goerli-staging": {
       url: `https://opt-goerli.g.alchemy.com/v2/${
         process.env.OPTIMISM_GOERLI_STAGING_API_KEY ?? ""
@@ -146,15 +150,14 @@ const config: HardhatUserConfig = {
     // mainnets
     ethereum: "https://tableland.network/chain/1/tables/",
     optimism: "https://tableland.network/chain/10/tables/",
+    arbitrum: "https://tableland.network/chain/42161/tables/",
     polygon: "https://tableland.network/chain/137/tables/",
     // testnets
     "ethereum-goerli": "https://testnet.tableland.network/chain/5/tables/",
-    "optimism-kovan": "https://testnet.tableland.network/chain/69/tables/",
     "optimism-goerli": "https://testnet.tableland.network/chain/420/tables/",
+    "arbitrum-goerli": "https://testnet.tableland.network/chain/421613/tables/",
     "polygon-mumbai": "https://testnet.tableland.network/chain/80001/tables/",
     // devnets
-    "optimism-kovan-staging":
-      "https://staging.tableland.network/chain/69/tables/",
     "optimism-goerli-staging":
       "https://staging.tableland.network/chain/420/tables/",
     localhost: "http://localhost:8080/chain/31337/tables/",
@@ -166,16 +169,16 @@ interface TablelandNetworkConfig {
   // mainnets
   ethereum: string;
   optimism: string;
+  arbitrum: string;
   polygon: string;
 
   // testnets
   "ethereum-goerli": string;
-  "optimism-kovan": string;
   "optimism-goerli": string;
+  "arbitrum-goerli": string;
   "polygon-mumbai": string;
 
   // devnets
-  "optimism-kovan-staging": string;
   "optimism-goerli-staging": string;
   localhost: string; // hardhat
 }

@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "../ITablelandTables.sol";
@@ -30,7 +29,6 @@ contract TestCreateFromContract is ERC721, Ownable {
             )
         );
 
-        console.log(tableId);
         tables[name] = tableId;
     }
 }

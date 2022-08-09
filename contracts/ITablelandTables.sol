@@ -119,7 +119,7 @@ interface ITablelandTables {
      * Requirements:
      *
      * - contract must be unpaused
-     * - `msg.sender` must be `caller` and owner of `tableId`
+     * - `msg.sender` must be `caller` or contract owner and owner of `tableId`
      * - `tableId` must exist
      * - `tableId` controller must not be locked
      */
@@ -147,7 +147,7 @@ interface ITablelandTables {
      * Requirements:
      *
      * - contract must be unpaused
-     * - `msg.sender` must be `caller` and owner of `tableId`
+     * - `msg.sender` must be `caller` or contract owner and owner of `tableId`
      * - `tableId` must exist
      * - `tableId` controller must not be locked
      */

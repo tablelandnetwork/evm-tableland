@@ -14,8 +14,6 @@ import type {
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-
 describe("ITablelandController", function () {
   let accounts: SignerWithAddress[];
   let tables: TablelandTables;
@@ -67,7 +65,7 @@ describe("ITablelandController", function () {
       tables
         .connect(owner)
         .setController(owner.address, BigNumber.from(1), accounts[3].address)
-    ).to.be.revertedWith("Unauthorized");
+    ).to.be.revertedWith("OwnerQueryForNonexistentToken");
 
     let tx = await tables.createTable(
       owner.address,
@@ -77,16 +75,23 @@ describe("ITablelandController", function () {
     const [, createEvent] = receipt.events ?? [];
     const tableId = createEvent.args!.tableId;
 
-    // Test only owner can set controller
-    const sender = accounts[5];
+    // Test caller must be table owner
+    const notOwner = accounts[5];
+    const eoaController = accounts[6];
     await expect(
       tables
-        .connect(sender)
-        .setController(owner.address, tableId, accounts[3].address)
+        .connect(owner)
+        .setController(notOwner.address, tableId, eoaController.address)
+    ).to.be.revertedWith("Unauthorized");
+
+    // Test only owner can set controller
+    await expect(
+      tables
+        .connect(notOwner)
+        .setController(owner.address, tableId, eoaController.address)
     ).to.be.revertedWith("Unauthorized");
 
     // Test setting controller to an EOA address
-    const eoaController = accounts[6];
     tx = await tables
       .connect(owner)
       .setController(owner.address, tableId, eoaController.address);
@@ -178,12 +183,16 @@ describe("ITablelandController", function () {
 
     tx = await tables
       .connect(owner)
-      .setController(owner.address, tableId, ZERO_ADDRESS);
+      .setController(owner.address, tableId, ethers.constants.AddressZero);
     receipt = await tx.wait();
     const [setControllerEvent] = receipt.events ?? [];
-    expect(setControllerEvent.args!.controller).to.equal(ZERO_ADDRESS);
+    expect(setControllerEvent.args!.controller).to.equal(
+      ethers.constants.AddressZero
+    );
 
-    expect(await tables.getController(tableId)).to.equal(ZERO_ADDRESS);
+    expect(await tables.getController(tableId)).to.equal(
+      ethers.constants.AddressZero
+    );
   });
 
   it("Should lock controller for a table", async function () {
@@ -191,7 +200,7 @@ describe("ITablelandController", function () {
     const owner = accounts[4];
     await expect(
       tables.connect(owner).lockController(owner.address, BigNumber.from(1))
-    ).to.be.revertedWith("Unauthorized");
+    ).to.be.revertedWith("OwnerQueryForNonexistentToken");
 
     let tx = await tables.createTable(
       owner.address,
@@ -201,10 +210,15 @@ describe("ITablelandController", function () {
     const [, createEvent] = receipt.events ?? [];
     const tableId = createEvent.args!.tableId;
 
-    // Test only owner can lock controller
-    const sender = accounts[5];
+    // Test caller must be table owner
+    const notOwner = accounts[5];
     await expect(
-      tables.connect(sender).lockController(owner.address, tableId)
+      tables.connect(owner).lockController(notOwner.address, tableId)
+    ).to.be.revertedWith("Unauthorized");
+
+    // Test only owner can lock controller
+    await expect(
+      tables.connect(notOwner).lockController(owner.address, tableId)
     ).to.be.revertedWith("Unauthorized");
 
     const eoaController = accounts[6];
@@ -227,6 +241,43 @@ describe("ITablelandController", function () {
     // Test controller cannot be locked again
     await expect(
       tables.connect(owner).lockController(owner.address, tableId)
+    ).to.be.revertedWith("Unauthorized");
+  });
+
+  it("Should set and lock controller for a table with contract owner", async function () {
+    const owner = accounts[4];
+    let tx = await tables.createTable(
+      owner.address,
+      "create table testing (int a);"
+    );
+    let receipt = await tx.wait();
+    const [, createEvent] = receipt.events ?? [];
+    const tableId = createEvent.args!.tableId;
+
+    // Test contract owner can lock controller
+    const contractOwner = accounts[0];
+    const eoaController = accounts[6];
+    tx = await tables
+      .connect(contractOwner)
+      .setController(owner.address, tableId, eoaController.address);
+    await tx.wait();
+    expect(await tables.getController(tableId)).to.equal(eoaController.address);
+
+    tx = await tables
+      .connect(contractOwner)
+      .lockController(owner.address, tableId);
+    receipt = await tx.wait();
+
+    // Test controller can no longer be set
+    await expect(
+      tables
+        .connect(contractOwner)
+        .setController(owner.address, tableId, eoaController.address)
+    ).to.be.revertedWith("Unauthorized");
+
+    // Test controller cannot be locked again
+    await expect(
+      tables.connect(contractOwner).lockController(owner.address, tableId)
     ).to.be.revertedWith("Unauthorized");
   });
 
