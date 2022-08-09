@@ -27,6 +27,7 @@ This is the Tableland Tables EVM contracts and client components.
 | Goerli          | 5        | 0xDA8EA22d092307874f30A1F277D1388dca0BA97a |
 | Optimism Kovan  | 69       | 0xf2C9Fc73884A9c6e6Db58778176Ab67989139D06 |
 | Optimism Goerli | 420      |                                            |
+| Arbitrum Goerli | 421613   |                                            |
 | Polygon Mumbai  | 80001    | 0x4b48841d4b32C4650E4ABc117A03FE8B51f38F68 |
 
 # Development
