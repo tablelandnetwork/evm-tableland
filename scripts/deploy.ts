@@ -18,7 +18,7 @@ async function main() {
   console.log(`Using base URI '${baseURI}'`);
 
   // Don't allow multiple proxies per network
-  if (proxy !== "" && proxy !== undefined) {
+  if (proxy !== undefined && proxy !== "") {
     throw Error(`proxy already deployed to '${network.name}'`);
   }
 
@@ -57,7 +57,7 @@ async function main() {
 
   // Warn that proxy address needs to be saved in config
   console.warn(
-    `\nSave 'proxies.${network.name}: "${tables.address}"' in the hardhat config!`
+    `\nSave 'proxies.${network.name}: "${tables.address}"' in 'proxies.ts'!`
   );
 }
 

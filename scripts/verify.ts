@@ -4,7 +4,7 @@ async function main() {
   console.log(`\nVerifying on '${network.name}'...`);
 
   // Ensure deployments
-  if (proxy === "") {
+  if (proxy === undefined || proxy === "") {
     throw Error(`no proxy entry for '${network.name}'`);
   }
 

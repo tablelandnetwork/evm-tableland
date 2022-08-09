@@ -49,7 +49,6 @@ const config: HardhatUserConfig = {
       polygon: process.env.POLYSCAN_API_KEY || "",
       polygonMumbai: process.env.POLYSCAN_API_KEY || "",
     },
-    // arbitrum
     customChains: [
       {
         network: "arbitrumGoerli",
@@ -164,9 +163,9 @@ const config: HardhatUserConfig = {
   },
   baseURIs: {
     // mainnets
-    ethereum: "https://tableland.network/chain/1/tables/",
-    optimism: "https://tableland.network/chain/10/tables/",
-    polygon: "https://tableland.network/chain/137/tables/",
+    ethereum: "https://testnet.tableland.network/chain/1/tables/",
+    optimism: "https://testnet.tableland.network/chain/10/tables/",
+    polygon: "https://testnet.tableland.network/chain/137/tables/",
     // testnets
     "ethereum-goerli": "https://testnet.tableland.network/chain/5/tables/",
     "optimism-kovan": "https://testnet.tableland.network/chain/69/tables/",
