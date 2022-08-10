@@ -45,6 +45,9 @@ const config: HardhatUserConfig = {
       optimisticEthereum: process.env.OPTIMISM_ETHERSCAN_API_KEY || "",
       optimisticKovan: process.env.OPTIMISM_ETHERSCAN_API_KEY || "",
 
+      // arbitrum
+      arbitrumGoerli: process.env.ARBISCAN_API_KEY || "",
+
       // polygon
       polygon: process.env.POLYSCAN_API_KEY || "",
       polygonMumbai: process.env.POLYSCAN_API_KEY || "",
