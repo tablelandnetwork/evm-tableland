@@ -7,7 +7,6 @@ import "@openzeppelin/contracts/utils/Strings.sol";
  * @dev Library of helpers for generating SQL statements from common parameters.
  */
 library Helpers {
-
     /**
      * @notice Generates a properly formatted table name from a prefix and table id.
      * @param prefix the user generated table prefix as a string.
@@ -16,18 +15,19 @@ library Helpers {
      *
      * @dev requirements: block.chainid must refer to a supported chain.
      */
-    function getNameFromId(string memory prefix, uint256 tableId) 
-        public 
+    function getNameFromId(string memory prefix, uint256 tableId)
+        public
         view
         returns (string memory)
     {
-        return string.concat(
-          prefix,
-          "_",
-          Strings.toString(block.chainid),
-          "_",
-          Strings.toString(tableId)
-        );
+        return
+            string.concat(
+                prefix,
+                "_",
+                Strings.toString(block.chainid),
+                "_",
+                Strings.toString(tableId)
+            );
     }
 
     /**
@@ -39,20 +39,21 @@ library Helpers {
      *
      * @dev requirements: block.chainid must refer to a supported chain.
      */
-    function getCreateFromSchema(string memory prefix, string memory schema) 
-        public 
+    function getCreateFromSchema(string memory prefix, string memory schema)
+        public
         view
         returns (string memory)
     {
-        return string.concat(
-          "CREATE TABLE ",
-          prefix,
-          "_",
-          Strings.toString(block.chainid),
-          " (",
-          schema,
-          ");"
-        );
+        return
+            string.concat(
+                "CREATE TABLE ",
+                prefix,
+                "_",
+                Strings.toString(block.chainid),
+                " (",
+                schema,
+                ");"
+            );
     }
 
     /**
@@ -66,20 +67,22 @@ library Helpers {
      *
      * @dev requirements: block.chainid must refer to a supported chain.
      */
-    function getInsert(string memory prefix, uint256 tableId, string memory columns, string memory values) 
-        public 
-        view
-        returns (string memory)
-    {
+    function getInsert(
+        string memory prefix,
+        uint256 tableId,
+        string memory columns,
+        string memory values
+    ) public view returns (string memory) {
         string memory name = getNameFromId(prefix, tableId);
-        return string.concat(
-            "INSERT INTO ",
-            name,
-            " (",
-            columns,
-            ") VALUES ",
-            values
-        );
+        return
+            string.concat(
+                "INSERT INTO ",
+                name,
+                " (",
+                columns,
+                ") VALUES ",
+                values
+            );
     }
 
     /**
@@ -93,26 +96,18 @@ library Helpers {
      *
      * @dev requirements: block.chainid must refer to a supported chain.
      */
-    function getUpdate(string memory prefix, uint256 tableId, string memory setters, string memory filters) 
-        public 
-        view
-        returns (string memory)
-    {
+    function getUpdate(
+        string memory prefix,
+        uint256 tableId,
+        string memory setters,
+        string memory filters
+    ) public view returns (string memory) {
         string memory name = getNameFromId(prefix, tableId);
         string memory filter = "";
         if (bytes(filters).length > 0) {
-            filter = string.concat(
-                "WHERE ",
-                filters
-            );
+            filter = string.concat("WHERE ", filters);
         }
-        return string.concat(
-            "UPDATE ",
-            name,
-            "SET ",
-            setters,
-            filter
-        );
+        return string.concat("UPDATE ", name, "SET ", setters, filter);
     }
 
     /**
@@ -122,21 +117,15 @@ library Helpers {
      * @param tableId the Tableland generated tableId as a uint256.
      * @param filters a string encoded list of filters. Example: "id<2 & name!='jerry'".
      * @return delete newly allocated string containing the delete statement.
-     * 
+     *
      * @dev requirements: block.chainid must refer to a supported chain.
      */
-    function getDelete(string memory prefix, uint256 tableId, string memory filters) 
-        public 
-        view
-        returns (string memory)
-    {
+    function getDelete(
+        string memory prefix,
+        uint256 tableId,
+        string memory filters
+    ) public view returns (string memory) {
         string memory name = getNameFromId(prefix, tableId);
-        return string.concat(
-            "DELETE FROM ",
-            name,
-            "WHERE ",
-            filters
-        );
+        return string.concat("DELETE FROM ", name, "WHERE ", filters);
     }
-
 }
