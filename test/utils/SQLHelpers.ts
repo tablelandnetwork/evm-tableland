@@ -15,7 +15,7 @@ describe("SQLHelpers", function () {
     await lib.deployed();
   });
 
-  it("Should return a name from a prefex", async function () {
+  it("Should return a name from a prefix", async function () {
     await expect(
       // This is not a valid name in Tableland but tests string concat.
       await lib.toNameFromId("_test_&$%()#@!*_123__", 101)
