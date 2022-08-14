@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.8.4 <0.9.0;
+pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/utils/Strings.sol";
 
 /**
  * @dev Library of helpers for generating SQL statements from common parameters.
  */
-library Helpers {
+library SQLHelpers {
     /**
      * @notice Generates a properly formatted table name from a prefix and table id.
      * @param prefix the user generated table prefix as a string.
@@ -15,19 +15,19 @@ library Helpers {
      *
      * @dev requirements: block.chainid must refer to a supported chain.
      */
-    function getNameFromId(string memory prefix, uint256 tableId)
+    function toNameFromId(string memory prefix, uint256 tableId)
         public
         view
         returns (string memory)
     {
         return
-            string.concat(
+            string(abi.encodePacked(
                 prefix,
                 "_",
                 Strings.toString(block.chainid),
                 "_",
                 Strings.toString(tableId)
-            );
+            ));
     }
 
     /**
@@ -39,21 +39,21 @@ library Helpers {
      *
      * @dev requirements: block.chainid must refer to a supported chain.
      */
-    function getCreateFromSchema(string memory prefix, string memory schema)
+    function toCreateFromSchema(string memory prefix, string memory schema)
         public
         view
         returns (string memory)
     {
         return
-            string.concat(
+            string(abi.encodePacked(
                 "CREATE TABLE ",
                 prefix,
                 "_",
                 Strings.toString(block.chainid),
                 " (",
                 schema,
-                ");"
-            );
+                ")"
+            ));
     }
 
     /**
@@ -67,22 +67,24 @@ library Helpers {
      *
      * @dev requirements: block.chainid must refer to a supported chain.
      */
-    function getInsert(
+    function toInsert(
         string memory prefix,
         uint256 tableId,
         string memory columns,
         string memory values
     ) public view returns (string memory) {
-        string memory name = getNameFromId(prefix, tableId);
+        string memory name = toNameFromId(prefix, tableId);(prefix, tableId);
         return
-            string.concat(
+            string(abi.encodePacked(
                 "INSERT INTO ",
                 name,
                 " (",
                 columns,
-                ") VALUES ",
+                ") VALUES (",
                 values
-            );
+                ,
+                ")"
+            ));
     }
 
     /**
@@ -96,18 +98,21 @@ library Helpers {
      *
      * @dev requirements: block.chainid must refer to a supported chain.
      */
-    function getUpdate(
+    function toUpdate(
         string memory prefix,
         uint256 tableId,
         string memory setters,
         string memory filters
     ) public view returns (string memory) {
-        string memory name = getNameFromId(prefix, tableId);
+        string memory name = toNameFromId(prefix, tableId);(prefix, tableId);
         string memory filter = "";
         if (bytes(filters).length > 0) {
-            filter = string.concat("WHERE ", filters);
+            filter = string(abi.encodePacked(" WHERE ", filters));
         }
-        return string.concat("UPDATE ", name, "SET ", setters, filter);
+        return
+            string(abi.encodePacked(
+                "UPDATE ", name, " SET ", setters, filter
+            ));
     }
 
     /**
@@ -120,12 +125,15 @@ library Helpers {
      *
      * @dev requirements: block.chainid must refer to a supported chain.
      */
-    function getDelete(
+    function toDelete(
         string memory prefix,
         uint256 tableId,
         string memory filters
     ) public view returns (string memory) {
-        string memory name = getNameFromId(prefix, tableId);
-        return string.concat("DELETE FROM ", name, "WHERE ", filters);
+        string memory name = toNameFromId(prefix, tableId);(prefix, tableId);
+        return
+            string(abi.encodePacked(
+                "DELETE FROM ", name, " WHERE ", filters
+            ));
     }
 }
