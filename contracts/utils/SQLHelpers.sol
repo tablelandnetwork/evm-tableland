@@ -8,12 +8,14 @@ import "@openzeppelin/contracts/utils/Strings.sol";
  */
 library SQLHelpers {
     /**
-     * @notice Generates a properly formatted table name from a prefix and table id.
-     * @param prefix the user generated table prefix as a string.
-     * @param tableId the Tableland generated tableId as a uint256.
-     * @return name newly allocated string containing the table name.
+     * @dev Generates a properly formatted table name from a prefix and table id.
      *
-     * @dev requirements: block.chainid must refer to a supported chain.
+     * prefix - the user generated table prefix as a string
+     * tableId - the Tableland generated tableId as a uint256
+     *
+     * Requirements:
+     *
+     * - block.chainid must refer to a supported chain.
      */
     function toNameFromId(string memory prefix, uint256 tableId)
         public
@@ -21,23 +23,26 @@ library SQLHelpers {
         returns (string memory)
     {
         return
-            string(abi.encodePacked(
-                prefix,
-                "_",
-                Strings.toString(block.chainid),
-                "_",
-                Strings.toString(tableId)
-            ));
+            string(
+                abi.encodePacked(
+                    prefix,
+                    "_",
+                    Strings.toString(block.chainid),
+                    "_",
+                    Strings.toString(tableId)
+                )
+            );
     }
 
     /**
-     * @notice Generates a CREATE statement based on a desired schema and table prefix.
+     * @dev Generates a CREATE statement based on a desired schema and table prefix.
      *
-     * @param prefix the user generated table prefix as a string.
-     * @param schema a comma seperated string indicating the desired prefix. Example: "int id, text name".
-     * @return create newly allocated string containing the create statement.
+     * prefix - the user generated table prefix as a string
+     * schema - a comma seperated string indicating the desired prefix. Example: "int id, text name"
      *
-     * @dev requirements: block.chainid must refer to a supported chain.
+     * Requirements:
+     *
+     * - block.chainid must refer to a supported chain.
      */
     function toCreateFromSchema(string memory prefix, string memory schema)
         public
@@ -45,27 +50,30 @@ library SQLHelpers {
         returns (string memory)
     {
         return
-            string(abi.encodePacked(
-                "CREATE TABLE ",
-                prefix,
-                "_",
-                Strings.toString(block.chainid),
-                " (",
-                schema,
-                ")"
-            ));
+            string(
+                abi.encodePacked(
+                    "CREATE TABLE ",
+                    prefix,
+                    "_",
+                    Strings.toString(block.chainid),
+                    " (",
+                    schema,
+                    ")"
+                )
+            );
     }
 
     /**
-     * @notice Generates an INSERT statement based on table prefix, tableId, columns, and values.
+     * @dev Generates an INSERT statement based on table prefix, tableId, columns, and values.
      *
-     * @param prefix the user generated table prefix as a string.
-     * @param tableId the Tableland generated tableId as a uint256.
-     * @param columns a string encoded ordered list of columns that will be updated. Example: "name, age".
-     * @param values a string encoded ordered list of values that will be inserted wrapped in parentheses. Example: "('jerry', 24)".
-     * @return insert newly allocated string containing the insert statement.
+     * prefix - the user generated table prefix as a string.
+     * tableId - the Tableland generated tableId as a uint256.
+     * columns - a string encoded ordered list of columns that will be updated. Example: "name, age".
+     * values - a string encoded ordered list of values that will be inserted wrapped in parentheses. Example: "'jerry', 24". Values order must match column order.
      *
-     * @dev requirements: block.chainid must refer to a supported chain.
+     * Requirements:
+     *
+     * - block.chainid must refer to a supported chain.
      */
     function toInsert(
         string memory prefix,
@@ -73,30 +81,33 @@ library SQLHelpers {
         string memory columns,
         string memory values
     ) public view returns (string memory) {
-        string memory name = toNameFromId(prefix, tableId);(prefix, tableId);
+        string memory name = toNameFromId(prefix, tableId);
+        (prefix, tableId);
         return
-            string(abi.encodePacked(
-                "INSERT INTO ",
-                name,
-                " (",
-                columns,
-                ") VALUES (",
-                values
-                ,
-                ")"
-            ));
+            string(
+                abi.encodePacked(
+                    "INSERT INTO ",
+                    name,
+                    " (",
+                    columns,
+                    ") VALUES (",
+                    values,
+                    ")"
+                )
+            );
     }
 
     /**
-     * @notice Generates an Update statement based on table prefix, tableId, setters, and filters.
+     * @dev Generates an Update statement based on table prefix, tableId, setters, and filters.
      *
-     * @param prefix the user generated table prefix as a string.
-     * @param tableId the Tableland generated tableId as a uint256.
-     * @param setters a string encoded set of updates. Example: "name='tom', age=26".
-     * @param filters a string encoded list of filters or "" for no filters. Example: "id<2 & name!='jerry'".
-     * @return update newly allocated string containing the update statement.
+     * prefix - the user generated table prefix as a string
+     * tableId - the Tableland generated tableId as a uint256
+     * setters - a string encoded set of updates. Example: "name='tom', age=26"
+     * filters - a string encoded list of filters or "" for no filters. Example: "id<2 and name!='jerry'"
      *
-     * @dev requirements: block.chainid must refer to a supported chain.
+     * Requirements:
+     *
+     * - block.chainid must refer to a supported chain.
      */
     function toUpdate(
         string memory prefix,
@@ -104,36 +115,35 @@ library SQLHelpers {
         string memory setters,
         string memory filters
     ) public view returns (string memory) {
-        string memory name = toNameFromId(prefix, tableId);(prefix, tableId);
+        string memory name = toNameFromId(prefix, tableId);
+        (prefix, tableId);
         string memory filter = "";
         if (bytes(filters).length > 0) {
             filter = string(abi.encodePacked(" WHERE ", filters));
         }
         return
-            string(abi.encodePacked(
-                "UPDATE ", name, " SET ", setters, filter
-            ));
+            string(abi.encodePacked("UPDATE ", name, " SET ", setters, filter));
     }
 
     /**
-     * @notice Generates a Delete statement based on table prefix, tableId, and filters.
+     * @dev Generates a Delete statement based on table prefix, tableId, and filters.
      *
-     * @param prefix the user generated table prefix as a string.
-     * @param tableId the Tableland generated tableId as a uint256.
-     * @param filters a string encoded list of filters. Example: "id<2 & name!='jerry'".
-     * @return delete newly allocated string containing the delete statement.
+     * prefix - the user generated table prefix as a string.
+     * tableId - the Tableland generated tableId as a uint256.
+     * filters - a string encoded list of filters. Example: "id<2 and name!='jerry'".
      *
-     * @dev requirements: block.chainid must refer to a supported chain.
+     * Requirements:
+     *
+     * - block.chainid must refer to a supported chain.
      */
     function toDelete(
         string memory prefix,
         uint256 tableId,
         string memory filters
     ) public view returns (string memory) {
-        string memory name = toNameFromId(prefix, tableId);(prefix, tableId);
+        string memory name = toNameFromId(prefix, tableId);
+        (prefix, tableId);
         return
-            string(abi.encodePacked(
-                "DELETE FROM ", name, " WHERE ", filters
-            ));
+            string(abi.encodePacked("DELETE FROM ", name, " WHERE ", filters));
     }
 }
