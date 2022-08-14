@@ -19,25 +19,25 @@ describe("SQLHelpers", function () {
     await expect(
       // This is not a valid name in Tableland but tests string concat.
       await lib.toNameFromId("_test_&$%()#@!*_123__", 101)
-    ).to.equal(
-      "_test_&$%()#@!*_123___31337_101"
-    );
+    ).to.equal("_test_&$%()#@!*_123___31337_101");
   });
-
 
   it("Should return a valid CREATE statement from schema", async function () {
     await expect(
       // This is not a valid name in Tableland but tests string concat.
       await lib.toCreateFromSchema("test_101", "id int, name text, desc text")
-    ).to.equal(
-      "CREATE TABLE test_101_31337 (id int, name text, desc text)"
-    );
+    ).to.equal("CREATE TABLE test_101_31337 (id int, name text, desc text)");
   });
 
   it("Should return a valid INSERT statement from columns and values", async function () {
     await expect(
       // This is not a valid name in Tableland but tests string concat.
-      await lib.toInsert("test_101", 1, "id, name, desc", "2, 'test', 'information'")
+      await lib.toInsert(
+        "test_101",
+        1,
+        "id, name, desc",
+        "2, 'test', 'information'"
+      )
     ).to.equal(
       "INSERT INTO test_101_31337_1 (id, name, desc) VALUES (2, 'test', 'information')"
     );
@@ -46,7 +46,12 @@ describe("SQLHelpers", function () {
   it("Should return a valid UPDATE statement from columns, setters, and filters", async function () {
     await expect(
       // This is not a valid name in Tableland but tests string concat.
-      await lib.toUpdate("test_101", 1, "name='update_test', desc='updated!'", "id=2")
+      await lib.toUpdate(
+        "test_101",
+        1,
+        "name='update_test', desc='updated!'",
+        "id=2"
+      )
     ).to.equal(
       "UPDATE test_101_31337_1 SET name='update_test', desc='updated!' WHERE id=2"
     );
@@ -55,7 +60,12 @@ describe("SQLHelpers", function () {
   it("Should return a valid UPDATE statement from columns and setters", async function () {
     await expect(
       // This is not a valid name in Tableland but tests string concat.
-      await lib.toUpdate("test_101", 1, "name='update_all_test', desc='updated!'", "")
+      await lib.toUpdate(
+        "test_101",
+        1,
+        "name='update_all_test', desc='updated!'",
+        ""
+      )
     ).to.equal(
       "UPDATE test_101_31337_1 SET name='update_all_test', desc='updated!'"
     );
@@ -65,9 +75,6 @@ describe("SQLHelpers", function () {
     await expect(
       // This is not a valid name in Tableland but tests string concat.
       await lib.toDelete("test_101", 1, "id=2")
-    ).to.equal(
-      "DELETE FROM test_101_31337_1 WHERE id=2"
-    );
+    ).to.equal("DELETE FROM test_101_31337_1 WHERE id=2");
   });
-
 });
