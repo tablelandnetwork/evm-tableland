@@ -61,7 +61,7 @@ describe("SQLHelpers", function () {
     );
   });
 
-  it("Should return a valid UPDATE statement from columns and setters", async function () {
+  it("Should return a valid DELETE statement from filters", async function () {
     await expect(
       // This is not a valid name in Tableland but tests string concat.
       await lib.toDelete("test_101", 1, "id=2")
