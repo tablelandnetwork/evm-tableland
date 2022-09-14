@@ -25,7 +25,7 @@ describe("SQLHelpers", function () {
   it("Should return a valid CREATE statement from schema", async function () {
     await expect(
       // This is not a valid name in Tableland but tests string concat.
-      await lib.toCreateFromSchema("test_101", "id int, name text, desc text")
+      await lib.toCreateFromSchema("id int, name text, desc text", "test_101")
     ).to.equal("CREATE TABLE test_101_31337 (id int, name text, desc text)");
   });
 
