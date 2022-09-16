@@ -37,14 +37,14 @@ library SQLHelpers {
     /**
      * @dev Generates a CREATE statement based on a desired schema and table prefix.
      *
-     * prefix - the user generated table prefix as a string
      * schema - a comma seperated string indicating the desired prefix. Example: "int id, text name"
+     * prefix - the user generated table prefix as a string
      *
      * Requirements:
      *
      * - block.chainid must refer to a supported chain.
      */
-    function toCreateFromSchema(string memory prefix, string memory schema)
+    function toCreateFromSchema(string memory schema, string memory prefix)
         public
         view
         returns (string memory)
