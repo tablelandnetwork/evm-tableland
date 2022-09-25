@@ -1,4 +1,3 @@
-import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import chai from "chai";
 import chaiAsPromised from "chai-as-promised";
 import { ethers } from "hardhat";
@@ -9,9 +8,7 @@ const expect = chai.expect;
 
 describe("SQLHelpers", function () {
   let lib: SQLHelpers;
-  let accounts: SignerWithAddress[];
   beforeEach(async function () {
-    accounts = await ethers.getSigners();
     const Lib = await ethers.getContractFactory("SQLHelpers");
     lib = (await Lib.deploy()) as SQLHelpers;
     await lib.deployed();
@@ -91,7 +88,6 @@ describe("SQLHelpers", function () {
       await lib.toDelete("test_101", 1, "id=2")
     ).to.equal("DELETE FROM test_101_31337_1 WHERE id=2");
   });
-
 
   it("Should return a single-quote wrapped string", async function () {
     await expect(
