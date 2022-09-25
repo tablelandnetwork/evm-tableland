@@ -1,4 +1,4 @@
-// import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import chai from "chai";
 import chaiAsPromised from "chai-as-promised";
 import { ethers } from "hardhat";
@@ -9,7 +9,9 @@ const expect = chai.expect;
 
 describe("SQLHelpers", function () {
   let lib: SQLHelpers;
+  let accounts: SignerWithAddress[];
   beforeEach(async function () {
+    accounts = await ethers.getSigners();
     const Lib = await ethers.getContractFactory("SQLHelpers");
     lib = (await Lib.deploy()) as SQLHelpers;
     await lib.deployed();
@@ -26,7 +28,7 @@ describe("SQLHelpers", function () {
     await expect(
       // This is not a valid name in Tableland but tests string concat.
       await lib.toCreateFromSchema("id int, name text, desc text", "test_101")
-    ).to.equal("CREATE TABLE test_101_31337 (id int, name text, desc text)");
+    ).to.equal("CREATE TABLE test_101_31337(id int, name text, desc text)");
   });
 
   it("Should return a valid INSERT statement from columns and values", async function () {
@@ -39,7 +41,19 @@ describe("SQLHelpers", function () {
         "2, 'test', 'information'"
       )
     ).to.equal(
-      "INSERT INTO test_101_31337_1 (id, name, desc) VALUES (2, 'test', 'information')"
+      "INSERT INTO test_101_31337_1(id, name, desc)VALUES(2, 'test', 'information')"
+    );
+  });
+
+  it("Should return a valid INSERT statement from columns and an array of values", async function () {
+    await expect(
+      // This is not a valid name in Tableland but tests string concat.
+      await lib.toBatchInsert("test_101", 1, "id, name, desc", [
+        "1,'hello','information'",
+        "2,'world','information'",
+      ])
+    ).to.equal(
+      "INSERT INTO test_101_31337_1(id, name, desc)VALUES(1,'hello','information'),(2,'world','information')"
     );
   });
 
@@ -76,5 +90,13 @@ describe("SQLHelpers", function () {
       // This is not a valid name in Tableland but tests string concat.
       await lib.toDelete("test_101", 1, "id=2")
     ).to.equal("DELETE FROM test_101_31337_1 WHERE id=2");
+  });
+
+
+  it("Should return a single-quote wrapped string", async function () {
+    await expect(
+      // This is not a valid name in Tableland but tests string concat.
+      await lib.quote("hello")
+    ).to.equal("'hello'");
   });
 });
