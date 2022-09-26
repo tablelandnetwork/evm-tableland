@@ -5,7 +5,8 @@
 *           @joewagner @sanderpick @carsonfarmer @dtbuchholz
 
 # For JS/TS files
-*.{js,ts}   @joewagner
+*.js        @joewagner
+*.ts        @joewagner
 
 # Any solidity, contracts, or scripts
 *.sol       @sanderpick @joewagner
