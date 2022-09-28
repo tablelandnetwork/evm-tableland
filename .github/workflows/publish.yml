@@ -1,0 +1,49 @@
+name: Publish
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v2.3.1
+
+      - name: Cache 📦
+        uses: actions/cache@v1
+        with:
+          path: ~/.npm # npm cache files are stored in `~/.npm` on Linux/macOS
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: Setup Node Environment ⬢
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16
+
+      - name: Install 🔧
+        run: npm install
+
+      - name: Compile 🛠
+        run: npx hardhat compile
+
+      - name: Build 🗜
+        run: npm run build
+
+      - id: publish
+        name: Publish to NPM 📦
+        uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.NPM_AUTH_TOKEN }}
+          tag: next
+          access: public
+          check-version: true
+
+      - if: steps.publish.outputs.type != 'none'
+        run: |
+          echo "Version changed: ${{ steps.publish.outputs.old-version }} => ${{ steps.publish.outputs.version }}"

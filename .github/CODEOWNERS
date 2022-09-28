@@ -1,0 +1,14 @@
+# These owners will be the default owners for everything in
+# the repo. Unless a later match takes precedence.
+# By convention in @tablelandnetwork repos, the first listed
+# CODEOWNER is the repo DRI (directly responsible individual)
+*           @joewagner @sanderpick @carsonfarmer @dtbuchholz
+
+# For JS/TS files
+*.js        @joewagner @sanderpick
+*.ts        @joewagner @sanderpick
+
+# Any solidity, contracts, or scripts
+*.sol       @sanderpick @joewagner
+scripts/    @sanderpick @joewagner
+contracts/  @sanderpick @joewagner
