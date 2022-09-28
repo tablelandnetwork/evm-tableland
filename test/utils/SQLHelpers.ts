@@ -1,4 +1,3 @@
-// import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import chai from "chai";
 import chaiAsPromised from "chai-as-promised";
 import { ethers } from "hardhat";
@@ -25,8 +24,8 @@ describe("SQLHelpers", function () {
   it("Should return a valid CREATE statement from schema", async function () {
     await expect(
       // This is not a valid name in Tableland but tests string concat.
-      await lib.toCreateFromSchema("id int, name text, desc text", "test_101")
-    ).to.equal("CREATE TABLE test_101_31337 (id int, name text, desc text)");
+      await lib.toCreateFromSchema("id int,name text,desc text", "test_101")
+    ).to.equal("CREATE TABLE test_101_31337(id int,name text,desc text)");
   });
 
   it("Should return a valid INSERT statement from columns and values", async function () {
@@ -35,11 +34,23 @@ describe("SQLHelpers", function () {
       await lib.toInsert(
         "test_101",
         1,
-        "id, name, desc",
-        "2, 'test', 'information'"
+        "id,name,desc",
+        "2,'test','information'"
       )
     ).to.equal(
-      "INSERT INTO test_101_31337_1 (id, name, desc) VALUES (2, 'test', 'information')"
+      "INSERT INTO test_101_31337_1(id,name,desc)VALUES(2,'test','information')"
+    );
+  });
+
+  it("Should return a valid INSERT statement from columns and an array of values", async function () {
+    await expect(
+      // This is not a valid name in Tableland but tests string concat.
+      await lib.toBatchInsert("test_101", 1, "id,name,desc", [
+        "1,'hello','information'",
+        "2,'world','information'",
+      ])
+    ).to.equal(
+      "INSERT INTO test_101_31337_1(id,name,desc)VALUES(1,'hello','information'),(2,'world','information')"
     );
   });
 
@@ -49,11 +60,11 @@ describe("SQLHelpers", function () {
       await lib.toUpdate(
         "test_101",
         1,
-        "name='update_test', desc='updated!'",
+        "name='update_test',desc='updated!'",
         "id=2"
       )
     ).to.equal(
-      "UPDATE test_101_31337_1 SET name='update_test', desc='updated!' WHERE id=2"
+      "UPDATE test_101_31337_1 SET name='update_test',desc='updated!' WHERE id=2"
     );
   });
 
@@ -63,11 +74,11 @@ describe("SQLHelpers", function () {
       await lib.toUpdate(
         "test_101",
         1,
-        "name='update_all_test', desc='updated!'",
+        "name='update_all_test',desc='updated!'",
         ""
       )
     ).to.equal(
-      "UPDATE test_101_31337_1 SET name='update_all_test', desc='updated!'"
+      "UPDATE test_101_31337_1 SET name='update_all_test',desc='updated!'"
     );
   });
 
@@ -76,5 +87,12 @@ describe("SQLHelpers", function () {
       // This is not a valid name in Tableland but tests string concat.
       await lib.toDelete("test_101", 1, "id=2")
     ).to.equal("DELETE FROM test_101_31337_1 WHERE id=2");
+  });
+
+  it("Should return a single-quote wrapped string", async function () {
+    await expect(
+      // This is not a valid name in Tableland but tests string concat.
+      await lib.quote("hello")
+    ).to.equal("'hello'");
   });
 });

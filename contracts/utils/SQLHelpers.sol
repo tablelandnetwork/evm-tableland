@@ -56,7 +56,7 @@ library SQLHelpers {
                     prefix,
                     "_",
                     Strings.toString(block.chainid),
-                    " (",
+                    "(",
                     schema,
                     ")"
                 )
@@ -88,13 +88,46 @@ library SQLHelpers {
                 abi.encodePacked(
                     "INSERT INTO ",
                     name,
-                    " (",
+                    "(",
                     columns,
-                    ") VALUES (",
+                    ")VALUES(",
                     values,
                     ")"
                 )
             );
+    }
+
+    /**
+     * @dev Generates an INSERT statement based on table prefix, tableId, columns, and values.
+     *
+     * prefix - the user generated table prefix as a string.
+     * tableId - the Tableland generated tableId as a uint256.
+     * columns - a string encoded ordered list of columns that will be updated. Example: "name, age".
+     * values - an array where each item is a string encoded ordered list of values.
+     *
+     * Requirements:
+     *
+     * - block.chainid must refer to a supported chain.
+     */
+    function toBatchInsert(
+        string memory prefix,
+        uint256 tableId,
+        string memory columns,
+        string[] memory values
+    ) public view returns (string memory) {
+        string memory name = toNameFromId(prefix, tableId);
+        (prefix, tableId);
+        string memory insert = string(
+            abi.encodePacked("INSERT INTO ", name, "(", columns, ")VALUES")
+        );
+        for (uint256 i = 0; i < values.length; i++) {
+            if (i == 0) {
+                insert = string(abi.encodePacked(insert, "(", values[i], ")"));
+            } else {
+                insert = string(abi.encodePacked(insert, ",(", values[i], ")"));
+            }
+        }
+        return insert;
     }
 
     /**
@@ -145,5 +178,15 @@ library SQLHelpers {
         (prefix, tableId);
         return
             string(abi.encodePacked("DELETE FROM ", name, " WHERE ", filters));
+    }
+
+    /**
+     * @dev Add single quotes around a string value
+     *
+     * input - any input value.
+     *
+     */
+    function quote(string memory input) public pure returns (string memory) {
+        return string(abi.encodePacked("'", input, "'"));
     }
 }
