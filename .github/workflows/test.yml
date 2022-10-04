@@ -35,9 +35,6 @@ jobs:
       - name: Install 🔧
         run: npm install
 
-      - name: Compile 🛠
-        run: npx hardhat compile
-
       - name: Build ⚒️
         run: npm run build
 

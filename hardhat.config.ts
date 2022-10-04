@@ -9,6 +9,7 @@ import "@nomiclabs/hardhat-waffle";
 import "@typechain/hardhat";
 import "hardhat-gas-reporter";
 import "hardhat-contract-sizer";
+import "hardhat-dependency-compiler";
 import "solidity-coverage";
 import { proxies, ProxyAddresses } from "./proxies";
 
@@ -23,6 +24,9 @@ const config: HardhatUserConfig = {
         runs: 200,
       },
     },
+  },
+  dependencyCompiler: {
+    paths: ["contracts/utils/SQLHelpers.sol", "contracts/utils/URITemplate.sol"],
   },
   contractSizer: {
     alphaSort: true,

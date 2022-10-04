@@ -40,9 +40,6 @@ jobs:
           if_true: "next"
           if_false: "latest"
 
-      - name: Compile 🛠
-        run: npx hardhat compile
-
       - name: Build 🗜
         run: npm run build
 

@@ -15,21 +15,21 @@ describe("SQLHelpers", function () {
   });
 
   it("Should return a name from a prefix", async function () {
-    await expect(
+    expect(
       // This is not a valid name in Tableland but tests string concat.
       await lib.toNameFromId("_test_&$%()#@!*_123__", 101)
     ).to.equal("_test_&$%()#@!*_123___31337_101");
   });
 
   it("Should return a valid CREATE statement from schema", async function () {
-    await expect(
+    expect(
       // This is not a valid name in Tableland but tests string concat.
       await lib.toCreateFromSchema("id int,name text,desc text", "test_101")
     ).to.equal("CREATE TABLE test_101_31337(id int,name text,desc text)");
   });
 
   it("Should return a valid INSERT statement from columns and values", async function () {
-    await expect(
+    expect(
       // This is not a valid name in Tableland but tests string concat.
       await lib.toInsert(
         "test_101",
@@ -43,7 +43,7 @@ describe("SQLHelpers", function () {
   });
 
   it("Should return a valid INSERT statement from columns and an array of values", async function () {
-    await expect(
+    expect(
       // This is not a valid name in Tableland but tests string concat.
       await lib.toBatchInsert("test_101", 1, "id,name,desc", [
         "1,'hello','information'",
@@ -55,7 +55,7 @@ describe("SQLHelpers", function () {
   });
 
   it("Should return a valid UPDATE statement from columns, setters, and filters", async function () {
-    await expect(
+    expect(
       // This is not a valid name in Tableland but tests string concat.
       await lib.toUpdate(
         "test_101",
@@ -69,7 +69,7 @@ describe("SQLHelpers", function () {
   });
 
   it("Should return a valid UPDATE statement from columns and setters", async function () {
-    await expect(
+    expect(
       // This is not a valid name in Tableland but tests string concat.
       await lib.toUpdate(
         "test_101",
@@ -83,14 +83,14 @@ describe("SQLHelpers", function () {
   });
 
   it("Should return a valid DELETE statement from filters", async function () {
-    await expect(
+    expect(
       // This is not a valid name in Tableland but tests string concat.
       await lib.toDelete("test_101", 1, "id=2")
     ).to.equal("DELETE FROM test_101_31337_1 WHERE id=2");
   });
 
   it("Should return a single-quote wrapped string", async function () {
-    await expect(
+    expect(
       // This is not a valid name in Tableland but tests string concat.
       await lib.quote("hello")
     ).to.equal("'hello'");

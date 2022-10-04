@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-pragma solidity >=0.8.4 <0.9.0;
+pragma solidity ^0.8.4;
 
 /**
  * @dev This is a subset of string slice methods from https://github.com/Arachnid/solidity-stringutils.
