@@ -1,9 +1,8 @@
 name: Publish
-
 on:
   push:
-    branches:
-      - main
+    tags:
+      - "*"
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -29,21 +28,38 @@ jobs:
       - name: Install 🔧
         run: npm install
 
+      - name: Latest
+        id: tag
+        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+
+      - name: Conditional
+        id: cond
+        uses: haya14busa/action-cond@v1
+        with:
+          cond: ${{ contains(steps.tag.outputs.tag, '-') }}
+          if_true: "next"
+          if_false: "latest"
+
       - name: Compile 🛠
         run: npx hardhat compile
 
       - name: Build 🗜
         run: npm run build
 
-      - id: publish
-        name: Publish to NPM 📦
+      - name: Publish 📦
+        id: publish
         uses: JS-DevTools/npm-publish@v1
         with:
           token: ${{ secrets.NPM_AUTH_TOKEN }}
-          tag: next
+          tag: ${{ steps.cond.outputs.value }}
           access: public
           check-version: true
 
-      - if: steps.publish.outputs.type != 'none'
-        run: |
-          echo "Version changed: ${{ steps.publish.outputs.old-version }} => ${{ steps.publish.outputs.version }}"
+      - name: Release
+        if: steps.publish.outputs.type != 'none'
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.publish.outputs.version }}
+          generateReleaseNotes: true
+          prerelease: ${{ contains(steps.publish.outputs.type, 'pre') }}
+          token: ${{ secrets.GITHUB_TOKEN }}
