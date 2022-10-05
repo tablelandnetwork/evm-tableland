@@ -25,9 +25,6 @@ library TablelandDeployments {
     // TablelandTables address on Ethereum Goerli.
     address internal constant GOERLI =
         0xDA8EA22d092307874f30A1F277D1388dca0BA97a;
-    // TablelandTables address on Optimism Kovan.
-    address internal constant OPTIMISTIC_KOVAN =
-        0xf2C9Fc73884A9c6e6Db58778176Ab67989139D06;
     // TablelandTables address on Optimism Goerli.
     address internal constant OPTIMISTIC_GOERLI =
         0xC72E8a7Be04f2469f8C2dB3F1BdF69A7D516aBbA;
@@ -60,8 +57,6 @@ library TablelandDeployments {
             return ITablelandTables(POLYGON);
         } else if (block.chainid == 5) {
             return ITablelandTables(GOERLI);
-        } else if (block.chainid == 69) {
-            return ITablelandTables(OPTIMISTIC_KOVAN);
         } else if (block.chainid == 420) {
             return ITablelandTables(OPTIMISTIC_GOERLI);
         } else if (block.chainid == 421613) {
