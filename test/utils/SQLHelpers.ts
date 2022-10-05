@@ -1,16 +1,16 @@
 import chai from "chai";
 import chaiAsPromised from "chai-as-promised";
 import { ethers } from "hardhat";
-import { SQLHelpers } from "../../typechain-types";
+import { TestSQLHelpers } from "../../typechain-types";
 
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe("SQLHelpers", function () {
-  let lib: SQLHelpers;
+  let lib: TestSQLHelpers;
   beforeEach(async function () {
-    const Lib = await ethers.getContractFactory("SQLHelpers");
-    lib = (await Lib.deploy()) as SQLHelpers;
+    const Lib = await ethers.getContractFactory("TestSQLHelpers");
+    lib = (await Lib.deploy()) as TestSQLHelpers;
     await lib.deployed();
   });
 

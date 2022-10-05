@@ -42,7 +42,7 @@ library ERC721AQueryablePolicies {
         uint256[] memory tokens = token.tokensOfOwner(caller);
 
         // Build in set clause with list of the tokens owned by caller
-        bytes memory inSet = bytes.concat(bytes(column), " in (");
+        bytes memory inSet = bytes.concat(bytes(column), " in(");
         for (uint256 i = 0; i < tokens.length; i++) {
             bytes memory id = bytes(StringsUpgradeable.toString(tokens[i]));
             if (i == 0) {
