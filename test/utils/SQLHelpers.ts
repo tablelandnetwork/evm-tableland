@@ -1,35 +1,35 @@
 import chai from "chai";
 import chaiAsPromised from "chai-as-promised";
 import { ethers } from "hardhat";
-import { SQLHelpers } from "../../typechain-types";
+import { TestSQLHelpers } from "../../typechain-types";
 
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe("SQLHelpers", function () {
-  let lib: SQLHelpers;
+  let lib: TestSQLHelpers;
   beforeEach(async function () {
-    const Lib = await ethers.getContractFactory("SQLHelpers");
-    lib = (await Lib.deploy()) as SQLHelpers;
+    const Lib = await ethers.getContractFactory("TestSQLHelpers");
+    lib = (await Lib.deploy()) as TestSQLHelpers;
     await lib.deployed();
   });
 
   it("Should return a name from a prefix", async function () {
-    await expect(
+    expect(
       // This is not a valid name in Tableland but tests string concat.
       await lib.toNameFromId("_test_&$%()#@!*_123__", 101)
     ).to.equal("_test_&$%()#@!*_123___31337_101");
   });
 
   it("Should return a valid CREATE statement from schema", async function () {
-    await expect(
+    expect(
       // This is not a valid name in Tableland but tests string concat.
       await lib.toCreateFromSchema("id int,name text,desc text", "test_101")
     ).to.equal("CREATE TABLE test_101_31337(id int,name text,desc text)");
   });
 
   it("Should return a valid INSERT statement from columns and values", async function () {
-    await expect(
+    expect(
       // This is not a valid name in Tableland but tests string concat.
       await lib.toInsert(
         "test_101",
@@ -43,7 +43,7 @@ describe("SQLHelpers", function () {
   });
 
   it("Should return a valid INSERT statement from columns and an array of values", async function () {
-    await expect(
+    expect(
       // This is not a valid name in Tableland but tests string concat.
       await lib.toBatchInsert("test_101", 1, "id,name,desc", [
         "1,'hello','information'",
@@ -55,7 +55,7 @@ describe("SQLHelpers", function () {
   });
 
   it("Should return a valid UPDATE statement from columns, setters, and filters", async function () {
-    await expect(
+    expect(
       // This is not a valid name in Tableland but tests string concat.
       await lib.toUpdate(
         "test_101",
@@ -69,7 +69,7 @@ describe("SQLHelpers", function () {
   });
 
   it("Should return a valid UPDATE statement from columns and setters", async function () {
-    await expect(
+    expect(
       // This is not a valid name in Tableland but tests string concat.
       await lib.toUpdate(
         "test_101",
@@ -83,14 +83,14 @@ describe("SQLHelpers", function () {
   });
 
   it("Should return a valid DELETE statement from filters", async function () {
-    await expect(
+    expect(
       // This is not a valid name in Tableland but tests string concat.
       await lib.toDelete("test_101", 1, "id=2")
     ).to.equal("DELETE FROM test_101_31337_1 WHERE id=2");
   });
 
   it("Should return a single-quote wrapped string", async function () {
-    await expect(
+    expect(
       // This is not a valid name in Tableland but tests string concat.
       await lib.quote("hello")
     ).to.equal("'hello'");

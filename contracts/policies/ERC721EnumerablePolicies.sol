@@ -39,7 +39,7 @@ library ERC721EnumerablePolicies {
         }
 
         // Build in set clause with list of the tokens owned by caller
-        bytes memory inSet = bytes.concat(bytes(column), " in (");
+        bytes memory inSet = bytes.concat(bytes(column), " in(");
         for (uint256 i = 0; i < balance; i++) {
             bytes memory id = bytes(
                 StringsUpgradeable.toString(

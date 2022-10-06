@@ -18,7 +18,7 @@ library SQLHelpers {
      * - block.chainid must refer to a supported chain.
      */
     function toNameFromId(string memory prefix, uint256 tableId)
-        public
+        internal
         view
         returns (string memory)
     {
@@ -45,7 +45,7 @@ library SQLHelpers {
      * - block.chainid must refer to a supported chain.
      */
     function toCreateFromSchema(string memory schema, string memory prefix)
-        public
+        internal
         view
         returns (string memory)
     {
@@ -80,9 +80,8 @@ library SQLHelpers {
         uint256 tableId,
         string memory columns,
         string memory values
-    ) public view returns (string memory) {
+    ) internal view returns (string memory) {
         string memory name = toNameFromId(prefix, tableId);
-        (prefix, tableId);
         return
             string(
                 abi.encodePacked(
@@ -114,9 +113,8 @@ library SQLHelpers {
         uint256 tableId,
         string memory columns,
         string[] memory values
-    ) public view returns (string memory) {
+    ) internal view returns (string memory) {
         string memory name = toNameFromId(prefix, tableId);
-        (prefix, tableId);
         string memory insert = string(
             abi.encodePacked("INSERT INTO ", name, "(", columns, ")VALUES")
         );
@@ -147,9 +145,8 @@ library SQLHelpers {
         uint256 tableId,
         string memory setters,
         string memory filters
-    ) public view returns (string memory) {
+    ) internal view returns (string memory) {
         string memory name = toNameFromId(prefix, tableId);
-        (prefix, tableId);
         string memory filter = "";
         if (bytes(filters).length > 0) {
             filter = string(abi.encodePacked(" WHERE ", filters));
@@ -173,9 +170,8 @@ library SQLHelpers {
         string memory prefix,
         uint256 tableId,
         string memory filters
-    ) public view returns (string memory) {
+    ) internal view returns (string memory) {
         string memory name = toNameFromId(prefix, tableId);
-        (prefix, tableId);
         return
             string(abi.encodePacked("DELETE FROM ", name, " WHERE ", filters));
     }
@@ -186,7 +182,7 @@ library SQLHelpers {
      * input - any input value.
      *
      */
-    function quote(string memory input) public pure returns (string memory) {
+    function quote(string memory input) internal pure returns (string memory) {
         return string(abi.encodePacked("'", input, "'"));
     }
 }
