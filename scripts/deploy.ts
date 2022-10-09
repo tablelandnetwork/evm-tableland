@@ -57,7 +57,7 @@ async function main() {
 
   // Warn that proxy address needs to be saved in config
   console.warn(
-    `\nSave 'proxies.${network.name}: "${tables.address}"' in 'proxies.ts'!`
+    `\nSave 'proxies.${network.name}: "${tables.address}"' in 'network.ts'!`
   );
 }
 

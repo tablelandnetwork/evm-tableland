@@ -8,19 +8,19 @@
   "main": "typechain-types/index.js",
   "types": "typechain-types/index.d.ts",
   "files": [
-    "proxies.*",
+    "network.*",
     "contracts",
     "typechain-types/**/*.js?(.map)",
     "typechain-types/**/*.d.ts"
   ],
   "exports": {
     ".": "./typechain-types/index.js",
-    "./proxies.js": "./proxies.js",
+    "./network.js": "./network.js",
     "./contracts/": "./contracts/"
   },
   "scripts": {
     "build": "hardhat compile && npx tsc -p ./tsconfig.build.json",
-    "clean": "hardhat clean && rm -rf artifacts && rm -rf typechain-types && rm -rf cache && rm -rf coverage && rm -f coverage.json",
+    "clean": "hardhat clean && rm -rf artifacts && rm -rf typechain-types && rm -rf cache && rm -rf coverage && rm -f coverage.json && rm -f network.js* && rm -f network.d*",
     "up": "npm install && npx hardhat compile && npm run build && hardhat node",
     "test": "hardhat coverage && istanbul check-coverage ./coverage.json --statements 100 --branches 96 --functions 100 --lines 100",
     "lint": "eslint '**/*.{js,ts}'",
