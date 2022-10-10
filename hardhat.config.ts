@@ -10,7 +10,7 @@ import "@typechain/hardhat";
 import "hardhat-gas-reporter";
 import "hardhat-contract-sizer";
 import "solidity-coverage";
-import { proxies, ProxyAddresses } from "./proxies";
+import { baseURIs, proxies, TablelandNetworkConfig } from "./network";
 
 dotenv.config();
 
@@ -43,8 +43,10 @@ const config: HardhatUserConfig = {
 
       // optimism
       optimisticEthereum: process.env.OPTIMISM_ETHERSCAN_API_KEY || "",
+      optimisticGoerli: process.env.OPTIMISM_ETHERSCAN_API_KEY || "",
 
       // arbitrum
+      arbitrumOne: process.env.ARBISCAN_API_KEY || "",
       arbitrumGoerli: process.env.ARBISCAN_API_KEY || "",
 
       // polygon
@@ -53,11 +55,19 @@ const config: HardhatUserConfig = {
     },
     customChains: [
       {
+        network: "optimisticGoerli",
+        chainId: 420,
+        urls: {
+          apiURL: "https://api-goerli-optimism.etherscan.io/api",
+          browserURL: "https://goerli-optimism.etherscan.io/",
+        },
+      },
+      {
         network: "arbitrumGoerli",
         chainId: 421613,
         urls: {
-          apiURL: "https://goerli-rollup-explorer.arbiscan.io/api", // this may not be correct
-          browserURL: "https://goerli-rollup-explorer.arbitrum.io/",
+          apiURL: "https://api-goerli.arbiscan.io/api",
+          browserURL: "https://goerli.arbiscan.io/",
         },
       },
     ],
@@ -80,6 +90,15 @@ const config: HardhatUserConfig = {
       accounts:
         process.env.OPTIMISM_PRIVATE_KEY !== undefined
           ? [process.env.OPTIMISM_PRIVATE_KEY]
+          : [],
+    },
+    arbitrum: {
+      url: `https://arb-mainnet.g.alchemy.com/v2/${
+        process.env.ARBITRUM_API_KEY ?? ""
+      }`,
+      accounts:
+        process.env.ARBITRUM_PRIVATE_KEY !== undefined
+          ? [process.env.ARBITRUM_PRIVATE_KEY]
           : [],
     },
     polygon: {
@@ -145,46 +164,15 @@ const config: HardhatUserConfig = {
       },
     },
   },
-  baseURIs: {
-    // mainnets
-    ethereum: "https://testnet.tableland.network/chain/1/tables/",
-    optimism: "https://testnet.tableland.network/chain/10/tables/",
-    polygon: "https://testnet.tableland.network/chain/137/tables/",
-    // testnets
-    "ethereum-goerli": "https://testnet.tableland.network/chain/5/tables/",
-    "optimism-goerli": "https://testnet.tableland.network/chain/420/tables/",
-    "arbitrum-goerli": "https://testnet.tableland.network/chain/421613/tables/", // nitro testnet
-    "polygon-mumbai": "https://testnet.tableland.network/chain/80001/tables/",
-    // devnets
-    "optimism-goerli-staging":
-      "https://staging.tableland.network/chain/420/tables/",
-    localhost: "http://localhost:8080/chain/31337/tables/",
-  },
+  baseURIs,
   proxies,
 };
-
-interface TablelandNetworkConfig {
-  // mainnets
-  ethereum: string;
-  optimism: string;
-  polygon: string;
-
-  // testnets
-  "ethereum-goerli": string;
-  "optimism-goerli": string;
-  "arbitrum-goerli": string;
-  "polygon-mumbai": string;
-
-  // devnets
-  "optimism-goerli-staging": string;
-  localhost: string; // hardhat
-}
 
 declare module "hardhat/types/config" {
   // eslint-disable-next-line no-unused-vars
   interface HardhatUserConfig {
     baseURIs: TablelandNetworkConfig;
-    proxies: ProxyAddresses;
+    proxies: TablelandNetworkConfig;
   }
 }
 

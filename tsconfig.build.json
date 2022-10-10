@@ -9,5 +9,5 @@
     "skipLibCheck": true
   },
   "include": ["./typechain-types/**/*"],
-  "files": ["proxies.ts"]
+  "files": ["network.ts"]
 }
