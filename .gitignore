@@ -7,6 +7,8 @@ typechain-types
 abi.json
 bytecode.bin
 gobuild
+network.d*
+network.js*
 
 # Hardhat files
 cache
