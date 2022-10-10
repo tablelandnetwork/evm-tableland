@@ -26,6 +26,7 @@ This is the Tableland Tables EVM contracts and client components.
 | --------------- | -------- | ------------------------------------------ |
 | Ethereum        | 1        | 0x012969f7e3439a9B04025b5a049EB9BAD82A8C12 |
 | Optimism        | 10       | 0xfad44BF5B843dE943a09D4f3E84949A11d3aa3e6 |
+| Arbitrum        | 42161    | 0x9aBd75E8640871A5a20d3B4eE6330a04c962aFfd |
 | Polygon         | 137      | 0x5c4e6A9e5C1e1BF445A062006faF19EA6c49aFeA |
 | Goerli          | 5        | 0xDA8EA22d092307874f30A1F277D1388dca0BA97a |
 | Optimism Goerli | 420      | 0xC72E8a7Be04f2469f8C2dB3F1BdF69A7D516aBbA |
@@ -74,7 +75,7 @@ npx hardhat run scripts/deploy.ts --network optimism-goerli-staging
 
 Where `optimism-goerli-staging` indicates a deployment to the Optimism Goerli testnet for the Tableland staging network.
 
-Refer to the `proxies` entry in `hardhat.config.js` for the list of current deployments.
+Refer to `proxies` in `network.ts` for the list of current deployments.
 
 ## Upgrading
 
@@ -84,7 +85,7 @@ The Tableland contracts are currently upgradeable at this early stage of develop
 npx hardhat run scripts/upgrade.ts --network optimism
 ```
 
-Upgrading on a network only works if a previous deployment already exists, referenced by a corresponding proxy address in the `proxies` entry in `hardhat.config.js`.
+Upgrading on a network only works if a previous deployment already exists, referenced by proxy address in `network.ts`.
 
 ## Extacting the ABI and Bytecode
 
