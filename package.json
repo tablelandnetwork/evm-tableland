@@ -11,12 +11,14 @@
     "network.*",
     "contracts",
     "typechain-types/**/*.js?(.map)",
-    "typechain-types/**/*.d.ts"
+    "typechain-types/**/*.d.ts",
+    "scripts"
   ],
   "exports": {
     ".": "./typechain-types/index.js",
     "./network.js": "./network.js",
-    "./contracts/": "./contracts/"
+    "./contracts/": "./contracts/",
+    "./scripts/deploy.ts": "./scripts/deploy.ts"
   },
   "scripts": {
     "build": "hardhat compile && npx tsc -p ./tsconfig.build.json",
