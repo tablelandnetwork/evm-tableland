@@ -56,7 +56,7 @@ async function main() {
   console.log("Healthbot table updated with:", runEvent.args?.statement);
 
   // Warn that proxy address needs to be saved in config
-  console.warn(
+  console.log(
     `\nSave 'proxies.${network.name}: "${tables.address}"' in 'network.ts'!`
   );
 }

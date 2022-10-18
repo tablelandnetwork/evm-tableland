@@ -1,6 +1,6 @@
 {
   "name": "@tableland/evm",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Tableland Tables EVM contracts and client components",
   "engines": {
     "node": ">=14.0.0"
@@ -11,12 +11,14 @@
     "network.*",
     "contracts",
     "typechain-types/**/*.js?(.map)",
-    "typechain-types/**/*.d.ts"
+    "typechain-types/**/*.d.ts",
+    "scripts"
   ],
   "exports": {
     ".": "./typechain-types/index.js",
     "./network.js": "./network.js",
-    "./contracts/": "./contracts/"
+    "./contracts/": "./contracts/",
+    "./scripts/deploy.ts": "./scripts/deploy.ts"
   },
   "scripts": {
     "build": "hardhat compile && npx tsc -p ./tsconfig.build.json",
