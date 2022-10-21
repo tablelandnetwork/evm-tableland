@@ -9,6 +9,10 @@ bytecode.bin
 gobuild
 network.d*
 network.js*
+hardhat.config.d*
+hardhat.config.js*
+scripts/*.d*
+scripts/*.js*
 
 # Hardhat files
 cache
