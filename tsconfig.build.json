@@ -8,6 +8,6 @@
     "declarationMap": true,
     "skipLibCheck": true
   },
-  "include": ["./typechain-types/**/*"],
-  "files": ["network.ts"]
+  "include": ["./typechain-types/**/*", "./scripts/**/*"],
+  "files": ["network.ts", "hardhat.config.ts"]
 }
