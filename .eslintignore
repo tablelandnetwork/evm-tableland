@@ -3,5 +3,9 @@ typechain-types
 artifacts
 cache
 coverage
+hardhat.config.d.ts
+hardhat.config.js
 network.d.ts
 network.js
+scripts/*.js
+scripts/*.d.ts
