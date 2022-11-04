@@ -73,10 +73,10 @@ interface ITablelandTables {
      *
      * - contract must be unpaused
      */
-    function createTable(address owner, string memory statement)
-        external
-        payable
-        returns (uint256);
+    function createTable(
+        address owner,
+        string memory statement
+    ) external payable returns (uint256);
 
     /**
      * @dev Runs a SQL statement for `caller` using `statement`.

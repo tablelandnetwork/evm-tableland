@@ -33,12 +33,9 @@ contract TestERC721Enumerable is ERC721, ERC721Enumerable, Ownable {
         super._beforeTokenTransfer(from, to, tokenId);
     }
 
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        override(ERC721, ERC721Enumerable)
-        returns (bool)
-    {
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view override(ERC721, ERC721Enumerable) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 }

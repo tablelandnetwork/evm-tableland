@@ -15,12 +15,9 @@ contract TestTablelandController is ITablelandController, Ownable {
     address private _foos;
     address private _bars;
 
-    function getPolicy(address caller)
-        public
-        payable
-        override
-        returns (ITablelandController.Policy memory)
-    {
+    function getPolicy(
+        address caller
+    ) public payable override returns (ITablelandController.Policy memory) {
         // Enforce some ether and revert if insufficient
         if (msg.value != 1 ether) {
             revert InsufficientValue(msg.value, REQUIRED_VALUE);

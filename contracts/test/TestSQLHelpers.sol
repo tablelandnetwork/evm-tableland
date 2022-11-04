@@ -7,19 +7,17 @@ import "../utils/SQLHelpers.sol";
  * @dev SQLHelpers with public methods for testing.
  */
 library TestSQLHelpers {
-    function toNameFromId(string memory prefix, uint256 tableId)
-        public
-        view
-        returns (string memory)
-    {
+    function toNameFromId(
+        string memory prefix,
+        uint256 tableId
+    ) public view returns (string memory) {
         return SQLHelpers.toNameFromId(prefix, tableId);
     }
 
-    function toCreateFromSchema(string memory schema, string memory prefix)
-        public
-        view
-        returns (string memory)
-    {
+    function toCreateFromSchema(
+        string memory schema,
+        string memory prefix
+    ) public view returns (string memory) {
         return SQLHelpers.toCreateFromSchema(schema, prefix);
     }
 
