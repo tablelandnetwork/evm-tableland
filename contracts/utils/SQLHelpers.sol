@@ -17,11 +17,10 @@ library SQLHelpers {
      *
      * - block.chainid must refer to a supported chain.
      */
-    function toNameFromId(string memory prefix, uint256 tableId)
-        internal
-        view
-        returns (string memory)
-    {
+    function toNameFromId(
+        string memory prefix,
+        uint256 tableId
+    ) internal view returns (string memory) {
         return
             string(
                 abi.encodePacked(
@@ -44,11 +43,10 @@ library SQLHelpers {
      *
      * - block.chainid must refer to a supported chain.
      */
-    function toCreateFromSchema(string memory schema, string memory prefix)
-        internal
-        view
-        returns (string memory)
-    {
+    function toCreateFromSchema(
+        string memory schema,
+        string memory prefix
+    ) internal view returns (string memory) {
         return
             string(
                 abi.encodePacked(

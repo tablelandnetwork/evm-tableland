@@ -8,11 +8,9 @@ library Policies {
     /**
      * @dev Joins multiple conditional clauses for {ITablelandController.Policy}'s `whereClause` and `withCheck` fields.
      */
-    function joinClauses(string[] memory clauses)
-        internal
-        pure
-        returns (string memory)
-    {
+    function joinClauses(
+        string[] memory clauses
+    ) internal pure returns (string memory) {
         bytes memory clause;
         for (uint256 i = 0; i < clauses.length; i++) {
             if (bytes(clauses[i]).length == 0) {
