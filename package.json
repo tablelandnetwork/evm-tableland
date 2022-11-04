@@ -1,6 +1,6 @@
 {
   "name": "@tableland/evm",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "Tableland Tables EVM contracts and client components",
   "engines": {
     "node": ">=14.0.0"
@@ -18,6 +18,7 @@
   "exports": {
     ".": "./typechain-types/index.js",
     "./network": "./network.js",
+    "./network.js": "./network.js",
     "./contracts/": "./contracts/",
     "./scripts/deploy.js": "./scripts/deploy.js"
   },
