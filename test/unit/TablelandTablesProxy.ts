@@ -8,7 +8,7 @@ import type {
   TestERC721Enumerable,
   TestERC721AQueryable,
   TestTablelandController,
-} from "../typechain-types";
+} from "../../typechain-types";
 
 chai.use(chaiAsPromised);
 const expect = chai.expect;
@@ -101,6 +101,10 @@ describe("TablelandTablesProxy", function () {
     const tables1 = await deploy(Factory, "https://foo.xyz/");
 
     // Deploy test erc721 contracts
+    const enumPolicyLib = (await (
+      await ethers.getContractFactory("ERC721EnumerablePolicies")
+    ).deploy()) as TestTablelandController;
+    await enumPolicyLib.deployed();
     const foos = (await (
       await ethers.getContractFactory("TestERC721Enumerable")
     ).deploy()) as TestERC721Enumerable;
@@ -179,7 +183,10 @@ describe("TablelandTablesProxy", function () {
       tables2
         .connect(caller2)
         .runSQL(caller2.address, tableId, runStatement, { value })
-    ).to.be.revertedWith("Unauthorized");
+    ).to.be.revertedWithCustomError(
+      enumPolicyLib,
+      "ERC721EnumerablePoliciesUnauthorized"
+    );
   });
 });
 

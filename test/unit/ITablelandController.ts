@@ -9,7 +9,9 @@ import type {
   TestERC721AQueryable,
   TestTablelandController,
   TestAllowAllTablelandController,
-} from "../typechain-types";
+  ERC721EnumerablePolicies,
+  ERC721AQueryablePolicies,
+} from "../../typechain-types";
 
 chai.use(chaiAsPromised);
 const expect = chai.expect;
@@ -19,6 +21,8 @@ describe("ITablelandController", function () {
   let tables: TablelandTables;
   let foos: TestERC721Enumerable;
   let bars: TestERC721AQueryable;
+  let enumPolicyLib: ERC721EnumerablePolicies;
+  let queryablePolicyLib: ERC721AQueryablePolicies;
   let controller: TestTablelandController;
   let allowAllController: TestAllowAllTablelandController;
 
@@ -41,6 +45,18 @@ describe("ITablelandController", function () {
       await ethers.getContractFactory("TestERC721AQueryable")
     ).deploy()) as TestERC721AQueryable;
     await bars.deployed();
+
+    // Get the enumerablePolicies library
+    enumPolicyLib = (await (
+      await ethers.getContractFactory("ERC721EnumerablePolicies")
+    ).deploy()) as TestTablelandController;
+    await enumPolicyLib.deployed();
+
+    // Get the queryablePolicies library
+    queryablePolicyLib = (await (
+      await ethers.getContractFactory("ERC721AQueryablePolicies")
+    ).deploy()) as TestTablelandController;
+    await queryablePolicyLib.deployed();
 
     // Deploy test controllers
     controller = (await (
@@ -65,7 +81,7 @@ describe("ITablelandController", function () {
       tables
         .connect(owner)
         .setController(owner.address, BigNumber.from(1), accounts[3].address)
-    ).to.be.revertedWith("OwnerQueryForNonexistentToken");
+    ).to.be.revertedWithCustomError(tables, "OwnerQueryForNonexistentToken");
 
     let tx = await tables.createTable(
       owner.address,
@@ -82,14 +98,14 @@ describe("ITablelandController", function () {
       tables
         .connect(owner)
         .setController(notOwner.address, tableId, eoaController.address)
-    ).to.be.revertedWith("Unauthorized");
+    ).to.be.revertedWithCustomError(tables, "Unauthorized");
 
     // Test only owner can set controller
     await expect(
       tables
         .connect(notOwner)
         .setController(owner.address, tableId, eoaController.address)
-    ).to.be.revertedWith("Unauthorized");
+    ).to.be.revertedWithCustomError(tables, "Unauthorized");
 
     // Test setting controller to an EOA address
     tx = await tables
@@ -107,7 +123,7 @@ describe("ITablelandController", function () {
     const runStatement = "insert into testing values (0);";
     await expect(
       tables.connect(owner).runSQL(owner.address, tableId, runStatement)
-    ).to.be.revertedWith("Unauthorized");
+    ).to.be.revertedWithCustomError(tables, "Unauthorized");
     tx = await tables
       .connect(eoaController)
       .runSQL(eoaController.address, tableId, runStatement);
@@ -200,7 +216,7 @@ describe("ITablelandController", function () {
     const owner = accounts[4];
     await expect(
       tables.connect(owner).lockController(owner.address, BigNumber.from(1))
-    ).to.be.revertedWith("OwnerQueryForNonexistentToken");
+    ).to.be.revertedWithCustomError(tables, "OwnerQueryForNonexistentToken");
 
     let tx = await tables.createTable(
       owner.address,
@@ -214,12 +230,12 @@ describe("ITablelandController", function () {
     const notOwner = accounts[5];
     await expect(
       tables.connect(owner).lockController(notOwner.address, tableId)
-    ).to.be.revertedWith("Unauthorized");
+    ).to.be.revertedWithCustomError(tables, "Unauthorized");
 
     // Test only owner can lock controller
     await expect(
       tables.connect(notOwner).lockController(owner.address, tableId)
-    ).to.be.revertedWith("Unauthorized");
+    ).to.be.revertedWithCustomError(tables, "Unauthorized");
 
     const eoaController = accounts[6];
     tx = await tables
@@ -236,12 +252,12 @@ describe("ITablelandController", function () {
       tables
         .connect(owner)
         .setController(owner.address, tableId, eoaController.address)
-    ).to.be.revertedWith("Unauthorized");
+    ).to.be.revertedWithCustomError(tables, "Unauthorized");
 
     // Test controller cannot be locked again
     await expect(
       tables.connect(owner).lockController(owner.address, tableId)
-    ).to.be.revertedWith("Unauthorized");
+    ).to.be.revertedWithCustomError(tables, "Unauthorized");
   });
 
   it("Should set and lock controller for a table with contract owner", async function () {
@@ -273,12 +289,12 @@ describe("ITablelandController", function () {
       tables
         .connect(contractOwner)
         .setController(owner.address, tableId, eoaController.address)
-    ).to.be.revertedWith("Unauthorized");
+    ).to.be.revertedWithCustomError(tables, "Unauthorized");
 
     // Test controller cannot be locked again
     await expect(
       tables.connect(contractOwner).lockController(owner.address, tableId)
-    ).to.be.revertedWith("Unauthorized");
+    ).to.be.revertedWithCustomError(tables, "Unauthorized");
   });
 
   it("Should be able to gate run SQL with controller contract", async function () {
@@ -300,7 +316,7 @@ describe("ITablelandController", function () {
     const caller = accounts[5];
     await expect(
       tables.connect(caller).runSQL(caller.address, tableId, runStatement)
-    ).to.be.revertedWith("InsufficientValue");
+    ).to.be.revertedWithCustomError(controller, "InsufficientValue");
 
     // Test that run SQL on table is gated by Foo and Bar ownership
     const value = ethers.utils.parseEther("1");
@@ -308,7 +324,10 @@ describe("ITablelandController", function () {
       tables.connect(caller).runSQL(caller.address, tableId, runStatement, {
         value,
       })
-    ).to.be.revertedWith("Unauthorized");
+    ).to.be.revertedWithCustomError(
+      enumPolicyLib,
+      "ERC721EnumerablePoliciesUnauthorized"
+    );
 
     // Test balance was reverted
     expect(await ethers.provider.getBalance(tables.address)).to.equal(
@@ -327,7 +346,10 @@ describe("ITablelandController", function () {
       tables.connect(caller).runSQL(caller.address, tableId, runStatement, {
         value,
       })
-    ).to.be.revertedWith("Unauthorized");
+    ).to.be.revertedWithCustomError(
+      queryablePolicyLib,
+      "ERC721AQueryablePoliciesUnauthorized"
+    );
 
     // Mint a Bar
     tx = await bars.connect(caller).mint();
