@@ -89,7 +89,7 @@ describe("Validator, Chain, and SDK work end to end", function () {
 
     const signer2 = accounts[2];
     const tableland2 = connect({
-      signer2,
+      signer: signer2,
       chain: "local-tableland",
     });
 
