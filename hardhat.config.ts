@@ -5,7 +5,7 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import "@openzeppelin/hardhat-upgrades";
 import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-etherscan";
-import "@nomiclabs/hardhat-waffle";
+import "@nomicfoundation/hardhat-chai-matchers";
 import "@typechain/hardhat";
 import "hardhat-gas-reporter";
 import "hardhat-contract-sizer";

@@ -1,7 +1,7 @@
 import chai from "chai";
 import chaiAsPromised from "chai-as-promised";
 import { ethers } from "hardhat";
-import { TestSQLHelpers } from "../../typechain-types";
+import { TestSQLHelpers } from "../../../typechain-types";
 
 chai.use(chaiAsPromised);
 const expect = chai.expect;

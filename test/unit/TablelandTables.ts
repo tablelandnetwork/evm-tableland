@@ -3,7 +3,7 @@ import chai from "chai";
 import chaiAsPromised from "chai-as-promised";
 import { BigNumber } from "ethers";
 import { ethers } from "hardhat";
-import { TablelandTables } from "../typechain-types";
+import { TablelandTables } from "../../typechain-types";
 
 chai.use(chaiAsPromised);
 const expect = chai.expect;
@@ -74,7 +74,7 @@ describe("TablelandTables", function () {
       tables
         .connect(owner)
         .runSQL(owner.address, BigNumber.from(1), runStatement)
-    ).to.be.revertedWith("Unauthorized");
+    ).to.be.revertedWithCustomError(tables, "Unauthorized");
 
     const createStatement = "create table testing (int a);";
     let tx = await tables
@@ -114,7 +114,7 @@ describe("TablelandTables", function () {
     const caller = accounts[6];
     await expect(
       tables.connect(sender).runSQL(caller.address, tableId, runStatement)
-    ).to.be.revertedWith("Unauthorized");
+    ).to.be.revertedWithCustomError(tables, "Unauthorized");
 
     // Test contract owner can run SQL on behalf of another account
     const contractOwner = accounts[0];
@@ -256,7 +256,7 @@ describe("TablelandTables", function () {
 
     await expect(
       tables.connect(owner).runSQL(owner.address, tableId, runStatement)
-    ).to.be.revertedWith("MaxQuerySizeExceeded");
+    ).to.be.revertedWithCustomError(tables, "MaxQuerySizeExceeded");
   });
 
   it("Should be able to get tableId inside a contract", async function () {
