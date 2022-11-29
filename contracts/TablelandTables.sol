@@ -31,6 +31,9 @@ contract TablelandTables is
     mapping(uint256 => bool) internal _locks;
     // The maximum size allowed for a query.
     uint256 internal constant QUERY_MAX_SIZE = 35000;
+    // The maximum number of sql statements that can be run in a single call to runSQLs
+    // TODO: does having a limit here make sense, and if so what should it be?
+    uint256 internal constant RUNNABLES_MAX_LENGTH = 10;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
@@ -71,9 +74,40 @@ contract TablelandTables is
     function runSQL(
         address caller,
         uint256 tableId,
-        string memory statement
+        string calldata statement
     ) external payable override whenNotPaused nonReentrant {
-        if (!_exists(tableId) || caller != _msgSenderERC721A()) {
+        _runSQL(caller, tableId, statement);
+    }
+
+    /**
+     * @dev See {ITablelandTables-runSQLs}.
+     */
+    function runSQLs(
+        address caller,
+        ITablelandTables.Runnable[] calldata runnables
+    ) external payable override whenNotPaused nonReentrant {
+        if (runnables.length > RUNNABLES_MAX_LENGTH) {
+            revert MaxStatementCountExceeded(
+                runnables.length,
+                RUNNABLES_MAX_LENGTH
+            );
+        }
+
+        for (uint256 i = 0; i < runnables.length; i++) {
+            // simple pass along of each set of runSQL calls
+            _runSQL(caller, runnables[i].tableId, runnables[i].statement);
+        }
+    }
+
+    function _runSQL(
+        address caller,
+        uint256 tableId,
+        string calldata statement
+    ) private {
+        if (
+            !_exists(tableId) ||
+            !(caller == _msgSenderERC721A() || owner() == _msgSenderERC721A())
+        ) {
             revert Unauthorized();
         }
 

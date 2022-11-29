@@ -122,6 +122,191 @@ describe("TablelandTables", function () {
     ).to.be.revertedWithCustomError(tables, "Unauthorized");
   });
 
+  it("Should NOT be able to run a set of SQL statements on table that doesn't exist", async function () {
+    // Test run SQL fails if table does not exist
+    const owner = accounts[4];
+    const runStatement1 = "insert into testing values (1);";
+    const runStatement2 = "insert into testing values (2);";
+    await expect(
+      tables.connect(owner).runSQLs(owner.address, [
+        { tableId: BigNumber.from(1), statement: runStatement1 },
+        { tableId: BigNumber.from(1), statement: runStatement2 },
+      ])
+    ).to.be.revertedWithCustomError(tables, "Unauthorized");
+  });
+
+  it("Should be able to run a set of SQL statements in the same transaction", async function () {
+    const owner = accounts[4];
+
+    const createStatement = "create table testing (int a);";
+    const runStatement1 = "insert into testing values (1);";
+    const runStatement2 = "insert into testing values (2);";
+
+    let tx = await tables
+      .connect(owner)
+      .createTable(owner.address, createStatement);
+    let receipt = await tx.wait();
+    const [, createEvent] = receipt.events ?? [];
+    const tableId = createEvent.args!.tableId;
+
+    // Test owner can run SQLs on table
+    tx = await tables.connect(owner).runSQLs(owner.address, [
+      { tableId, statement: runStatement1 },
+      { tableId, statement: runStatement2 },
+    ]);
+    receipt = await tx.wait();
+    const [runEvent1, runEvent2] = receipt.events ?? [];
+
+    // event 1
+    expect(runEvent1.args!.caller).to.equal(owner.address);
+    expect(runEvent1.args!.isOwner).to.equal(true);
+    expect(runEvent1.args!.tableId).to.equal(tableId);
+    expect(runEvent1.args!.statement).to.equal(runStatement1);
+    expect(runEvent1.args!.policy).to.not.equal(undefined);
+
+    // event 2
+    expect(runEvent2.args!.caller).to.equal(owner.address);
+    expect(runEvent2.args!.isOwner).to.equal(true);
+    expect(runEvent2.args!.tableId).to.equal(tableId);
+    expect(runEvent2.args!.statement).to.equal(runStatement2);
+    expect(runEvent2.args!.policy).to.not.equal(undefined);
+  });
+
+  it("Should be able to run a set of SQL statements on table you do not own", async function () {
+    // Test others can run SQLs on table
+    const nonOwner = accounts[5];
+    const owner = accounts[4];
+
+    const createStatement = "create table testing (int a);";
+    const runStatement1 = "insert into testing values (1);";
+    const runStatement2 = "insert into testing values (2);";
+
+    let tx = await tables
+      .connect(owner)
+      .createTable(owner.address, createStatement);
+    let receipt = await tx.wait();
+    const [, createEvent] = receipt.events ?? [];
+    const tableId = createEvent.args!.tableId;
+
+    tx = await tables.connect(nonOwner).runSQLs(nonOwner.address, [
+      { tableId, statement: runStatement1 },
+      { tableId, statement: runStatement2 },
+    ]);
+    receipt = await tx.wait();
+    const [runEvent1, runEvent2] = receipt.events ?? [];
+
+    expect(runEvent1.args!.caller).to.equal(nonOwner.address);
+    expect(runEvent1.args!.isOwner).to.equal(false);
+    expect(runEvent1.args!.tableId).to.equal(tableId);
+    expect(runEvent1.args!.statement).to.equal(runStatement1);
+    expect(runEvent1.args!.policy).to.not.equal(undefined);
+
+    expect(runEvent2.args!.caller).to.equal(nonOwner.address);
+    expect(runEvent2.args!.isOwner).to.equal(false);
+    expect(runEvent2.args!.tableId).to.equal(tableId);
+    expect(runEvent2.args!.statement).to.equal(runStatement2);
+    expect(runEvent2.args!.policy).to.not.equal(undefined);
+  });
+
+  it("Should NOT be able to run a set of SQL statements on behalf of someone else", async function () {
+    // Test others cannot run SQL on behalf of another account
+    const sender = accounts[5];
+    const caller = accounts[6];
+    const owner = accounts[4];
+
+    const createStatement = "create table testing (int a);";
+    const runStatement1 = "insert into testing values (1);";
+    const runStatement2 = "insert into testing values (2);";
+
+    const tx = await tables
+      .connect(owner)
+      .createTable(owner.address, createStatement);
+    const receipt = await tx.wait();
+    const [, createEvent] = receipt.events ?? [];
+    const tableId = createEvent.args!.tableId;
+
+    await expect(
+      tables.connect(sender).runSQLs(caller.address, [
+        { tableId, statement: runStatement1 },
+        { tableId, statement: runStatement2 },
+      ])
+    ).to.be.revertedWithCustomError(tables, "Unauthorized");
+  });
+
+  it("Should allow contract owner to run a set of SQL statements on behalf of someone else", async function () {
+    // Test contract owner can run SQL on behalf of another account
+    const contractOwner = accounts[0];
+    const tableOwner = accounts[4];
+    const caller = accounts[5];
+
+    const createStatement = "create table testing (int a);";
+    const runStatement1 = "insert into testing values (1);";
+    const runStatement2 = "insert into testing values (2);";
+
+    let tx = await tables
+      .connect(tableOwner)
+      .createTable(tableOwner.address, createStatement);
+    let receipt = await tx.wait();
+    const [, createEvent] = receipt.events ?? [];
+    const tableId = createEvent.args!.tableId;
+
+    tx = await tables.connect(contractOwner).runSQLs(caller.address, [
+      { tableId, statement: runStatement1 },
+      { tableId, statement: runStatement2 },
+    ]);
+    receipt = await tx.wait();
+    const [runEvent1, runEvent2] = receipt.events ?? [];
+
+    expect(runEvent1.args!.caller).to.equal(caller.address);
+    expect(runEvent1.args!.isOwner).to.equal(false);
+    expect(runEvent1.args!.tableId).to.equal(tableId);
+    expect(runEvent1.args!.statement).to.equal(runStatement1);
+    expect(runEvent1.args!.policy).to.not.equal(undefined);
+
+    expect(runEvent2.args!.caller).to.equal(caller.address);
+    expect(runEvent2.args!.isOwner).to.equal(false);
+    expect(runEvent2.args!.tableId).to.equal(tableId);
+    expect(runEvent2.args!.statement).to.equal(runStatement2);
+    expect(runEvent2.args!.policy).to.not.equal(undefined);
+  });
+
+  it("Should NOT allow running more than the max number of SQL statements", async function () {
+    // Test others cannot run SQL on behalf of another account
+    const owner = accounts[4];
+
+    const createStatement = "create table testing (int a);";
+    const statements = [];
+
+    let tx = await tables
+      .connect(owner)
+      .createTable(owner.address, createStatement);
+    let receipt = await tx.wait();
+    const [, createEvent] = receipt.events ?? [];
+    const tableId = createEvent.args!.tableId;
+
+    const maxStatements = 10;
+    for (let i = 0; i < maxStatements; i++) {
+      statements.push({
+        statement: `insert into testing values (${i});`,
+        tableId,
+      });
+    }
+
+    // test the max works
+    tx = await tables.connect(owner).runSQLs(owner.address, statements);
+    receipt = await tx.wait();
+
+    expect(receipt.events.length).to.equal(10);
+
+    statements.push({
+      statement: `insert into testing values (${maxStatements + 1});`,
+      tableId,
+    });
+    await expect(
+      tables.connect(owner).runSQLs(owner.address, statements)
+    ).to.be.revertedWithCustomError(tables, "MaxStatementCountExceeded");
+  });
+
   it("Should emit transfer event when table transferred", async function () {
     const owner = accounts[4];
     const createStatement = "create table testing (int a);";
