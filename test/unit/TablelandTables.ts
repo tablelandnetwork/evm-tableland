@@ -3,7 +3,12 @@ import chai from "chai";
 import chaiAsPromised from "chai-as-promised";
 import { BigNumber } from "ethers";
 import { ethers, upgrades } from "hardhat";
-import { TablelandTables } from "../../typechain-types";
+import {
+  TablelandTables,
+  TestReentrancyRunSQL,
+  TestReentrancyRunSQLs,
+  TestReentrancyBulkSQL,
+} from "../../typechain-types";
 
 chai.use(chaiAsPromised);
 const expect = chai.expect;
@@ -11,15 +16,44 @@ const expect = chai.expect;
 describe("TablelandTables", function () {
   let accounts: SignerWithAddress[];
   let tables: TablelandTables;
+  let runSqlReentrantController: TestReentrancyRunSQL;
+  let runSqlsReentrantController: TestReentrancyRunSQLs;
+  let bulkSqlReentrantController: TestReentrancyBulkSQL;
 
   beforeEach(async function () {
     accounts = await ethers.getSigners();
     const Factory = await ethers.getContractFactory("TablelandTables");
+
     tables = await (
       (await upgrades.deployProxy(Factory, ["https://foo.xyz/"], {
         kind: "uups",
       })) as TablelandTables
     ).deployed();
+
+    await tables.deployed();
+    await (await tables.initialize("https://foo.xyz/")).wait();
+
+    // Deploy test controller contracts
+    runSqlReentrantController = (await (
+      await ethers.getContractFactory("TestReentrancyRunSQL")
+    ).deploy(tables.address)) as TestReentrancyRunSQL;
+    await runSqlReentrantController.deployed();
+
+    runSqlsReentrantController = (await (
+      await ethers.getContractFactory("TestReentrancyRunSQLs")
+    ).deploy(tables.address)) as TestReentrancyRunSQLs;
+    await runSqlsReentrantController.deployed();
+
+    bulkSqlReentrantController = (await (
+      await ethers.getContractFactory("TestReentrancyBulkSQL")
+    ).deploy(tables.address)) as TestReentrancyRunSQLs;
+    await bulkSqlReentrantController.deployed();
+  });
+
+  it("Should not be initializable more than once", async function () {
+    await expect(tables.initialize("https://foo.xyz/")).to.be.revertedWith(
+      "ERC721A__Initializable: contract is already initialized"
+    );
   });
 
   it("Should have set owner to deployer address", async function () {
@@ -122,6 +156,29 @@ describe("TablelandTables", function () {
     ).to.be.revertedWithCustomError(tables, "Unauthorized");
   });
 
+  it("Should not enable reentracy attack via runSQL with policy", async function () {
+    const owner = accounts[4];
+
+    const createStatement = "create table testing (int a);";
+    const runStatement = "insert into testing values (1);";
+
+    let tx = await tables
+      .connect(owner)
+      .createTable(owner.address, createStatement);
+    const receipt = await tx.wait();
+    const [, createEvent] = receipt.events ?? [];
+    const tableId = createEvent.args!.tableId;
+
+    tx = await tables
+      .connect(owner)
+      .setController(owner.address, tableId, runSqlReentrantController.address);
+    await tx.wait();
+
+    await expect(
+      tables.connect(owner).runSQL(owner.address, tableId, runStatement)
+    ).to.be.revertedWith("ReentrancyGuard: reentrant call");
+  });
+
   it("Should be able to run a set of SQL statements in the same transaction", async function () {
     const owner = accounts[4];
 
@@ -159,6 +216,37 @@ describe("TablelandTables", function () {
     expect(runEvent2.args!.policy).to.not.equal(undefined);
   });
 
+  it("Should not enable reentracy attack via runSQLs with policy", async function () {
+    const owner = accounts[4];
+
+    const createStatement = "create table testing (int a);";
+    const runStatement1 = "insert into testing values (1);";
+    const runStatement2 = "insert into testing values (2);";
+
+    let tx = await tables
+      .connect(owner)
+      .createTable(owner.address, createStatement);
+    const receipt = await tx.wait();
+    const [, createEvent] = receipt.events ?? [];
+    const tableId = createEvent.args!.tableId;
+
+    tx = await tables
+      .connect(owner)
+      .setController(
+        owner.address,
+        tableId,
+        runSqlsReentrantController.address
+      );
+    await tx.wait();
+
+    await expect(
+      tables.connect(owner).runSQLs(owner.address, [
+        { tableId, statement: runStatement1 },
+        { tableId, statement: runStatement2 },
+      ])
+    ).to.be.revertedWith("ReentrancyGuard: reentrant call");
+  });
+
   // it("gas implications", async function () {
   //   // Test run SQL fails if table does not exist
   //   const owner = accounts[4];
@@ -187,12 +275,6 @@ describe("TablelandTables", function () {
 
   //   receipt = await tx.wait();
   //   expect(receipt.events.length).to.equal(2);
-
-  //   tx = await tables.connect(owner)
-  //     .runSQL(owner.address, BigNumber.from(1), runStatement1);
-
-  //   receipt = await tx.wait();
-  //   expect(receipt.events.length).to.equal(1);
 
   // });
 
@@ -243,6 +325,36 @@ describe("TablelandTables", function () {
     expect(runEvent2.args!.policy).to.not.equal(undefined);
   });
 
+  it("Should NOT enable reentracy attack via bulkSQL with policy", async function () {
+    const owner = accounts[4];
+
+    const createStatement = "create table testing (int a);";
+    const runStatement1 = "insert into testing values (1);";
+    const runStatement2 = "insert into testing values (2);";
+
+    let tx = await tables
+      .connect(owner)
+      .createTable(owner.address, createStatement);
+    const receipt = await tx.wait();
+    const [, createEvent] = receipt.events ?? [];
+    const tableId = createEvent.args!.tableId;
+
+    tx = await tables
+      .connect(owner)
+      .setController(
+        owner.address,
+        tableId,
+        bulkSqlReentrantController.address
+      );
+    await tx.wait();
+
+    await expect(
+      tables.connect(owner).bulkSQL(owner.address, [
+        { tableId, statement: runStatement1 },
+        { tableId, statement: runStatement2 },
+      ])
+    ).to.be.revertedWith("ReentrancyGuard: reentrant call");
+  });
   it("Should NOT be able to run bulkSQL with table that doesn't exist", async function () {
     // Test run SQL fails if table does not exist
     const owner = accounts[4];
