@@ -91,7 +91,7 @@ interface ITablelandTables {
      */
     function createTable(
         address owner,
-        string memory statement
+        string calldata statement
     ) external payable returns (uint256);
 
     /**
@@ -119,18 +119,36 @@ interface ITablelandTables {
      * @dev Runs a set SQL statements for `caller` using the `runnables`.
      *
      * caller - the address that is running the SQL statement
-     * tableId - the id of the target table
-     * statement - the SQL statement to run
+     * runnable - a struct containing the id of the target table and coresponding statement
      *
      * Requirements:
      *
      * - contract must be unpaused
      * - `msg.sender` must be `caller` or contract owner
-     * - `tableId` must exist
+     * - `tableId` must exist in each struct
      * - `caller` must be authorized by the table controller
-     * - `statement` must be less than or equal to 35000 bytes
+     * - `statement` must exist in each struct and be less than or equal to 35000 bytes
      */
     function runSQLs(
+        address caller,
+        ITablelandTables.Runnable[] calldata runnables
+    ) external payable;
+
+    /**
+     * @dev Does Create or Run for each of a set SQL statements for `caller` using the `runnables`.
+     *
+     * caller - the address that is running the SQL statement
+     * runnable - a struct optionally containing the id of the target table and coresponding statement
+     *
+     * Requirements:
+     *
+     * - contract must be unpaused
+     * - `msg.sender` must be `caller` or contract owner
+     * - `tableId` is optional in each struct
+     * - `caller` must be authorized by the table controller
+     * - `statement` must exist in each struct and be less than or equal to 35000 bytes
+     */
+    function bulkSQL(
         address caller,
         ITablelandTables.Runnable[] calldata runnables
     ) external payable;

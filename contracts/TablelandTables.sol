@@ -58,14 +58,9 @@ contract TablelandTables is
      */
     function createTable(
         address owner,
-        string memory statement
-    ) external payable override whenNotPaused returns (uint256 tableId) {
-        tableId = _nextTokenId();
-        _safeMint(owner, 1);
-
-        emit CreateTable(owner, tableId, statement);
-
-        return tableId;
+        string calldata statement
+    ) external payable override whenNotPaused returns (uint256) {
+        return _createTable(owner, statement);
     }
 
     /**
@@ -97,6 +92,44 @@ contract TablelandTables is
             // simple pass along of each set of runSQL calls
             _runSQL(caller, runnables[i].tableId, runnables[i].statement);
         }
+    }
+
+    /**
+     * @dev See {ITablelandTables-runSQLs}.
+     */
+    function bulkSQL(
+        address caller,
+        ITablelandTables.Runnable[] calldata runnables
+    ) external payable override whenNotPaused nonReentrant {
+        if (runnables.length > RUNNABLES_MAX_LENGTH) {
+            revert MaxStatementCountExceeded(
+                runnables.length,
+                RUNNABLES_MAX_LENGTH
+            );
+        }
+
+        for (uint256 i = 0; i < runnables.length; i++) {
+            if (runnables[i].tableId > 0) {
+                // simple pass along of each set of runSQL calls
+                _runSQL(caller, runnables[i].tableId, runnables[i].statement);
+            } else {
+                // if the tableId isn't greater than the default of 0 then the
+                // statement must be a create statement, and we pass it through
+                _createTable(caller, runnables[i].statement);
+            }
+        }
+    }
+
+    function _createTable(
+        address owner,
+        string calldata statement
+    ) private returns (uint256 tableId) {
+        tableId = _nextTokenId();
+        _safeMint(owner, 1);
+
+        emit CreateTable(owner, tableId, statement);
+
+        return tableId;
     }
 
     function _runSQL(
