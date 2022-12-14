@@ -11,25 +11,12 @@ contract TestURITemplate is ERC721, Ownable, URITemplate {
     using Counters for Counters.Counter;
     // Track the current value of the ERC-721 token
     Counters.Counter private _tokenIdCounter;
-    // For testing purposes, a boolean to track whether the "single" or "multiple" methods are used
-    bool isMultiple;
 
     constructor() ERC721("TestURITemplate", "URI") {}
 
     // Set the token URI by passing a string with exactly one `{id}` substring
-    function setURITemplateSingle(
-        string memory uriTemplate
-    ) external onlyOwner {
-        _setURITemplateSingle(uriTemplate);
-        isMultiple = false;
-    }
-
-    // Set the token URI by passing a string with one or multiple `{id}` substrings
-    function setURITemplateMultiple(
-        string memory uriTemplate
-    ) external onlyOwner {
-        _setURITemplateMultiple(uriTemplate);
-        isMultiple = true;
+    function setURITemplate(string[] memory uriTemplate) external onlyOwner {
+        _setURITemplate(uriTemplate);
     }
 
     // Mint an ERC-721 token
@@ -44,9 +31,6 @@ contract TestURITemplate is ERC721, Ownable, URITemplate {
         uint256 tokenId
     ) public view override returns (string memory) {
         require(_exists(tokenId), "token does not exist");
-        return
-            isMultiple
-                ? _getTokenURIMultiple(Strings.toString(tokenId))
-                : _getTokenURISingle(Strings.toString(tokenId));
+        return _getTokenURI(Strings.toString(tokenId));
     }
 }
