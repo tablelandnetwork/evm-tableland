@@ -46,8 +46,6 @@ describe("URITemplate", function () {
       // Set a new token URI
       uriString = "https://foo.xyz/asdf/";
       await contract.setURITemplate([uriString]);
-      let f = await contract.tokenURI(tokenId);
-      console.log(f);
       expect(await contract.tokenURI(tokenId)).to.equal(uriString + tokenId);
     });
 
