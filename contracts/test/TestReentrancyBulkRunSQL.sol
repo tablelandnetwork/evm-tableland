@@ -9,7 +9,7 @@ import "../policies/Policies.sol";
 import "../policies/ERC721EnumerablePolicies.sol";
 import "../policies/ERC721AQueryablePolicies.sol";
 
-contract TestReentrancyRunSQLs is ITablelandController, ERC721, Ownable {
+contract TestReentrancyBulkRunSQL is ITablelandController, ERC721, Ownable {
     ITablelandTables private _tableland;
     ITablelandTables.Runnable[] private runnables;
 
@@ -20,7 +20,7 @@ contract TestReentrancyRunSQLs is ITablelandController, ERC721, Ownable {
     function getPolicy(
         address
     ) public payable override returns (ITablelandController.Policy memory) {
-        // try to reenter `runSQLs` with some kind of malicious call...
+        // try to reenter `runSQL` with some kind of malicious call...
         uint256 tableId = 1;
         ITablelandTables.Runnable memory runnable = ITablelandTables.Runnable({
             tableId: tableId,
@@ -29,7 +29,7 @@ contract TestReentrancyRunSQLs is ITablelandController, ERC721, Ownable {
 
         runnables.push(runnable);
 
-        _tableland.runSQLs(msg.sender, runnables);
+        _tableland.runSQL(msg.sender, runnables);
         // Return allow-all policy
         return
             ITablelandController.Policy({

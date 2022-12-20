@@ -38,7 +38,10 @@ async function main() {
   // Create health bot table
   const { chainId } = await account.provider.getNetwork();
   const createStatement = `create table healthbot_${chainId} (counter integer);`;
-  let tx = await tables.createTable(account.address, createStatement);
+  let tx = await tables["runSQL(address,string)"](
+    account.address,
+    createStatement
+  );
   let receipt = await tx.wait();
   const [, createEvent] = receipt.events ?? [];
   const tableId = createEvent.args!.tableId;
@@ -46,7 +49,11 @@ async function main() {
 
   // Insert first row into health bot table
   const runStatement = `insert into healthbot_${chainId}_${tableId} values (1);`;
-  tx = await tables.runSQL(account.address, tableId, runStatement);
+  tx = await tables["runSQL(address,uint256,string)"](
+    account.address,
+    tableId,
+    runStatement
+  );
   receipt = await tx.wait();
   const [runEvent] = receipt.events ?? [];
   assert(

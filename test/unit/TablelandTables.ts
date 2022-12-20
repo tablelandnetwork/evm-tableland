@@ -6,8 +6,7 @@ import { ethers, upgrades } from "hardhat";
 import {
   TablelandTables,
   TestReentrancyRunSQL,
-  TestReentrancyRunSQLs,
-  TestReentrancyBulkSQL,
+  TestReentrancyBulkRunSQL,
 } from "../../typechain-types";
 
 chai.use(chaiAsPromised);
@@ -17,8 +16,7 @@ describe("TablelandTables", function () {
   let accounts: SignerWithAddress[];
   let tables: TablelandTables;
   let runSqlReentrantController: TestReentrancyRunSQL;
-  let runSqlsReentrantController: TestReentrancyRunSQLs;
-  let bulkSqlReentrantController: TestReentrancyBulkSQL;
+  let bulkSqlReentrantController: TestReentrancyBulkRunSQL;
 
   beforeEach(async function () {
     accounts = await ethers.getSigners();
@@ -39,14 +37,9 @@ describe("TablelandTables", function () {
     ).deploy(tables.address)) as TestReentrancyRunSQL;
     await runSqlReentrantController.deployed();
 
-    runSqlsReentrantController = (await (
-      await ethers.getContractFactory("TestReentrancyRunSQLs")
-    ).deploy(tables.address)) as TestReentrancyRunSQLs;
-    await runSqlsReentrantController.deployed();
-
     bulkSqlReentrantController = (await (
-      await ethers.getContractFactory("TestReentrancyBulkSQL")
-    ).deploy(tables.address)) as TestReentrancyRunSQLs;
+      await ethers.getContractFactory("TestReentrancyBulkRunSQL")
+    ).deploy(tables.address)) as TestReentrancyBulkRunSQL;
     await bulkSqlReentrantController.deployed();
   });
 
@@ -67,7 +60,7 @@ describe("TablelandTables", function () {
     const createStatement = "create table testing (int a);";
     let tx = await tables
       .connect(owner)
-      .createTable(owner.address, createStatement);
+      ["runSQL(address,string)"](owner.address, createStatement);
     let receipt = await tx.wait();
     let [mintEvent, createEvent] = receipt.events ?? [];
     expect(mintEvent.args!.tokenId).to.equal(BigNumber.from(1));
@@ -83,7 +76,7 @@ describe("TablelandTables", function () {
     const sender = accounts[5];
     tx = await tables
       .connect(sender)
-      .createTable(owner.address, createStatement);
+      ["runSQL(address,string)"](owner.address, createStatement);
     receipt = await tx.wait();
     [mintEvent, createEvent] = receipt.events ?? [];
     expect(mintEvent.args!.tokenId).to.equal(BigNumber.from(2));
@@ -103,13 +96,17 @@ describe("TablelandTables", function () {
     await expect(
       tables
         .connect(owner)
-        .runSQL(owner.address, BigNumber.from(1), runStatement)
+        ["runSQL(address,uint256,string)"](
+          owner.address,
+          BigNumber.from(1),
+          runStatement
+        )
     ).to.be.revertedWithCustomError(tables, "Unauthorized");
 
     const createStatement = "create table testing (int a);";
     let tx = await tables
       .connect(owner)
-      .createTable(owner.address, createStatement);
+      ["runSQL(address,string)"](owner.address, createStatement);
     let receipt = await tx.wait();
     const [, createEvent] = receipt.events ?? [];
     const tableId = createEvent.args!.tableId;
@@ -117,7 +114,7 @@ describe("TablelandTables", function () {
     // Test owner can run SQL on table
     tx = await tables
       .connect(owner)
-      .runSQL(owner.address, tableId, runStatement);
+      ["runSQL(address,uint256,string)"](owner.address, tableId, runStatement);
     receipt = await tx.wait();
     let [runEvent] = receipt.events ?? [];
     expect(runEvent.args!.caller).to.equal(owner.address);
@@ -130,7 +127,11 @@ describe("TablelandTables", function () {
     const nonOwner = accounts[5];
     tx = await tables
       .connect(nonOwner)
-      .runSQL(nonOwner.address, tableId, runStatement);
+      ["runSQL(address,uint256,string)"](
+        nonOwner.address,
+        tableId,
+        runStatement
+      );
     receipt = await tx.wait();
     [runEvent] = receipt.events ?? [];
     expect(runEvent.args!.caller).to.equal(nonOwner.address);
@@ -143,7 +144,13 @@ describe("TablelandTables", function () {
     const sender = accounts[5];
     const caller = accounts[6];
     await expect(
-      tables.connect(sender).runSQL(caller.address, tableId, runStatement)
+      tables
+        .connect(sender)
+        ["runSQL(address,uint256,string)"](
+          caller.address,
+          tableId,
+          runStatement
+        )
     ).to.be.revertedWithCustomError(tables, "Unauthorized");
 
     // Test contract owner can not run SQL on behalf of another account
@@ -152,8 +159,19 @@ describe("TablelandTables", function () {
     await expect(
       tables
         .connect(contractOwner)
-        .runSQL(caller.address, tableId, runStatement)
+        ["runSQL(address,uint256,string)"](caller.address, tableId, runStatement)
     ).to.be.revertedWithCustomError(tables, "Unauthorized");
+
+    tx = await tables
+      .connect(contractOwner)
+      ["runSQL(address,uint256,string)"](caller.address, tableId, runStatement);
+    receipt = await tx.wait();
+    [runEvent] = receipt.events ?? [];
+    expect(runEvent.args!.caller).to.equal(caller.address);
+    expect(runEvent.args!.isOwner).to.equal(false);
+    expect(runEvent.args!.tableId).to.equal(tableId);
+    expect(runEvent.args!.statement).to.equal(runStatement);
+    expect(runEvent.args!.policy).to.not.equal(undefined);
   });
 
   it("Should not enable reentracy attack via runSQL with policy", async function () {
@@ -164,7 +182,7 @@ describe("TablelandTables", function () {
 
     let tx = await tables
       .connect(owner)
-      .createTable(owner.address, createStatement);
+      ["runSQL(address,string)"](owner.address, createStatement);
     const receipt = await tx.wait();
     const [, createEvent] = receipt.events ?? [];
     const tableId = createEvent.args!.tableId;
@@ -175,7 +193,9 @@ describe("TablelandTables", function () {
     await tx.wait();
 
     await expect(
-      tables.connect(owner).runSQL(owner.address, tableId, runStatement)
+      tables
+        .connect(owner)
+        ["runSQL(address,uint256,string)"](owner.address, tableId, runStatement)
     ).to.be.revertedWith("ReentrancyGuard: reentrant call");
   });
 
@@ -188,16 +208,18 @@ describe("TablelandTables", function () {
 
     let tx = await tables
       .connect(owner)
-      .createTable(owner.address, createStatement);
+      ["runSQL(address,string)"](owner.address, createStatement);
     let receipt = await tx.wait();
     const [, createEvent] = receipt.events ?? [];
     const tableId = createEvent.args!.tableId;
 
     // Test owner can run SQLs on table
-    tx = await tables.connect(owner).runSQLs(owner.address, [
-      { tableId, statement: runStatement1 },
-      { tableId, statement: runStatement2 },
-    ]);
+    tx = await tables
+      .connect(owner)
+      ["runSQL(address,(uint256,string)[])"](owner.address, [
+        { tableId, statement: runStatement1 },
+        { tableId, statement: runStatement2 },
+      ]);
     receipt = await tx.wait();
     const [runEvent1, runEvent2] = receipt.events ?? [];
 
@@ -216,7 +238,7 @@ describe("TablelandTables", function () {
     expect(runEvent2.args!.policy).to.not.equal(undefined);
   });
 
-  it("Should not enable reentracy attack via runSQLs with policy", async function () {
+  it("Should not enable reentracy attack via bulk runSQL with policy", async function () {
     const owner = accounts[4];
 
     const createStatement = "create table testing (int a);";
@@ -225,7 +247,7 @@ describe("TablelandTables", function () {
 
     let tx = await tables
       .connect(owner)
-      .createTable(owner.address, createStatement);
+      ["runSQL(address,string)"](owner.address, createStatement);
     const receipt = await tx.wait();
     const [, createEvent] = receipt.events ?? [];
     const tableId = createEvent.args!.tableId;
@@ -235,48 +257,19 @@ describe("TablelandTables", function () {
       .setController(
         owner.address,
         tableId,
-        runSqlsReentrantController.address
+        bulkSqlReentrantController.address
       );
     await tx.wait();
 
     await expect(
-      tables.connect(owner).runSQLs(owner.address, [
-        { tableId, statement: runStatement1 },
-        { tableId, statement: runStatement2 },
-      ])
+      tables
+        .connect(owner)
+        ["runSQL(address,(uint256,string)[])"](owner.address, [
+          { tableId, statement: runStatement1 },
+          { tableId, statement: runStatement2 },
+        ])
     ).to.be.revertedWith("ReentrancyGuard: reentrant call");
   });
-
-  // it("gas implications", async function () {
-  //   // Test run SQL fails if table does not exist
-  //   const owner = accounts[4];
-  //   const createStatement = "create table testing (int a);";
-  //   const runStatement1 = "insert into testing values (1);";
-
-  //   let tx = await tables
-  //     .connect(owner)
-  //     .createTable(owner.address, createStatement);
-  //   let receipt = await tx.wait();
-  //   const [, createEvent] = receipt.events ?? [];
-  //   const tableId = createEvent.args!.tableId;
-
-  //   tx = await tables.connect(owner).runSQLs(owner.address, [
-  //     { tableId, statement: runStatement1 },
-  //     { tableId, statement: runStatement1 },
-  //   ]);
-
-  //   receipt = await tx.wait();
-  //   expect(receipt.events.length).to.equal(2);
-
-  //   tx = await tables.connect(owner).bulkSQL(owner.address, [
-  //     { tableId, statement: runStatement1 },
-  //     { tableId, statement: runStatement1 },
-  //   ]);
-
-  //   receipt = await tx.wait();
-  //   expect(receipt.events.length).to.equal(2);
-
-  // });
 
   it("Should be able to run a set of runSQL and create statements in the same transaction", async function () {
     const owner = accounts[4];
@@ -288,16 +281,18 @@ describe("TablelandTables", function () {
 
     let tx = await tables
       .connect(owner)
-      .createTable(owner.address, createStatement);
+      ["runSQL(address,string)"](owner.address, createStatement);
     let receipt = await tx.wait();
     const [, createEvent] = receipt.events ?? [];
     const tableId = createEvent.args!.tableId;
 
-    tx = await tables.connect(owner).bulkSQL(owner.address, [
-      { tableId, statement: statement1 },
-      { tableId: BigNumber.from(0), statement: statement2 },
-      { tableId, statement: statement3 },
-    ]);
+    tx = await tables
+      .connect(owner)
+      ["runSQL(address,(uint256,string)[])"](owner.address, [
+        { tableId, statement: statement1 },
+        { tableId: BigNumber.from(0), statement: statement2 },
+        { tableId, statement: statement3 },
+      ]);
     receipt = await tx.wait();
     const [runEvent1, transferEvent, createEvent1, runEvent2] =
       receipt.events ?? [];
@@ -334,7 +329,7 @@ describe("TablelandTables", function () {
 
     let tx = await tables
       .connect(owner)
-      .createTable(owner.address, createStatement);
+      ["runSQL(address,string)"](owner.address, createStatement);
     const receipt = await tx.wait();
     const [, createEvent] = receipt.events ?? [];
     const tableId = createEvent.args!.tableId;
@@ -349,10 +344,12 @@ describe("TablelandTables", function () {
     await tx.wait();
 
     await expect(
-      tables.connect(owner).bulkSQL(owner.address, [
-        { tableId, statement: runStatement1 },
-        { tableId, statement: runStatement2 },
-      ])
+      tables
+        .connect(owner)
+        ["runSQL(address,(uint256,string)[])"](owner.address, [
+          { tableId, statement: runStatement1 },
+          { tableId, statement: runStatement2 },
+        ])
     ).to.be.revertedWith("ReentrancyGuard: reentrant call");
   });
   it("Should NOT be able to run bulkSQL with table that doesn't exist", async function () {
@@ -361,10 +358,12 @@ describe("TablelandTables", function () {
     const runStatement1 = "insert into testing values (1);";
     const runStatement2 = "insert into testing values (2);";
     await expect(
-      tables.connect(owner).bulkSQL(owner.address, [
-        { tableId: BigNumber.from(1), statement: runStatement1 },
-        { tableId: BigNumber.from(1), statement: runStatement2 },
-      ])
+      tables
+        .connect(owner)
+        ["runSQL(address,(uint256,string)[])"](owner.address, [
+          { tableId: BigNumber.from(1), statement: runStatement1 },
+          { tableId: BigNumber.from(1), statement: runStatement2 },
+        ])
     ).to.be.revertedWithCustomError(tables, "Unauthorized");
   });
 
@@ -379,17 +378,19 @@ describe("TablelandTables", function () {
 
     let tx = await tables
       .connect(owner)
-      .createTable(owner.address, createStatement);
+      ["runSQL(address,string)"](owner.address, createStatement);
     let receipt = await tx.wait();
     const [, createEvent] = receipt.events ?? [];
     const tableId = createEvent.args!.tableId;
 
-    tx = await tables.connect(nonOwner).bulkSQL(nonOwner.address, [
-      { tableId, statement: runStatement1 },
-      { tableId, statement: runStatement2 },
-      // this creates the table for the nonOwner address and gives them ownership
-      { tableId: BigNumber.from(0), statement: createStatement },
-    ]);
+    tx = await tables
+      .connect(nonOwner)
+      ["runSQL(address,(uint256,string)[])"](nonOwner.address, [
+        { tableId, statement: runStatement1 },
+        { tableId, statement: runStatement2 },
+        // this creates the table for the nonOwner address and gives them ownership
+        { tableId: BigNumber.from(0), statement: createStatement },
+      ]);
     receipt = await tx.wait();
     const [runEvent1, runEvent2, transferEvent, createEvent1] =
       receipt.events ?? [];
@@ -417,7 +418,7 @@ describe("TablelandTables", function () {
     expect(createEvent1.args!.owner).to.equal(nonOwner.address);
   });
 
-  it("Should NOT be able to run bulkSQL on behalf of someone else", async function () {
+  it("Should NOT be able to run bulk runSQL on behalf of someone else", async function () {
     // Test others cannot run SQL on behalf of another account
     const sender = accounts[5];
     const caller = accounts[6];
@@ -429,20 +430,22 @@ describe("TablelandTables", function () {
 
     const tx = await tables
       .connect(owner)
-      .createTable(owner.address, createStatement);
+      ["runSQL(address,string)"](owner.address, createStatement);
     const receipt = await tx.wait();
     const [, createEvent] = receipt.events ?? [];
     const tableId = createEvent.args!.tableId;
 
     await expect(
-      tables.connect(sender).bulkSQL(caller.address, [
-        { tableId, statement: runStatement1 },
-        { tableId, statement: runStatement2 },
-      ])
+      tables
+        .connect(sender)
+        ["runSQL(address,(uint256,string)[])"](caller.address, [
+          { tableId, statement: runStatement1 },
+          { tableId, statement: runStatement2 },
+        ])
     ).to.be.revertedWithCustomError(tables, "Unauthorized");
   });
 
-  it("Should allow contract owner to run bulkSQL on behalf of someone else", async function () {
+  it("Should allow contract owner to run bulk runSQL on behalf of someone else", async function () {
     // Test contract owner can run SQL on behalf of another account
     const contractOwner = accounts[0];
     const tableOwner = accounts[4];
@@ -454,16 +457,18 @@ describe("TablelandTables", function () {
 
     let tx = await tables
       .connect(tableOwner)
-      .createTable(tableOwner.address, createStatement);
+      ["runSQL(address,string)"](tableOwner.address, createStatement);
     let receipt = await tx.wait();
     const [, createEvent] = receipt.events ?? [];
     const tableId = createEvent.args!.tableId;
 
-    tx = await tables.connect(contractOwner).bulkSQL(caller.address, [
-      { tableId, statement: runStatement1 },
-      { tableId, statement: runStatement2 },
-      { tableId: BigNumber.from(0), statement: createStatement },
-    ]);
+    tx = await tables
+      .connect(contractOwner)
+      ["runSQL(address,(uint256,string)[])"](caller.address, [
+        { tableId, statement: runStatement1 },
+        { tableId, statement: runStatement2 },
+        { tableId: BigNumber.from(0), statement: createStatement },
+      ]);
     receipt = await tx.wait();
     const [runEvent1, runEvent2, transferEvent, createEvent1] =
       receipt.events ?? [];
@@ -491,7 +496,7 @@ describe("TablelandTables", function () {
     expect(createEvent1.args!.owner).to.equal(caller.address);
   });
 
-  it("Should NOT allow bulkSQL to run more than the max number of SQL statements", async function () {
+  it("Should NOT allow bulk runSQL to run more than the max number of SQL statements", async function () {
     // Test others cannot run SQL on behalf of another account
     const owner = accounts[4];
 
@@ -500,7 +505,7 @@ describe("TablelandTables", function () {
 
     let tx = await tables
       .connect(owner)
-      .createTable(owner.address, createStatement);
+      ["runSQL(address,string)"](owner.address, createStatement);
     let receipt = await tx.wait();
     const [, createEvent] = receipt.events ?? [];
     const tableId = createEvent.args!.tableId;
@@ -521,7 +526,9 @@ describe("TablelandTables", function () {
     }
 
     // test the max works
-    tx = await tables.connect(owner).bulkSQL(owner.address, statements);
+    tx = await tables
+      .connect(owner)
+      ["runSQL(address,(uint256,string)[])"](owner.address, statements);
     receipt = await tx.wait();
 
     expect(receipt.events.length).to.equal(15);
@@ -531,11 +538,13 @@ describe("TablelandTables", function () {
       tableId,
     });
     await expect(
-      tables.connect(owner).bulkSQL(owner.address, statements)
+      tables
+        .connect(owner)
+        ["runSQL(address,(uint256,string)[])"](owner.address, statements)
     ).to.be.revertedWithCustomError(tables, "MaxStatementCountExceeded");
   });
 
-  it("Should NOT allow bulkSQL to run when paused", async function () {
+  it("Should NOT allow bulk runSQL to run when paused", async function () {
     // Test others cannot run SQL on behalf of another account
     const owner = accounts[4];
     const contractOwner = accounts[0];
@@ -546,7 +555,7 @@ describe("TablelandTables", function () {
 
     let tx = await tables
       .connect(owner)
-      .createTable(owner.address, createStatement);
+      ["runSQL(address,string)"](owner.address, createStatement);
     const receipt = await tx.wait();
     const [, createEvent] = receipt.events ?? [];
     const tableId = createEvent.args!.tableId;
@@ -557,11 +566,13 @@ describe("TablelandTables", function () {
 
     // Test creating tables is paused
     await expect(
-      tables.connect(owner).bulkSQL(owner.address, [
-        { tableId, statement: runStatement1 },
-        { tableId, statement: runStatement2 },
-        { tableId: BigNumber.from(0), statement: createStatement },
-      ])
+      tables
+        .connect(owner)
+        ["runSQL(address,(uint256,string)[])"](owner.address, [
+          { tableId, statement: runStatement1 },
+          { tableId, statement: runStatement2 },
+          { tableId: BigNumber.from(0), statement: createStatement },
+        ])
     ).to.be.revertedWith("Pausable: paused");
   });
 
@@ -571,10 +582,12 @@ describe("TablelandTables", function () {
     const runStatement1 = "insert into testing values (1);";
     const runStatement2 = "insert into testing values (2);";
     await expect(
-      tables.connect(owner).runSQLs(owner.address, [
-        { tableId: BigNumber.from(1), statement: runStatement1 },
-        { tableId: BigNumber.from(1), statement: runStatement2 },
-      ])
+      tables
+        .connect(owner)
+        ["runSQL(address,(uint256,string)[])"](owner.address, [
+          { tableId: BigNumber.from(1), statement: runStatement1 },
+          { tableId: BigNumber.from(1), statement: runStatement2 },
+        ])
     ).to.be.revertedWithCustomError(tables, "Unauthorized");
   });
 
@@ -589,15 +602,17 @@ describe("TablelandTables", function () {
 
     let tx = await tables
       .connect(owner)
-      .createTable(owner.address, createStatement);
+      ["runSQL(address,string)"](owner.address, createStatement);
     let receipt = await tx.wait();
     const [, createEvent] = receipt.events ?? [];
     const tableId = createEvent.args!.tableId;
 
-    tx = await tables.connect(nonOwner).runSQLs(nonOwner.address, [
-      { tableId, statement: runStatement1 },
-      { tableId, statement: runStatement2 },
-    ]);
+    tx = await tables
+      .connect(nonOwner)
+      ["runSQL(address,(uint256,string)[])"](nonOwner.address, [
+        { tableId, statement: runStatement1 },
+        { tableId, statement: runStatement2 },
+      ]);
     receipt = await tx.wait();
     const [runEvent1, runEvent2] = receipt.events ?? [];
 
@@ -626,16 +641,18 @@ describe("TablelandTables", function () {
 
     const tx = await tables
       .connect(owner)
-      .createTable(owner.address, createStatement);
+      ["runSQL(address,string)"](owner.address, createStatement);
     const receipt = await tx.wait();
     const [, createEvent] = receipt.events ?? [];
     const tableId = createEvent.args!.tableId;
 
     await expect(
-      tables.connect(sender).runSQLs(caller.address, [
-        { tableId, statement: runStatement1 },
-        { tableId, statement: runStatement2 },
-      ])
+      tables
+        .connect(sender)
+        ["runSQL(address,(uint256,string)[])"](caller.address, [
+          { tableId, statement: runStatement1 },
+          { tableId, statement: runStatement2 },
+        ])
     ).to.be.revertedWithCustomError(tables, "Unauthorized");
   });
 
@@ -651,15 +668,17 @@ describe("TablelandTables", function () {
 
     let tx = await tables
       .connect(tableOwner)
-      .createTable(tableOwner.address, createStatement);
+      ["runSQL(address,string)"](tableOwner.address, createStatement);
     let receipt = await tx.wait();
     const [, createEvent] = receipt.events ?? [];
     const tableId = createEvent.args!.tableId;
 
-    tx = await tables.connect(contractOwner).runSQLs(caller.address, [
-      { tableId, statement: runStatement1 },
-      { tableId, statement: runStatement2 },
-    ]);
+    tx = await tables
+      .connect(contractOwner)
+      ["runSQL(address,(uint256,string)[])"](caller.address, [
+        { tableId, statement: runStatement1 },
+        { tableId, statement: runStatement2 },
+      ]);
     receipt = await tx.wait();
     const [runEvent1, runEvent2] = receipt.events ?? [];
 
@@ -685,7 +704,7 @@ describe("TablelandTables", function () {
 
     let tx = await tables
       .connect(owner)
-      .createTable(owner.address, createStatement);
+      ["runSQL(address,string)"](owner.address, createStatement);
     let receipt = await tx.wait();
     const [, createEvent] = receipt.events ?? [];
     const tableId = createEvent.args!.tableId;
@@ -699,7 +718,9 @@ describe("TablelandTables", function () {
     }
 
     // test the max works
-    tx = await tables.connect(owner).runSQLs(owner.address, statements);
+    tx = await tables
+      .connect(owner)
+      ["runSQL(address,(uint256,string)[])"](owner.address, statements);
     receipt = await tx.wait();
 
     expect(receipt.events.length).to.equal(10);
@@ -709,7 +730,9 @@ describe("TablelandTables", function () {
       tableId,
     });
     await expect(
-      tables.connect(owner).runSQLs(owner.address, statements)
+      tables
+        .connect(owner)
+        ["runSQL(address,(uint256,string)[])"](owner.address, statements)
     ).to.be.revertedWithCustomError(tables, "MaxStatementCountExceeded");
   });
 
@@ -724,7 +747,7 @@ describe("TablelandTables", function () {
 
     let tx = await tables
       .connect(owner)
-      .createTable(owner.address, createStatement);
+      ["runSQL(address,string)"](owner.address, createStatement);
     const receipt = await tx.wait();
     const [, createEvent] = receipt.events ?? [];
     const tableId = createEvent.args!.tableId;
@@ -735,10 +758,12 @@ describe("TablelandTables", function () {
 
     // Test creating tables is paused
     await expect(
-      tables.connect(owner).runSQLs(owner.address, [
-        { tableId, statement: runStatement1 },
-        { tableId, statement: runStatement2 },
-      ])
+      tables
+        .connect(owner)
+        ["runSQL(address,(uint256,string)[])"](owner.address, [
+          { tableId, statement: runStatement1 },
+          { tableId, statement: runStatement2 },
+        ])
     ).to.be.revertedWith("Pausable: paused");
   });
 
@@ -747,7 +772,7 @@ describe("TablelandTables", function () {
     const createStatement = "create table testing (int a);";
     let tx = await tables
       .connect(owner)
-      .createTable(owner.address, createStatement);
+      ["runSQL(address,string)"](owner.address, createStatement);
     let receipt = await tx.wait();
     const [, createEvent] = receipt.events ?? [];
     const tableId = createEvent.args!.tableId;
@@ -785,7 +810,10 @@ describe("TablelandTables", function () {
 
     tx = await tables
       .connect(owner)
-      .createTable(owner.address, "create table testing (int a);");
+      ["runSQL(address,string)"](
+        owner.address,
+        "create table testing (int a);"
+      );
     await tx.wait();
     const tokenURI = await tables.tokenURI(1);
     expect(tokenURI).includes("https://fake.com/");
@@ -796,7 +824,7 @@ describe("TablelandTables", function () {
     const createStatement = "create table testing (int a);";
     let tx = await tables
       .connect(owner)
-      .createTable(owner.address, createStatement);
+      ["runSQL(address,string)"](owner.address, createStatement);
     await tx.wait();
 
     // Test only contract owner can pause
@@ -811,14 +839,16 @@ describe("TablelandTables", function () {
 
     // Test creating tables is paused
     await expect(
-      tables.connect(owner).createTable(owner.address, createStatement)
+      tables
+        .connect(owner)
+        ["runSQL(address,string)"](owner.address, createStatement)
     ).to.be.revertedWith("Pausable: paused");
 
     // Test running SQL is paused
     await expect(
       tables
         .connect(owner)
-        .runSQL(
+        ["runSQL(address,uint256,string)"](
           owner.address,
           BigNumber.from(1),
           "insert into testing values (0);"
@@ -849,7 +879,7 @@ describe("TablelandTables", function () {
     // Test creating tables is unpaused
     tx = await tables
       .connect(owner)
-      .createTable(owner.address, createStatement);
+      ["runSQL(address,string)"](owner.address, createStatement);
     await tx.wait();
   });
 
@@ -858,7 +888,7 @@ describe("TablelandTables", function () {
     const createStatement = "create table testing (int a);";
     const tx = await tables
       .connect(owner)
-      .createTable(owner.address, createStatement);
+      ["runSQL(address,string)"](owner.address, createStatement);
     const receipt = await tx.wait();
     const [, createEvent] = receipt.events ?? [];
     const tableId = createEvent.args!.tableId;
@@ -867,7 +897,9 @@ describe("TablelandTables", function () {
     const runStatement = Array(35001).fill("a").join("");
 
     await expect(
-      tables.connect(owner).runSQL(owner.address, tableId, runStatement)
+      tables
+        .connect(owner)
+        ["runSQL(address,uint256,string)"](owner.address, tableId, runStatement)
     ).to.be.revertedWithCustomError(tables, "MaxQuerySizeExceeded");
   });
 

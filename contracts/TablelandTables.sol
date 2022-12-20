@@ -54,9 +54,9 @@ contract TablelandTables is
     }
 
     /**
-     * @dev See {ITablelandTables-createTable}.
+     * @dev See {ITablelandTables-runSQL}.
      */
-    function createTable(
+    function runSQL(
         address owner,
         string calldata statement
     ) external payable override whenNotPaused returns (uint256) {
@@ -71,33 +71,13 @@ contract TablelandTables is
         uint256 tableId,
         string calldata statement
     ) external payable override whenNotPaused nonReentrant {
-        _runSQL(caller, tableId, statement);
+        _mutateTable(caller, tableId, statement);
     }
 
     /**
-     * @dev See {ITablelandTables-runSQLs}.
+     * @dev See {ITablelandTables-runSQL}.
      */
-    function runSQLs(
-        address caller,
-        ITablelandTables.Runnable[] calldata runnables
-    ) external payable override whenNotPaused nonReentrant {
-        if (runnables.length > RUNNABLES_MAX_LENGTH) {
-            revert MaxStatementCountExceeded(
-                runnables.length,
-                RUNNABLES_MAX_LENGTH
-            );
-        }
-
-        for (uint256 i = 0; i < runnables.length; i++) {
-            // simple pass along of each set of runSQL calls
-            _runSQL(caller, runnables[i].tableId, runnables[i].statement);
-        }
-    }
-
-    /**
-     * @dev See {ITablelandTables-runSQLs}.
-     */
-    function bulkSQL(
+    function runSQL(
         address caller,
         ITablelandTables.Runnable[] calldata runnables
     ) external payable override whenNotPaused nonReentrant {
@@ -111,7 +91,11 @@ contract TablelandTables is
         for (uint256 i = 0; i < runnables.length; i++) {
             if (runnables[i].tableId > 0) {
                 // simple pass along of each set of runSQL calls
-                _runSQL(caller, runnables[i].tableId, runnables[i].statement);
+                _mutateTable(
+                    caller,
+                    runnables[i].tableId,
+                    runnables[i].statement
+                );
             } else {
                 // if the tableId isn't greater than the default of 0 then the
                 // statement must be a create statement, and we pass it through
@@ -132,7 +116,7 @@ contract TablelandTables is
         return tableId;
     }
 
-    function _runSQL(
+    function _mutateTable(
         address caller,
         uint256 tableId,
         string calldata statement
