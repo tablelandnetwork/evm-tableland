@@ -76,11 +76,11 @@ describe("TablelandTablesProxy", function () {
     const createStatement = "create table testing (int a);";
     let tx = await tables1
       .connect(owner)
-      ["runSQL(address,string)"](owner.address, createStatement);
+      .createTable(owner.address, createStatement);
     await tx.wait();
     tx = await tables2
       .connect(owner)
-      ["runSQL(address,string)"](owner.address, createStatement);
+      .createTable(owner.address, createStatement);
     await tx.wait();
 
     expect(await tables1.tokenURI(1)).to.include("https://foo.xyz/");
@@ -95,10 +95,7 @@ describe("TablelandTablesProxy", function () {
     const owner = accounts[1];
     const tx = await tables1
       .connect(owner)
-      ["runSQL(address,string)"](
-        owner.address,
-        "create table testing (int a);"
-      );
+      .createTable(owner.address, "create table testing (int a);");
     await tx.wait();
 
     const Factory2 = await ethers.getContractFactory(
@@ -195,10 +192,7 @@ describe("TablelandTablesProxy", function () {
     const owner = accounts[1];
     let tx = await tables1
       .connect(owner)
-      ["runSQL(address,string)"](
-        owner.address,
-        "create table testing (int a);"
-      );
+      .createTable(owner.address, "create table testing (int a);");
     let receipt = await tx.wait();
     const [, createEvent] = receipt.events ?? [];
     const tableId = createEvent.args!.tableId;
@@ -221,12 +215,7 @@ describe("TablelandTablesProxy", function () {
     const value = ethers.utils.parseEther("1");
     tx = await tables1
       .connect(caller)
-      ["runSQL(address,uint256,string)"](
-        caller.address,
-        tableId,
-        runStatement,
-        { value }
-      );
+      .writeToTable(caller.address, tableId, runStatement, { value });
     receipt = await tx.wait();
     let [runEvent] = receipt.events ?? [];
     expect(runEvent.args!.caller).to.equal(caller.address);
@@ -243,12 +232,7 @@ describe("TablelandTablesProxy", function () {
     // Run sql again against new tables implementation
     tx = await tables2
       .connect(caller)
-      ["runSQL(address,uint256,string)"](
-        caller.address,
-        tableId,
-        runStatement,
-        { value }
-      );
+      .writeToTable(caller.address, tableId, runStatement, { value });
     receipt = await tx.wait();
     [runEvent] = receipt.events ?? [];
     expect(runEvent.args!.caller).to.equal(caller.address);
@@ -262,12 +246,7 @@ describe("TablelandTablesProxy", function () {
     await expect(
       tables2
         .connect(caller2)
-        ["runSQL(address,uint256,string)"](
-          caller2.address,
-          tableId,
-          runStatement,
-          { value }
-        )
+        .writeToTable(caller2.address, tableId, runStatement, { value })
     ).to.be.revertedWithCustomError(
       enumPolicyLib,
       "ERC721EnumerablePoliciesUnauthorized"

@@ -45,12 +45,12 @@ contract TestTablelandTablesUpgrade is
         _baseURIString = baseURI;
     }
 
-    function runSQL(
+    function createTable(
         address,
         string memory
     ) external payable override whenNotPaused returns (uint256) {} // solhint-disable no-empty-blocks
 
-    function runSQL(
+    function writeToTable(
         address caller,
         uint256 tableId,
         string memory statement
@@ -70,6 +70,12 @@ contract TestTablelandTablesUpgrade is
             _getPolicy(caller, tableId)
         );
     }
+
+    function runSQL(
+        address caller,
+        uint256 tableId,
+        string memory statement
+    ) external payable override whenNotPaused nonReentrant {} // solhint-disable no-empty-blocks
 
     function runSQL(
         address caller,

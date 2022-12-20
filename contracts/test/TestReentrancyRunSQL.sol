@@ -20,7 +20,7 @@ contract TestReentrancyRunSQL is ITablelandController, ERC721, Ownable {
         address
     ) public payable override returns (ITablelandController.Policy memory) {
         uint256 tableId = 1;
-        _tableland.runSQL(
+        _tableland.writeToTable(
             msg.sender,
             tableId,
             "delete * from msgsendertableidontown"

@@ -18,7 +18,7 @@ contract TestCreateFromContract is ERC721, Ownable {
         require(tables[name] == 0, "name already exists");
 
         // Make sure we can get table_id from the created table
-        uint256 tableId = _tableland.runSQL(
+        uint256 tableId = _tableland.createTable(
             msg.sender,
             string(
                 abi.encodePacked(

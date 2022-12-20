@@ -107,7 +107,7 @@ describe("ITablelandController", function () {
         .setController(owner.address, BigNumber.from(1), accounts[3].address)
     ).to.be.revertedWithCustomError(tables, "OwnerQueryForNonexistentToken");
 
-    let tx = await tables["runSQL(address,string)"](
+    let tx = await tables.createTable(
       owner.address,
       "create table testing (int a);"
     );
@@ -193,7 +193,7 @@ describe("ITablelandController", function () {
 
   it("Should get controller for a table", async function () {
     const owner = accounts[4];
-    let tx = await tables["runSQL(address,string)"](
+    let tx = await tables.createTable(
       owner.address,
       "create table testing (int a);"
     );
@@ -212,7 +212,7 @@ describe("ITablelandController", function () {
 
   it("Should unset controller for a table", async function () {
     const owner = accounts[4];
-    let tx = await tables["runSQL(address,string)"](
+    let tx = await tables.createTable(
       owner.address,
       "create table testing (int a);"
     );
@@ -248,7 +248,7 @@ describe("ITablelandController", function () {
       tables.connect(owner).lockController(owner.address, BigNumber.from(1))
     ).to.be.revertedWithCustomError(tables, "OwnerQueryForNonexistentToken");
 
-    let tx = await tables["runSQL(address,string)"](
+    let tx = await tables.createTable(
       owner.address,
       "create table testing (int a);"
     );
@@ -292,8 +292,12 @@ describe("ITablelandController", function () {
 
   it("Should not set or lock controller for a table with contract owner", async function () {
     const owner = accounts[4];
+<<<<<<< HEAD
 
     const tx = await tables.createTable(
+=======
+    let tx = await tables.createTable(
+>>>>>>> 656f7e2 (Update contract function naming)
       owner.address,
       "create table testing (int a);"
     );
@@ -317,7 +321,7 @@ describe("ITablelandController", function () {
 
   it("Should be able to gate run SQL with controller contract", async function () {
     const owner = accounts[4];
-    let tx = await tables["runSQL(address,string)"](
+    let tx = await tables.createTable(
       owner.address,
       "create table testing (int a);"
     );

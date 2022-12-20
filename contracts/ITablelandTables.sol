@@ -89,7 +89,7 @@ interface ITablelandTables {
      *
      * - contract must be unpaused
      */
-    function runSQL(
+    function createTable(
         address owner,
         string calldata statement
     ) external payable returns (uint256);
@@ -109,6 +109,15 @@ interface ITablelandTables {
      * - `caller` must be authorized by the table controller
      * - `statement` must be less than or equal to 35000 bytes
      */
+    function writeToTable(
+        address caller,
+        uint256 tableId,
+        string calldata statement
+    ) external payable;
+
+    /**
+     * @custom:deprecated This is a temporary alias for `writeToTable`, do not use this.
+     */
     function runSQL(
         address caller,
         uint256 tableId,
@@ -119,13 +128,13 @@ interface ITablelandTables {
      * @dev Does Create or Mutate for each of a set SQL statements for `caller` using the `runnables`.
      *
      * caller - the address that is running the SQL statement
-     * runnable - a struct optionally optionally containing the id of the target table and coresponding statement
+     * runnable - a struct optionally containing the id of the target table and coresponding statement
      *
      * Requirements:
      *
      * - contract must be unpaused
      * - `msg.sender` must be `caller` or contract owner
-     * - `tableId` is optional in each struct, if it is **not** present the statement is treated as a create
+     * - `tableId` is optional in each struct, if it is equal to zero the statement is treated as a create
      * - `caller` must be authorized by the table controller if the statement is mutating
      * - `statement` must exist in each struct and be less than or equal to 35000 bytes
      */

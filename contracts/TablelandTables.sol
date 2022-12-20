@@ -56,7 +56,7 @@ contract TablelandTables is
     /**
      * @dev See {ITablelandTables-runSQL}.
      */
-    function runSQL(
+    function createTable(
         address owner,
         string calldata statement
     ) external payable override whenNotPaused returns (uint256) {
@@ -64,7 +64,18 @@ contract TablelandTables is
     }
 
     /**
-     * @dev See {ITablelandTables-runSQL}.
+     * @dev See {ITablelandTables-writeToTable}.
+     */
+    function writeToTable(
+        address caller,
+        uint256 tableId,
+        string calldata statement
+    ) external payable override whenNotPaused nonReentrant {
+        _mutateTable(caller, tableId, statement);
+    }
+
+    /**
+     * @custom:depreciated See {ITablelandTables-runSQL}.
      */
     function runSQL(
         address caller,
