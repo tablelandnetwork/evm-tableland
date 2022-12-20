@@ -480,54 +480,6 @@ describe("TablelandTables", function () {
     expect(createEvent1.args!.owner).to.equal(caller.address);
   });
 
-  it("Should NOT allow bulk runSQL to run more than the max number of SQL statements", async function () {
-    // Test others cannot run SQL on behalf of another account
-    const owner = accounts[4];
-
-    const createStatement = "create table testing (int a);";
-    const statements = [];
-
-    let tx = await tables
-      .connect(owner)
-      .createTable(owner.address, createStatement);
-    let receipt = await tx.wait();
-    const [, createEvent] = receipt.events ?? [];
-    const tableId = createEvent.args!.tableId;
-
-    const maxStatements = 10;
-    for (let i = 0; i < maxStatements; i++) {
-      statements.push(
-        i % 2
-          ? {
-              statement: `insert into testing values (${i});`,
-              tableId,
-            }
-          : {
-              statement: createStatement,
-              tableId: BigNumber.from(0),
-            }
-      );
-    }
-
-    // test the max works
-    tx = await tables
-      .connect(owner)
-      ["runSQL(address,(uint256,string)[])"](owner.address, statements);
-    receipt = await tx.wait();
-
-    expect(receipt.events.length).to.equal(15);
-
-    statements.push({
-      statement: `insert into testing values (${maxStatements + 1});`,
-      tableId,
-    });
-    await expect(
-      tables
-        .connect(owner)
-        ["runSQL(address,(uint256,string)[])"](owner.address, statements)
-    ).to.be.revertedWithCustomError(tables, "MaxStatementCountExceeded");
-  });
-
   it("Should NOT allow bulk runSQL to run when paused", async function () {
     // Test others cannot run SQL on behalf of another account
     const owner = accounts[4];
@@ -677,47 +629,6 @@ describe("TablelandTables", function () {
     expect(runEvent2.args!.tableId).to.equal(tableId);
     expect(runEvent2.args!.statement).to.equal(runStatement2);
     expect(runEvent2.args!.policy).to.not.equal(undefined);
-  });
-
-  it("Should NOT allow running more than the max number of SQL statements", async function () {
-    // Test others cannot run SQL on behalf of another account
-    const owner = accounts[4];
-
-    const createStatement = "create table testing (int a);";
-    const statements = [];
-
-    let tx = await tables
-      .connect(owner)
-      .createTable(owner.address, createStatement);
-    let receipt = await tx.wait();
-    const [, createEvent] = receipt.events ?? [];
-    const tableId = createEvent.args!.tableId;
-
-    const maxStatements = 10;
-    for (let i = 0; i < maxStatements; i++) {
-      statements.push({
-        statement: `insert into testing values (${i});`,
-        tableId,
-      });
-    }
-
-    // test the max works
-    tx = await tables
-      .connect(owner)
-      ["runSQL(address,(uint256,string)[])"](owner.address, statements);
-    receipt = await tx.wait();
-
-    expect(receipt.events.length).to.equal(10);
-
-    statements.push({
-      statement: `insert into testing values (${maxStatements + 1});`,
-      tableId,
-    });
-    await expect(
-      tables
-        .connect(owner)
-        ["runSQL(address,(uint256,string)[])"](owner.address, statements)
-    ).to.be.revertedWithCustomError(tables, "MaxStatementCountExceeded");
   });
 
   it("Should NOT allow runSQLs to run when paused", async function () {
