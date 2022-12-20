@@ -9,9 +9,8 @@ import "../policies/Policies.sol";
 import "../policies/ERC721EnumerablePolicies.sol";
 import "../policies/ERC721AQueryablePolicies.sol";
 
-contract TestReentrancyRunSQL is ITablelandController, ERC721, Ownable {
+contract TestReentrancyWriteToTable is ITablelandController, ERC721, Ownable {
     ITablelandTables private _tableland;
-    ITablelandTables.Runnable[] private runnables;
 
     constructor(address registry) ERC721("TestCreateFromContract", "MTK") {
         _tableland = ITablelandTables(registry);
@@ -20,16 +19,12 @@ contract TestReentrancyRunSQL is ITablelandController, ERC721, Ownable {
     function getPolicy(
         address
     ) public payable override returns (ITablelandController.Policy memory) {
-        // try to reenter `runSQL` with some kind of malicious call...
         uint256 tableId = 1;
-        ITablelandTables.Runnable memory runnable = ITablelandTables.Runnable({
-            tableId: tableId,
-            statement: "delete * from msgsendertableidontown"
-        });
-
-        runnables.push(runnable);
-
-        _tableland.runSQL(msg.sender, runnables);
+        _tableland.writeToTable(
+            msg.sender,
+            tableId,
+            "delete * from msgsendertableidontown"
+        );
         // Return allow-all policy
         return
             ITablelandController.Policy({
