@@ -18,7 +18,8 @@ export interface TablelandNetworkConfig {
 }
 
 const homesteadAddr = "0x012969f7e3439a9B04025b5a049EB9BAD82A8C12";
-const localTablelandAddr = "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512";
+// When running local-tableland network the proxy address will be "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512"
+const localTablelandAddr = "";
 export const proxies: TablelandNetworkConfig = {
   mainnet: homesteadAddr,
   homestead: homesteadAddr,
