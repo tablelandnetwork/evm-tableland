@@ -14,6 +14,16 @@ import { baseURIs, proxies, TablelandNetworkConfig } from "./network";
 
 dotenv.config();
 
+const homestead = {
+  url: `https://eth-mainnet.alchemyapi.io/v2/${
+    process.env.ETHEREUM_API_KEY ?? ""
+  }`,
+  accounts:
+    process.env.ETHEREUM_PRIVATE_KEY !== undefined
+      ? [process.env.ETHEREUM_PRIVATE_KEY]
+      : [],
+};
+
 const config: HardhatUserConfig = {
   solidity: {
     version: "0.8.4",
@@ -74,15 +84,8 @@ const config: HardhatUserConfig = {
   },
   networks: {
     // mainnets
-    ethereum: {
-      url: `https://eth-mainnet.alchemyapi.io/v2/${
-        process.env.ETHEREUM_API_KEY ?? ""
-      }`,
-      accounts:
-        process.env.ETHEREUM_PRIVATE_KEY !== undefined
-          ? [process.env.ETHEREUM_PRIVATE_KEY]
-          : [],
-    },
+    mainnet: homestead,
+    homestead,
     optimism: {
       url: `https://opt-mainnet.g.alchemy.com/v2/${
         process.env.OPTIMISM_API_KEY ?? ""
@@ -101,7 +104,7 @@ const config: HardhatUserConfig = {
           ? [process.env.ARBITRUM_PRIVATE_KEY]
           : [],
     },
-    polygon: {
+    matic: {
       url: `https://polygon-mainnet.g.alchemy.com/v2/${
         process.env.POLYGON_API_KEY ?? ""
       }`,
@@ -111,7 +114,7 @@ const config: HardhatUserConfig = {
           : [],
     },
     // testnets
-    "ethereum-goerli": {
+    goerli: {
       url: `https://eth-goerli.alchemyapi.io/v2/${
         process.env.ETHEREUM_GOERLI_API_KEY ?? ""
       }`,
@@ -138,7 +141,7 @@ const config: HardhatUserConfig = {
           ? [process.env.ARBITRUM_GOERLI_PRIVATE_KEY]
           : [],
     },
-    "polygon-mumbai": {
+    maticmum: {
       url: `https://polygon-mumbai.g.alchemy.com/v2/${
         process.env.POLYGON_MUMBAI_API_KEY ?? ""
       }`,
