@@ -1,7 +1,5 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.4;
-
-import "./SStrings.sol";
 
 /**
  * @dev Helper contract for constructing token URIs where the tokenId may not
@@ -11,60 +9,45 @@ import "./SStrings.sol";
  * where tokenId may be embedded in the middle of the query string.
  */
 contract URITemplate {
-    using SStrings for string;
-    using SStrings for SStrings.Slice;
-
-    /**
-     * The template does not contain "{id}".
-     */
-    error InvalidTemplate();
-
-    // The tokenId placeholder in the template.
-    string private constant NEEDLE = "{id}";
     // URI components used to build token URIs.
-    string[] private _uriParts = new string[](2);
-
-    constructor(string memory uriTemplate) {
-        _setURITemplate(uriTemplate);
-    }
+    string[] private _uriParts;
 
     /**
      * @dev Sets the URI template.
      *
-     * baseURITemplate - a string containing "{id}"
-     *
-     * Requirements:
-     *
-     * - the template string must contain the needle substring "{id}"
+     * uriTemplate - an array of uri component strings (each component will be joined with `tokenId` to produce a token URI)
      */
-    function _setURITemplate(string memory baseURITemplate) internal {
-        SStrings.Slice[] memory parts = new SStrings.Slice[](2);
-        parts[1] = baseURITemplate.toSlice();
-        parts[1].split(NEEDLE.toSlice(), parts[0]);
-
-        if (
-            parts[0]._len == bytes(baseURITemplate).length && parts[1]._len == 0
-        ) {
-            revert InvalidTemplate();
-        }
-
-        _uriParts[0] = parts[0].toString();
-        _uriParts[1] = parts[1].toString();
+    function _setURITemplate(string[] memory uriTemplate) internal {
+        _uriParts = uriTemplate;
     }
 
     /**
      * @dev Returns a token URI based on the set template string.
      *
-     * tokenIdStr - the tokenId as a string
+     * tokenIdStr - the `tokenId` as a string
      */
     function _getTokenURI(
         string memory tokenIdStr
     ) internal view returns (string memory) {
-        return
-            _uriParts.length != 0
-                ? string(
-                    abi.encodePacked(_uriParts[0], tokenIdStr, _uriParts[1])
-                )
-                : "";
+        // Return an empty string if no URI parts exist
+        if (_uriParts.length == 0) {
+            return "";
+        }
+        // Return a string with `tokenId` at the end if only one URI part exists
+        if (_uriParts.length == 1) {
+            return string(abi.encodePacked(_uriParts[0], tokenIdStr));
+        }
+
+        // Return a string with `tokenId` in between each value of `_uriParts`
+        bytes memory uri;
+        for (uint256 i = 0; i < _uriParts.length; i++) {
+            if (i == 0) {
+                uri = abi.encodePacked(_uriParts[i]);
+            } else {
+                uri = abi.encodePacked(uri, tokenIdStr, _uriParts[i]);
+            }
+        }
+
+        return string(uri);
     }
 }
