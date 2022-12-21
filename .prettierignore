@@ -4,5 +4,5 @@ artifacts
 cache
 coverage*
 gasReporterOutput.json
-network.d.ts
+*.d.ts
 network.js
