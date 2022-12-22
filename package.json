@@ -1,6 +1,6 @@
 {
   "name": "@tableland/evm",
-  "version": "4.0.0-pre.0",
+  "version": "4.0.0-pre.1",
   "description": "Tableland Tables EVM contracts and client components",
   "engines": {
     "node": ">=14.0.0"
@@ -33,7 +33,8 @@
     "lint:fix": "npm run lint -- --fix",
     "prettier": "prettier '**/*.{ts,json,sol,md}' --check",
     "prettier:fix": "npm run prettier -- --write",
-    "format": "npm run prettier:fix && npm run lint:fix"
+    "format": "npm run prettier:fix && npm run lint:fix",
+    "prepublishOnly": "npm run build"
   },
   "publishConfig": {
     "access": "public"
