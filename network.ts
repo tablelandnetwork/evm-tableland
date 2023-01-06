@@ -18,8 +18,7 @@ export interface TablelandNetworkConfig {
 }
 
 const homesteadAddr = "0x012969f7e3439a9B04025b5a049EB9BAD82A8C12";
-// When running local-tableland network the proxy address will be "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512"
-const localTablelandAddr = "";
+
 export const proxies: TablelandNetworkConfig = {
   mainnet: homesteadAddr,
   homestead: homesteadAddr,
@@ -31,8 +30,11 @@ export const proxies: TablelandNetworkConfig = {
   "arbitrum-goerli": "0x033f69e8d119205089Ab15D340F5b797732f646b",
   maticmum: "0x4b48841d4b32C4650E4ABc117A03FE8B51f38F68",
   "optimism-goerli-staging": "0xfe79824f6E5894a3DD86908e637B7B4AF57eEE28",
-  localhost: localTablelandAddr,
-  "local-tableland": localTablelandAddr,
+  // localhost is a stand alone node
+  localhost: "",
+  // local-tableland implies that a validator is also running. the proxy address will always be
+  // "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512" because of the order of contract deployment
+  "local-tableland": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
 };
 
 const homesteadURI = "https://tableland.network/api/v1/tables/1/";
