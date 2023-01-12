@@ -5,7 +5,10 @@ import { LocalTableland, getAccounts } from "@tableland/local";
 
 chai.use(chaiAsPromised);
 const expect = chai.expect;
-const lt = new LocalTableland({ silent: true });
+const lt = new LocalTableland({
+  silent: true,
+  registryDir: "../evm-tableland"
+});
 const accounts = getAccounts();
 
 describe("Validator, Chain, and SDK work end to end", function () {
