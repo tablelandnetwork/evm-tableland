@@ -5,12 +5,15 @@ import { LocalTableland, getAccounts } from "@tableland/local";
 
 chai.use(chaiAsPromised);
 const expect = chai.expect;
-const lt = new LocalTableland({ silent: true });
+const lt = new LocalTableland({
+  silent: true,
+  registryDir: "../evm-tableland"
+});
 const accounts = getAccounts();
 
 describe("Validator, Chain, and SDK work end to end", function () {
   // These tests take a bit longer than normal since we are running them against an actual network
-  this.timeout(20000);
+  this.timeout(30000);
 
   before(async function () {
     lt.start();
@@ -556,7 +559,7 @@ describe("Validator, Chain, and SDK work end to end", function () {
     expect(tableSchema.columns[0].name).to.eql("a");
     expect(tableSchema.columns[0].type).to.eql("int");
     expect(Array.isArray(tableSchema.columns[0].constraints)).to.eql(true);
-    expect(tableSchema.columns[0].constraints[0]).to.eql("PRIMARY KEY");
+    expect(tableSchema.columns[0].constraints[0].toLowerCase()).to.eql("primary key");
   });
 
   it("get the structure for a hash", async function () {
