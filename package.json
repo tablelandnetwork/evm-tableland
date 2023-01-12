@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "description": "Tableland Tables EVM contracts and client components",
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=16.0.0"
   },
   "main": "typechain-types/index.js",
   "types": "typechain-types/index.d.ts",

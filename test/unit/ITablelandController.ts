@@ -292,12 +292,8 @@ describe("ITablelandController", function () {
 
   it("Should not set or lock controller for a table with contract owner", async function () {
     const owner = accounts[4];
-<<<<<<< HEAD
 
     const tx = await tables.createTable(
-=======
-    let tx = await tables.createTable(
->>>>>>> 656f7e2 (Update contract function naming)
       owner.address,
       "create table testing (int a);"
     );
