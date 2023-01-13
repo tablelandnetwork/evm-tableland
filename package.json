@@ -61,7 +61,7 @@
     "@openzeppelin/contracts": "4.7",
     "@openzeppelin/contracts-upgradeable": "4.7",
     "@openzeppelin/hardhat-upgrades": "^1.19.0",
-    "@tableland/local": "^0.0.5-pre.2",
+    "@tableland/local": "^1.0.0-pre.1",
     "@tableland/sdk": "^4.0.0-pre.2",
     "@typechain/ethers-v5": "^10.1.0",
     "@typechain/hardhat": "^6.1.5",
