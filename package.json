@@ -12,7 +12,7 @@
     "hardhat.config.*",
     "contracts",
     "typechain-types/**/*.js?(.map)",
-    "typechain-types/**/*.d.ts",
+    "typechain-types/**/*.ts",
     "scripts"
   ],
   "exports": {
