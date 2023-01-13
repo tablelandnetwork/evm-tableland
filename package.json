@@ -1,6 +1,6 @@
 {
   "name": "@tableland/evm",
-  "version": "4.0.0",
+  "version": "0.0.0",
   "description": "Tableland Tables EVM contracts and client components",
   "engines": {
     "node": ">=14.0.0"
