@@ -42,15 +42,11 @@ jobs:
       - name: Install 🔧
         run: npm install
 
-      - name: Latest
-        id: tag
-        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
-
       - name: Conditional
         id: cond
         uses: haya14busa/action-cond@v1
         with:
-          cond: ${{ contains(steps.tag.outputs.tag, '-') }}
+          cond: ${{ contains(github.event.inputs.release_version, '-') }}
           if_true: "next"
           if_false: "latest"
 
