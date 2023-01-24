@@ -64,6 +64,7 @@
     "@openzeppelin/hardhat-upgrades": "^1.22.1",
     "@tableland/local": "^1.0.0-pre.3",
     "@typechain/ethers-v5": "^10.2.0",
+    "@tableland/sdk": "^4.0.0-pre.5",
     "@typechain/hardhat": "^6.1.5",
     "@types/chai": "^4.3.4",
     "@types/chai-as-promised": "^7.1.5",
