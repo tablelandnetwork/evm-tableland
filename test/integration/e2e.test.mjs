@@ -2,8 +2,13 @@
 import chai from "chai";
 import chaiAsPromised from "chai-as-promised";
 import { describe, it } from "mocha";
-import { Database, Registry, Validator } from "@tableland/sdk";
-import { LocalTableland, getAccounts } from "@tableland/local";
+import {
+  LocalTableland,
+  getAccounts,
+  getDatabase,
+  getRegistry,
+  getValidator,
+} from "@tableland/local";
 
 chai.use(chaiAsPromised);
 const expect = chai.expect;
@@ -28,7 +33,7 @@ describe("Validator, Chain, and SDK work end to end", function () {
   it("Creates a table that can be read from", async function () {
     const signer = accounts[1];
 
-    const db = new Database({ signer, autoWait: true });
+    const db = getDatabase(signer);
 
     const prefix = "test_create_read";
     // `key` is a reserved word in sqlite
@@ -43,7 +48,7 @@ describe("Validator, Chain, and SDK work end to end", function () {
   it("Create a table that can be written to", async function () {
     const signer = accounts[1];
 
-    const db = new Database({ signer, autoWait: true });
+    const db = getDatabase(signer);
 
     const prefix = "test_create_write";
 
@@ -68,7 +73,7 @@ describe("Validator, Chain, and SDK work end to end", function () {
   it("Table cannot be written to unless caller is allowed", async function () {
     const signer = accounts[1];
 
-    const db = new Database({ signer, autoWait: true });
+    const db = getDatabase(signer);
 
     const prefix = "test_not_allowed";
     const {
@@ -81,14 +86,11 @@ describe("Validator, Chain, and SDK work end to end", function () {
     expect(data).to.eql([]);
 
     const signer2 = accounts[2];
-    const tableland2 = new Database({
-      signer: signer2,
-      autoWait: true,
-    });
+    const db2 = getDatabase(signer2);
 
     await expect(
       (async function () {
-        await tableland2
+        await db2
           .prepare(
             `INSERT INTO ${queryableName} (keyy, val) VALUES ('tree', 'aspen')`
           )
@@ -98,7 +100,7 @@ describe("Validator, Chain, and SDK work end to end", function () {
       "db query execution failed (code: ACL, msg: not enough privileges)"
     );
 
-    const data2 = await tableland2
+    const data2 = await db2
       .prepare(`SELECT * FROM ${queryableName};`)
       .raw();
     expect(data2).to.eql([]);
@@ -107,7 +109,7 @@ describe("Validator, Chain, and SDK work end to end", function () {
   it("Create a table can have a row deleted", async function () {
     const signer = accounts[1];
 
-    const db = new Database({ signer, autoWait: true });
+    const db = getDatabase(signer);
 
     const prefix = "test_create_delete";
     const {
@@ -148,7 +150,7 @@ describe("Validator, Chain, and SDK work end to end", function () {
   it("Read a table with `table` output", async function () {
     const signer = accounts[1];
 
-    const db = new Database({ signer, autoWait: true });
+    const db = getDatabase(signer);
 
     const prefix = "test_read";
     const {
@@ -171,7 +173,7 @@ describe("Validator, Chain, and SDK work end to end", function () {
   it("Read a table with `objects` output", async function () {
     const signer = accounts[1];
 
-    const db = new Database({ signer, autoWait: true });
+    const db = getDatabase(signer);
 
     const prefix = "test_read";
     const {
@@ -196,7 +198,7 @@ describe("Validator, Chain, and SDK work end to end", function () {
   it("Read a single row with `first` option", async function () {
     const signer = accounts[1];
 
-    const db = new Database({ signer, autoWait: true });
+    const db = getDatabase(signer);
 
     const prefix = "test_read";
     const {
@@ -219,8 +221,8 @@ describe("Validator, Chain, and SDK work end to end", function () {
   it("List an account's tables", async function () {
     const signer = accounts[1];
 
-    const db = new Database({ signer, autoWait: true });
-    const reg = new Registry({ signer });
+    const db = getDatabase(signer);
+    const reg = getRegistry(signer);
 
     const prefix = "test_create_list";
     await db.prepare(`create table ${prefix} (keyy TEXT, val TEXT)`).run();
@@ -233,7 +235,7 @@ describe("Validator, Chain, and SDK work end to end", function () {
   it("write validates table name prefix", async function () {
     const signer = accounts[1];
 
-    const db = new Database({ signer, autoWait: true });
+    const db = getDatabase(signer);
 
     const prefix = "test_direct_invalid_write";
     await db.prepare(`create table ${prefix} (keyy TEXT, val TEXT);`).run();
@@ -265,7 +267,7 @@ describe("Validator, Chain, and SDK work end to end", function () {
   it("write statement validates table ID", async function () {
     const signer = accounts[1];
 
-    const db = new Database({ signer, autoWait: true });
+    const db = getDatabase(signer);
 
     const prefix = "test_direct_invalid_id_write";
     await db.prepare(`create table ${prefix} (keyy TEXT, val TEXT);`).run();
@@ -287,8 +289,8 @@ describe("Validator, Chain, and SDK work end to end", function () {
   it("set controller", async function () {
     const signer = accounts[1];
 
-    const db = new Database({ signer, autoWait: true });
-    const reg = new Registry({ signer });
+    const db = getDatabase(signer);
+    const reg = getRegistry(signer);
 
     const prefix = "test_create_setcontroller_norelay";
     const {
@@ -308,8 +310,8 @@ describe("Validator, Chain, and SDK work end to end", function () {
   it("get controller returns an address", async function () {
     const signer = accounts[1];
 
-    const db = new Database({ signer, autoWait: true });
-    const reg = new Registry({ signer });
+    const db = getDatabase(signer);
+    const reg = getRegistry(signer);
 
     const prefix = "test_create_getcontroller";
     const {
@@ -335,8 +337,8 @@ describe("Validator, Chain, and SDK work end to end", function () {
   it("lock controller returns a transaction hash", async function () {
     const signer = accounts[1];
 
-    const db = new Database({ signer, autoWait: true });
-    const reg = new Registry({ signer });
+    const db = getDatabase(signer);
+    const reg = getRegistry(signer);
 
     const prefix = "test_create_lockcontroller";
     const {
@@ -362,8 +364,8 @@ describe("Validator, Chain, and SDK work end to end", function () {
   it("get the schema for a table", async function () {
     const signer = accounts[1];
 
-    const db = new Database({ signer, autoWait: true });
-    const val = Validator.forChain("local-tableland");
+    const db = getDatabase(signer);
+    const val = getValidator();
 
     const prefix = "test_get_schema";
     const {
@@ -388,7 +390,7 @@ describe("Validator, Chain, and SDK work end to end", function () {
   it("write that violates table constraints throws error", async function () {
     const signer = accounts[1];
 
-    const db = new Database({ signer, autoWait: true });
+    const db = getDatabase(signer);
 
     const prefix = "test_create_tc_violation";
     const {
