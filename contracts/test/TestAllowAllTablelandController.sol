@@ -7,9 +7,12 @@ import "../policies/ERC721EnumerablePolicies.sol";
 import "../policies/ERC721AQueryablePolicies.sol";
 
 contract TestAllowAllTablelandController is ITablelandController {
-    function getPolicy(
-        address
-    ) public payable override returns (ITablelandController.Policy memory) {
+    function getPolicy(address, uint256)
+        public
+        payable
+        override
+        returns (ITablelandController.Policy memory)
+    {
         // Return allow-all policy
         return
             ITablelandController.Policy({
