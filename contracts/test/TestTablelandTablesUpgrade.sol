@@ -8,7 +8,7 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "../ITablelandTables.sol";
-import "../ITablelandController.sol";
+import "../ITablelandControllerV2.sol";
 
 contract TestTablelandTablesUpgrade is
     ITablelandTables,
@@ -72,7 +72,7 @@ contract TestTablelandTablesUpgrade is
         address controller = _controllers[tableId];
         if (_isContract(controller)) {
             return
-                ITablelandController(controller).getPolicy{value: msg.value}(
+                ITablelandControllerV2(controller).getPolicy{value: msg.value}(
                     caller,
                     tableId
                 );

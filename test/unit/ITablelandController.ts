@@ -16,7 +16,7 @@ import type {
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe("ITablelandController", function () {
+describe("ITablelandControllerV2", function () {
   let accounts: SignerWithAddress[];
   let tables: TablelandTables;
   let foos: TestERC721Enumerable;

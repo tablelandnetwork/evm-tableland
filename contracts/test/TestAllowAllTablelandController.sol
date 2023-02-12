@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "../ITablelandController.sol";
+import "../ITablelandControllerV2.sol";
 import "../policies/Policies.sol";
 import "../policies/ERC721EnumerablePolicies.sol";
 import "../policies/ERC721AQueryablePolicies.sol";
 
-contract TestAllowAllTablelandController is ITablelandController {
+contract TestAllowAllTablelandController is ITablelandControllerV2 {
     function getPolicy(
         address,
         uint256

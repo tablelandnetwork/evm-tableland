@@ -2,12 +2,12 @@
 pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "../ITablelandController.sol";
+import "../ITablelandControllerV1.sol";
 import "../policies/Policies.sol";
 import "../policies/ERC721EnumerablePolicies.sol";
 import "../policies/ERC721AQueryablePolicies.sol";
 
-contract TestTablelandController is ITablelandController, Ownable {
+contract TestTablelandController is ITablelandControllerV1, Ownable {
     error InsufficientValue(uint256 receivedValue, uint256 requiredValue);
 
     uint256 public constant REQUIRED_VALUE = 1 ether;
@@ -16,8 +16,7 @@ contract TestTablelandController is ITablelandController, Ownable {
     address private _bars;
 
     function getPolicy(
-        address caller,
-        uint256
+        address caller
     ) public payable override returns (Policy memory) {
         // Enforce some ether and revert if insufficient
         if (msg.value != 1 ether) {
