@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "./ITablelandController.sol";
+import "./Policy.sol";
 
 /**
  * @dev Interface of a TablelandTables compliant contract.
@@ -45,14 +45,14 @@ interface ITablelandTables {
      * isOwner - whether or not the caller is the table owner
      * tableId - the id of the target table
      * statement - the SQL statement to run
-     * policy - an object describing how `caller` can interact with the table (see {ITablelandController.Policy})
+     * policy - an object describing how `caller` can interact with the table (see {Policy})
      */
     event RunSQL(
         address caller,
         bool isOwner,
         uint256 tableId,
         string statement,
-        ITablelandController.Policy policy
+        Policy policy
     );
 
     /**

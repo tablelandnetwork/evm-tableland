@@ -18,7 +18,7 @@ contract TestTablelandController is ITablelandController, Ownable {
     function getPolicy(
         address caller,
         uint256
-    ) public payable override returns (ITablelandController.Policy memory) {
+    ) public payable override returns (Policy memory) {
         // Enforce some ether and revert if insufficient
         if (msg.value != 1 ether) {
             revert InsufficientValue(msg.value, REQUIRED_VALUE);
@@ -52,7 +52,7 @@ contract TestTablelandController is ITablelandController, Ownable {
 
         // Return policy
         return
-            ITablelandController.Policy({
+            Policy({
                 allowInsert: false,
                 allowUpdate: true,
                 allowDelete: false,

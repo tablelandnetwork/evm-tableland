@@ -68,7 +68,7 @@ contract TestTablelandTablesUpgrade is
     function _getPolicy(
         address caller,
         uint256 tableId
-    ) private returns (ITablelandController.Policy memory) {
+    ) private returns (Policy memory) {
         address controller = _controllers[tableId];
         if (_isContract(controller)) {
             return
@@ -82,7 +82,7 @@ contract TestTablelandTablesUpgrade is
         }
 
         return
-            ITablelandController.Policy({
+            Policy({
                 allowInsert: true,
                 allowUpdate: true,
                 allowDelete: true,

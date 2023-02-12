@@ -10,10 +10,10 @@ contract TestAllowAllTablelandController is ITablelandController {
     function getPolicy(
         address,
         uint256
-    ) public payable override returns (ITablelandController.Policy memory) {
+    ) public payable override returns (Policy memory) {
         // Return allow-all policy
         return
-            ITablelandController.Policy({
+            Policy({
                 allowInsert: true,
                 allowUpdate: true,
                 allowDelete: true,

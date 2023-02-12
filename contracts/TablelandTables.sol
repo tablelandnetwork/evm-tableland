@@ -9,7 +9,9 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "./ITablelandTables.sol";
-import "./ITablelandController.sol";
+import "./Policy.sol";
+import "./ITablelandControllerV1.sol";
+import "./ITablelandControllerV2.sol";
 
 /**
  * @dev Implementation of {ITablelandTables}.
@@ -90,7 +92,7 @@ contract TablelandTables is
     }
 
     /**
-     * @dev Returns an {ITablelandController.Policy} for `caller` and `tableId`.
+     * @dev Returns an {Policy} for `caller` and `tableId`.
      *
      * An allow-all policy is returned if the table's controller does not exist.
      *
@@ -102,21 +104,38 @@ contract TablelandTables is
     function _getPolicy(
         address caller,
         uint256 tableId
-    ) private returns (ITablelandController.Policy memory) {
+    ) private returns (Policy memory) {
         address controller = _controllers[tableId];
         if (_isContract(controller)) {
-            return
-                ITablelandController(controller).getPolicy{value: msg.value}(
-                    caller,
-                    tableId
-                );
+            ITablelandControllerV2 controllerV2 = ITablelandControllerV2(
+                controller
+            );
+
+            // Check if using new Controller interface
+            if (address(controllerV2) != address(0)) {
+                return
+                    controllerV2.getPolicy{value: msg.value}(caller, tableId);
+            }
+
+            // If not using the new Controller, assume old one
+            ITablelandControllerV1 controllerV1 = ITablelandControllerV1(
+                controller
+            );
+
+            // Check if it's actually using the old one
+            if (address(controllerV1) != address(0)) {
+                return controllerV1.getPolicy{value: msg.value}(caller);
+            }
+
+            // If not using either V1 or V2, revert tranaction.
+            revert Unauthorized();
         }
         if (!(controller == address(0) || controller == caller)) {
             revert Unauthorized();
         }
 
         return
-            ITablelandController.Policy({
+            Policy({
                 allowInsert: true,
                 allowUpdate: true,
                 allowDelete: true,
