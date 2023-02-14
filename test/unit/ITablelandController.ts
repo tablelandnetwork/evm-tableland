@@ -270,7 +270,7 @@ describe("ITablelandController", function () {
     const [, createEvent] = receipt.events ?? [];
     const tableId = createEvent.args!.tableId;
 
-    // Test contract owner can lock controller
+    // Test contract owner can not set or lock the controller
     const contractOwner = accounts[0];
     const eoaController = accounts[6];
     await expect(
