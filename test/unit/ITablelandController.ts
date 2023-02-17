@@ -1,14 +1,16 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import chai from "chai";
 import chaiAsPromised from "chai-as-promised";
-import { BigNumber } from "ethers";
 import { ethers } from "hardhat";
+import { BigNumber } from "ethers";
 import type {
   TablelandTables,
   TestERC721Enumerable,
   TestERC721AQueryable,
   TestTablelandController,
   TestAllowAllTablelandController,
+  TestTablelandControllerV1,
+  TestTablelandControllerVersionUnknown,
   ERC721EnumerablePolicies,
   ERC721AQueryablePolicies,
 } from "../../typechain-types";
@@ -24,6 +26,8 @@ describe("ITablelandController", function () {
   let enumPolicyLib: ERC721EnumerablePolicies;
   let queryablePolicyLib: ERC721AQueryablePolicies;
   let controller: TestTablelandController;
+  let controllerV1: TestTablelandControllerV1;
+  let controllerVU: TestTablelandControllerVersionUnknown;
   let allowAllController: TestAllowAllTablelandController;
 
   beforeEach(async function () {
@@ -63,6 +67,18 @@ describe("ITablelandController", function () {
       await ethers.getContractFactory("TestTablelandController")
     ).deploy()) as TestTablelandController;
     await controller.deployed();
+
+    // Deploy test controllers
+    controllerV1 = (await (
+      await ethers.getContractFactory("TestTablelandControllerV1")
+    ).deploy()) as TestTablelandControllerV1;
+    await controllerV1.deployed();
+
+    // Deploy test controllers
+    controllerVU = (await (
+      await ethers.getContractFactory("TestTablelandControllerVersionUnknown")
+    ).deploy()) as TestTablelandControllerVersionUnknown;
+    await controllerVU.deployed();
 
     allowAllController = (await (
       await ethers.getContractFactory("TestAllowAllTablelandController")
@@ -295,6 +311,60 @@ describe("ITablelandController", function () {
     await expect(
       tables.connect(contractOwner).lockController(owner.address, tableId)
     ).to.be.revertedWithCustomError(tables, "Unauthorized");
+  });
+
+  it("Should revert with unknown controller version", async function () {
+    const owner = accounts[4];
+    let tx = await tables.createTable(
+      owner.address,
+      "create table testing (int a);"
+    );
+    const receipt = await tx.wait();
+    const [, createEvent] = receipt.events ?? [];
+    const tableId = createEvent.args!.tableId;
+    tx = await tables
+      .connect(owner)
+      .setController(owner.address, tableId, controllerVU.address);
+    await tx.wait();
+
+    // Test that run SQL on table is gated by ether
+    const runStatement = "insert into testing values (0);";
+    const caller = accounts[5];
+    await expect(
+      tables.connect(caller).runSQL(caller.address, tableId, runStatement)
+    ).to.be.revertedWith("Unknown controller version");
+  });
+
+  it("Should work with Version 1 controllers", async function () {
+    const owner = accounts[4];
+    let tx = await tables.createTable(
+      owner.address,
+      "create table testing (int a);"
+    );
+    let receipt = await tx.wait();
+    const [, createEvent] = receipt.events ?? [];
+    const tableId = createEvent.args!.tableId;
+    tx = await tables
+      .connect(owner)
+      .setController(owner.address, tableId, controllerV1.address);
+    await tx.wait();
+
+    const value = ethers.utils.parseEther("1");
+
+    // Test that run SQL on table is gated by ether
+    const runStatement = "insert into testing values (0);";
+    const caller = accounts[5];
+    tx = await tables
+      .connect(caller)
+      .runSQL(caller.address, tableId, runStatement, { value });
+
+    receipt = await tx.wait();
+    const [runEvent] = receipt.events ?? [];
+    expect(runEvent.args!.caller).to.equal(caller.address);
+    expect(runEvent.args!.isOwner).to.equal(false);
+    expect(runEvent.args!.tableId).to.equal(tableId);
+    expect(runEvent.args!.statement).to.equal(runStatement);
+    expect(runEvent.args!.policy).to.not.equal(undefined);
   });
 
   it("Should be able to gate run SQL with controller contract", async function () {

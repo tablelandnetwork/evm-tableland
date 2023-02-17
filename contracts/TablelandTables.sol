@@ -117,10 +117,11 @@ contract TablelandTables is
             ) {
                 if (version == 1) {
                     return
-                        ITablelandController(controller).getPolicy(
-                            caller,
-                            tableId
-                        );
+                        ITablelandController(controller).getPolicy{
+                            value: msg.value
+                        }(caller, tableId);
+                } else {
+                    revert("Unknown controller version");
                 }
             } catch {
                 return
@@ -128,9 +129,6 @@ contract TablelandTables is
                         value: msg.value
                     }(caller);
             }
-
-            // If not using either V1 or V2, revert tranaction.
-            revert Unauthorized();
         }
         if (!(controller == address(0) || controller == caller)) {
             revert Unauthorized();

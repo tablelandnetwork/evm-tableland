@@ -9,6 +9,7 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "../ITablelandTables.sol";
 import "../ITablelandController.sol";
+import "../ITablelandControllerV1.sol";
 
 contract TestTablelandTablesUpgrade is
     ITablelandTables,
@@ -76,11 +77,23 @@ contract TestTablelandTablesUpgrade is
     {
         address controller = _controllers[tableId];
         if (_isContract(controller)) {
-            return
-                ITablelandController(controller).getPolicy{value: msg.value}(
-                    caller,
-                    tableId
-                );
+            try ITablelandController(controller).version() returns (
+                uint256 version
+            ) {
+                if (version == 1) {
+                    return
+                        ITablelandController(controller).getPolicy{
+                            value: msg.value
+                        }(caller, tableId);
+                } else {
+                    revert("Unknown controller version");
+                }
+            } catch {
+                return
+                    ITablelandControllerV1(controller).getPolicy{
+                        value: msg.value
+                    }(caller);
+            }
         }
         if (!(controller == address(0) || controller == caller)) {
             revert Unauthorized();
