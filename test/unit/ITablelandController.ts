@@ -276,38 +276,25 @@ describe("ITablelandController", function () {
     ).to.be.revertedWithCustomError(tables, "Unauthorized");
   });
 
-  it("Should set and lock controller for a table with contract owner", async function () {
+  it("Should not set or lock controller for a table with contract owner", async function () {
     const owner = accounts[4];
-    let tx = await tables.createTable(
+    const tx = await tables.createTable(
       owner.address,
       "create table testing (int a);"
     );
-    let receipt = await tx.wait();
+    const receipt = await tx.wait();
     const [, createEvent] = receipt.events ?? [];
     const tableId = createEvent.args!.tableId;
 
-    // Test contract owner can lock controller
+    // Test contract owner can not set or lock the controller
     const contractOwner = accounts[0];
     const eoaController = accounts[6];
-    tx = await tables
-      .connect(contractOwner)
-      .setController(owner.address, tableId, eoaController.address);
-    await tx.wait();
-    expect(await tables.getController(tableId)).to.equal(eoaController.address);
-
-    tx = await tables
-      .connect(contractOwner)
-      .lockController(owner.address, tableId);
-    receipt = await tx.wait();
-
-    // Test controller can no longer be set
     await expect(
       tables
         .connect(contractOwner)
         .setController(owner.address, tableId, eoaController.address)
     ).to.be.revertedWithCustomError(tables, "Unauthorized");
 
-    // Test controller cannot be locked again
     await expect(
       tables.connect(contractOwner).lockController(owner.address, tableId)
     ).to.be.revertedWithCustomError(tables, "Unauthorized");
