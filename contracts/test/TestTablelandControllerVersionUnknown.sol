@@ -15,12 +15,10 @@ contract TestTablelandControllerVersionUnknown is
         return 55;
     }
 
-    function getPolicy(address, uint256)
-        public
-        payable
-        override
-        returns (Policy memory)
-    {
+    function getPolicy(
+        address,
+        uint256
+    ) public payable override returns (Policy memory) {
         // Return policy
         return
             Policy({

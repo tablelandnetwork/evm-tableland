@@ -15,10 +15,10 @@ interface ITablelandController {
     /**
      * @dev Returns a {Policy} struct defining how a table can be accessed by `caller`.
      */
-    function getPolicy(address caller, uint256 tableId)
-        external
-        payable
-        returns (Policy memory);
+    function getPolicy(
+        address caller,
+        uint256 tableId
+    ) external payable returns (Policy memory);
 
     /**
      * @dev Returns a {uint256} representing the version of the controller contract

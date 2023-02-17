@@ -31,7 +31,7 @@
     "test:e2e": "node --experimental-fetch ./node_modules/mocha/bin/mocha.js --exit test/integration",
     "lint": "eslint '**/*.{js,ts}'",
     "lint:fix": "npm run lint -- --fix",
-    "prettier": "prettier '**/*.{ts,json,sol,md}' --check",
+    "prettier": "prettier \"**/*.{ts,json,sol,md}\" --check",
     "prettier:fix": "npm run prettier -- --write",
     "format": "npm run prettier:fix && npm run lint:fix",
     "prepublishOnly": "npm run build"
