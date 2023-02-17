@@ -8,7 +8,7 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "../ITablelandTables.sol";
-import "../ITablelandControllerV2.sol";
+import "../ITablelandController.sol";
 
 contract TestTablelandTablesUpgrade is
     ITablelandTables,
@@ -26,9 +26,11 @@ contract TestTablelandTablesUpgrade is
 
     mapping(uint256 => address) private _dummyStorage;
 
-    function initialize(
-        string memory baseURI
-    ) public initializerERC721A initializer {
+    function initialize(string memory baseURI)
+        public
+        initializerERC721A
+        initializer
+    {
         __ERC721A_init("Tableland Tables", "TABLE");
         __ERC721AQueryable_init();
         __Ownable_init();
@@ -39,10 +41,13 @@ contract TestTablelandTablesUpgrade is
         _baseURIString = baseURI;
     }
 
-    function createTable(
-        address,
-        string memory
-    ) external payable override whenNotPaused returns (uint256) {} // solhint-disable no-empty-blocks
+    function createTable(address, string memory)
+        external
+        payable
+        override
+        whenNotPaused
+        returns (uint256)
+    {} // solhint-disable no-empty-blocks
 
     function runSQL(
         address caller,
@@ -65,14 +70,14 @@ contract TestTablelandTablesUpgrade is
         );
     }
 
-    function _getPolicy(
-        address caller,
-        uint256 tableId
-    ) private returns (Policy memory) {
+    function _getPolicy(address caller, uint256 tableId)
+        private
+        returns (Policy memory)
+    {
         address controller = _controllers[tableId];
         if (_isContract(controller)) {
             return
-                ITablelandControllerV2(controller).getPolicy{value: msg.value}(
+                ITablelandController(controller).getPolicy{value: msg.value}(
                     caller,
                     tableId
                 );
@@ -102,14 +107,18 @@ contract TestTablelandTablesUpgrade is
         address
     ) external override whenNotPaused {} // solhint-disable no-empty-blocks
 
-    function getController(
-        uint256 tableId
-    ) external view override returns (address) {} // solhint-disable no-empty-blocks
+    function getController(uint256 tableId)
+        external
+        view
+        override
+        returns (address)
+    {} // solhint-disable no-empty-blocks
 
-    function lockController(
-        address caller,
-        uint256 tableId
-    ) external override whenNotPaused {} // solhint-disable no-empty-blocks
+    function lockController(address caller, uint256 tableId)
+        external
+        override
+        whenNotPaused
+    {} // solhint-disable no-empty-blocks
 
     // solhint-disable-next-line no-empty-blocks
     function setBaseURI(string memory) external override onlyOwner {}

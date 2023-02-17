@@ -11,7 +11,7 @@ import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "./ITablelandTables.sol";
 import "./Policy.sol";
 import "./ITablelandControllerV1.sol";
-import "./ITablelandControllerV2.sol";
+import "./ITablelandController.sol";
 
 /**
  * @dev Implementation of {ITablelandTables}.
@@ -34,9 +34,11 @@ contract TablelandTables is
     // The maximum size allowed for a query.
     uint256 internal constant QUERY_MAX_SIZE = 35000;
 
-    function initialize(
-        string memory baseURI
-    ) public initializerERC721A initializer {
+    function initialize(string memory baseURI)
+        public
+        initializerERC721A
+        initializer
+    {
         __ERC721A_init("Tableland Tables", "TABLE");
         __ERC721AQueryable_init();
         __Ownable_init();
@@ -50,10 +52,13 @@ contract TablelandTables is
     /**
      * @dev See {ITablelandTables-createTable}.
      */
-    function createTable(
-        address owner,
-        string memory statement
-    ) external payable override whenNotPaused returns (uint256 tableId) {
+    function createTable(address owner, string memory statement)
+        external
+        payable
+        override
+        whenNotPaused
+        returns (uint256 tableId)
+    {
         tableId = _nextTokenId();
         _safeMint(owner, 1);
 
@@ -101,30 +106,27 @@ contract TablelandTables is
      * - if the controller is an EOA, caller must be controller
      * - if the controller is a contract address, it must implement {ITablelandController}
      */
-    function _getPolicy(
-        address caller,
-        uint256 tableId
-    ) private returns (Policy memory) {
+    function _getPolicy(address caller, uint256 tableId)
+        private
+        returns (Policy memory)
+    {
         address controller = _controllers[tableId];
         if (_isContract(controller)) {
-            ITablelandControllerV2 controllerV2 = ITablelandControllerV2(
-                controller
-            );
-
-            // Check if using new Controller interface
-            if (address(controllerV2) != address(0)) {
+            try ITablelandController(controller).version() returns (
+                uint256 version
+            ) {
+                if (version == 1) {
+                    return
+                        ITablelandController(controller).getPolicy(
+                            caller,
+                            tableId
+                        );
+                }
+            } catch {
                 return
-                    controllerV2.getPolicy{value: msg.value}(caller, tableId);
-            }
-
-            // If not using the new Controller, assume old one
-            ITablelandControllerV1 controllerV1 = ITablelandControllerV1(
-                controller
-            );
-
-            // Check if it's actually using the old one
-            if (address(controllerV1) != address(0)) {
-                return controllerV1.getPolicy{value: msg.value}(caller);
+                    ITablelandControllerV1(controller).getPolicy{
+                        value: msg.value
+                    }(caller);
             }
 
             // If not using either V1 or V2, revert tranaction.
@@ -177,19 +179,23 @@ contract TablelandTables is
     /**
      * @dev See {ITablelandTables-getController}.
      */
-    function getController(
-        uint256 tableId
-    ) external view override returns (address) {
+    function getController(uint256 tableId)
+        external
+        view
+        override
+        returns (address)
+    {
         return _controllers[tableId];
     }
 
     /**
      * @dev See {ITablelandTables-lockController}.
      */
-    function lockController(
-        address caller,
-        uint256 tableId
-    ) external override whenNotPaused {
+    function lockController(address caller, uint256 tableId)
+        external
+        override
+        whenNotPaused
+    {
         if (
             caller != ownerOf(tableId) ||
             !(caller == _msgSenderERC721A() ||

@@ -11,12 +11,17 @@ import "./Policy.sol";
  *
  * See {test/TestTablelandController} for an example of token-gating table write-access.
  */
-interface ITablelandControllerV2 {
+interface ITablelandController {
     /**
      * @dev Returns a {Policy} struct defining how a table can be accessed by `caller`.
      */
-    function getPolicy(
-        address caller,
-        uint256 tableId
-    ) external payable returns (Policy memory);
+    function getPolicy(address caller, uint256 tableId)
+        external
+        payable
+        returns (Policy memory);
+
+    /**
+     * @dev Returns a {uint256} representing the version of the controller contract
+     */
+    function version() external pure returns (uint256);
 }
