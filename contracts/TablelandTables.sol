@@ -9,7 +9,6 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "./ITablelandTables.sol";
-import "./Policy.sol";
 import "./ITablelandControllerV1.sol";
 import "./ITablelandController.sol";
 
@@ -104,7 +103,7 @@ contract TablelandTables is
     function _getPolicy(
         address caller,
         uint256 tableId
-    ) private returns (Policy memory) {
+    ) private returns (ITablelandController.Policy memory) {
         address controller = _controllers[tableId];
         if (_isContract(controller)) {
             try ITablelandController(controller).version() returns (
@@ -130,7 +129,7 @@ contract TablelandTables is
         }
 
         return
-            Policy({
+            ITablelandController.Policy({
                 allowInsert: true,
                 allowUpdate: true,
                 allowDelete: true,

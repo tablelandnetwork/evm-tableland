@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "./Policy.sol";
+import "./ITablelandController.sol";
 
 /**
  * @dev Interface of a TablelandController compliant contract.
@@ -15,5 +15,7 @@ interface ITablelandControllerV1 {
     /**
      * @dev Returns a {Policy} struct defining how a table can be accessed by `caller`.
      */
-    function getPolicy(address caller) external payable returns (Policy memory);
+    function getPolicy(
+        address caller
+    ) external payable returns (ITablelandController.Policy memory);
 }
