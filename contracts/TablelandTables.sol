@@ -69,10 +69,7 @@ contract TablelandTables is
         uint256 tableId,
         string memory statement
     ) external payable override whenNotPaused nonReentrant {
-        if (
-            !_exists(tableId) ||
-            !(caller == _msgSenderERC721A() || owner() == _msgSenderERC721A())
-        ) {
+        if (!_exists(tableId) || caller != _msgSenderERC721A()) {
             revert Unauthorized();
         }
 
@@ -156,8 +153,7 @@ contract TablelandTables is
     ) external override whenNotPaused {
         if (
             caller != ownerOf(tableId) ||
-            !(caller == _msgSenderERC721A() ||
-                owner() == _msgSenderERC721A()) ||
+            caller != _msgSenderERC721A() ||
             _locks[tableId]
         ) {
             revert Unauthorized();
@@ -186,8 +182,7 @@ contract TablelandTables is
     ) external override whenNotPaused {
         if (
             caller != ownerOf(tableId) ||
-            !(caller == _msgSenderERC721A() ||
-                owner() == _msgSenderERC721A()) ||
+            caller != _msgSenderERC721A() ||
             _locks[tableId]
         ) {
             revert Unauthorized();

@@ -87,9 +87,9 @@ npx hardhat run scripts/upgrade.ts --network optimism
 
 Upgrading on a network only works if a previous deployment already exists, referenced by proxy address in `network.ts`.
 
-## Extacting the ABI and Bytecode
+## Extracting the ABI and Bytecode
 
-You can you grab the assets you need by compiling and then using some `jq` magic:
+You can grab the assets you need by compiling and then using some `jq` magic:
 
 ### ABI
 

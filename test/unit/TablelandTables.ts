@@ -116,18 +116,14 @@ describe("TablelandTables", function () {
       tables.connect(sender).runSQL(caller.address, tableId, runStatement)
     ).to.be.revertedWithCustomError(tables, "Unauthorized");
 
-    // Test contract owner can run SQL on behalf of another account
+    // Test contract owner can not run SQL on behalf of another account
     const contractOwner = accounts[0];
-    tx = await tables
-      .connect(contractOwner)
-      .runSQL(caller.address, tableId, runStatement);
-    receipt = await tx.wait();
-    [runEvent] = receipt.events ?? [];
-    expect(runEvent.args!.caller).to.equal(caller.address);
-    expect(runEvent.args!.isOwner).to.equal(false);
-    expect(runEvent.args!.tableId).to.equal(tableId);
-    expect(runEvent.args!.statement).to.equal(runStatement);
-    expect(runEvent.args!.policy).to.not.equal(undefined);
+
+    await expect(
+      tables
+        .connect(contractOwner)
+        .runSQL(caller.address, tableId, runStatement)
+    ).to.be.revertedWithCustomError(tables, "Unauthorized");
   });
 
   it("Should emit transfer event when table transferred", async function () {
