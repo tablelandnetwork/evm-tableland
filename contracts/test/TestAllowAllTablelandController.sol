@@ -24,6 +24,6 @@ contract TestAllowAllTablelandController is ITablelandController {
     }
 
     function version() external pure override returns (uint256) {
-        return 1;
+        return 2;
     }
 }

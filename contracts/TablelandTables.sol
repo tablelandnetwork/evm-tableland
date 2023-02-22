@@ -107,7 +107,7 @@ contract TablelandTables is
             try ITablelandController(controller).version() returns (
                 uint256 version
             ) {
-                if (version == 1) {
+                if (version == 2) {
                     return
                         ITablelandController(controller).getPolicy{
                             value: msg.value

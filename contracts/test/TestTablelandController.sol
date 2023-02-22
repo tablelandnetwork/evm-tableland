@@ -16,7 +16,7 @@ contract TestTablelandController is ITablelandController, Ownable {
     address private _bars;
 
     function version() external pure override returns (uint256) {
-        return 1;
+        return 2;
     }
 
     function getPolicy(
