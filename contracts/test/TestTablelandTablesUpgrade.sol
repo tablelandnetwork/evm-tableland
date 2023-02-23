@@ -110,6 +110,11 @@ contract TestTablelandTablesUpgrade is
         uint256 tableId
     ) external override whenNotPaused {} // solhint-disable no-empty-blocks
 
+    function publishFunction(
+        address caller,
+        string memory cid
+    ) external payable override whenNotPaused {} // solhint-disable no-empty-blocks
+
     // solhint-disable-next-line no-empty-blocks
     function setBaseURI(string memory) external override onlyOwner {}
 

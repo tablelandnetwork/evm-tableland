@@ -183,6 +183,19 @@ contract TablelandTables is
     }
 
     /**
+     * @dev See {ITablelandTables-publishFunction}.
+     */
+    function publishFunction(
+        address caller,
+        string memory cid
+    ) external payable override whenNotPaused {
+        if (!(caller == _msgSenderERC721A() || owner() == _msgSenderERC721A()))
+            revert Unauthorized();
+
+        emit PublishFunction(caller, cid);
+    }
+
+    /**
      * @dev See {ITablelandTables-setBaseURI}.
      */
     function setBaseURI(string memory baseURI) external override onlyOwner {

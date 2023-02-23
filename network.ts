@@ -31,7 +31,7 @@ export const proxies: TablelandNetworkConfig = {
   maticmum: "0x4b48841d4b32C4650E4ABc117A03FE8B51f38F68",
   "optimism-goerli-staging": "0xfe79824f6E5894a3DD86908e637B7B4AF57eEE28",
   // localhost is a stand alone node
-  localhost: "",
+  localhost: "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
   // local-tableland implies that a validator is also running. the proxy address will always be
   // "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512" because of the order of contract deployment
   "local-tableland": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",

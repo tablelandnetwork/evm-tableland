@@ -56,6 +56,14 @@ interface ITablelandTables {
     );
 
     /**
+     * @dev Emitted when `caller` publishes a WASM Function.
+     *
+     * caller - the address that is publishing the function
+     * cid - the function content identifier
+     */
+    event PublishFunction(address caller, string cid);
+
+    /**
      * @dev Emitted when a table's controller is set.
      *
      * tableId - the id of the target table
@@ -152,6 +160,22 @@ interface ITablelandTables {
      * - `tableId` controller must not be locked
      */
     function lockController(address caller, uint256 tableId) external;
+
+    /**
+     * @dev Publishes a WASM Function addressed by `cid`.
+     *
+     * caller - the address that is publishing the function
+     * cid - the function content identifier
+     *
+     * Requirements:
+     *
+     * - contract must be unpaused
+     * - `msg.sender` must be `caller` or contract owner
+     */
+    function publishFunction(
+        address caller,
+        string memory cid
+    ) external payable;
 
     /**
      * @dev Sets the contract base URI.
