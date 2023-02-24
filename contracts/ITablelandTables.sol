@@ -2,6 +2,7 @@
 pragma solidity >=0.8.10 <0.9.0;
 
 import {ITablelandController} from "./ITablelandController.sol";
+import {TablelandPolicy} from "./TablelandPolicy.sol";
 
 /**
  * @dev Interface of a TablelandTables compliant contract.
@@ -45,14 +46,14 @@ interface ITablelandTables {
      * isOwner - whether or not the caller is the table owner
      * tableId - the id of the target table
      * statement - the SQL statement to run
-     * policy - an object describing how `caller` can interact with the table (see {ITablelandController.Policy})
+     * policy - an object describing how `caller` can interact with the table (see {TablelandPolicy})
      */
     event RunSQL(
         address caller,
         bool isOwner,
         uint256 tableId,
         string statement,
-        ITablelandController.Policy policy
+        TablelandPolicy policy
     );
 
     /**
