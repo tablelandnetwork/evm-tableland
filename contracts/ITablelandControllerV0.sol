@@ -8,7 +8,7 @@ import "./TablelandPolicy.sol";
  */
 interface ITablelandControllerV0 {
     /**
-     * @dev Returns a {Policy} struct defining how a table can be accessed by `caller`.
+     * @dev Returns a {TablelandPolicy} struct defining how a table can be accessed by `caller`.
      */
     function getPolicy(
         address caller
