@@ -2,13 +2,27 @@
 pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "../ITablelandController.sol";
-import "../TablelandPolicy.sol";
 import "../policies/Policies.sol";
 import "../policies/ERC721EnumerablePolicies.sol";
 import "../policies/ERC721AQueryablePolicies.sol";
 
-contract TestTablelandController is ITablelandController, Ownable {
+/**
+ * @dev This is an exact copy of the original ITablelandController, maintained here to ensure backwards compatibility.
+ */
+interface ITablelandControllerV0Test {
+    struct Policy {
+        bool allowInsert;
+        bool allowUpdate;
+        bool allowDelete;
+        string whereClause;
+        string withCheck;
+        string[] updatableColumns;
+    }
+
+    function getPolicy(address caller) external payable returns (Policy memory);
+}
+
+contract TestTablelandControllerV0 is ITablelandControllerV0Test, Ownable {
     error InsufficientValue(uint256 receivedValue, uint256 requiredValue);
 
     uint256 public constant REQUIRED_VALUE = 1 ether;
@@ -17,16 +31,12 @@ contract TestTablelandController is ITablelandController, Ownable {
     address private _bars;
 
     function getPolicy(
-        address caller,
-        uint256
-    ) public payable override returns (TablelandPolicy memory) {
+        address caller
+    ) public payable override returns (Policy memory) {
         // Enforce some ether and revert if insufficient
-        if (msg.value < 1 ether) {
+        if (msg.value != 1 ether) {
             revert InsufficientValue(msg.value, REQUIRED_VALUE);
         }
-
-        // The following line is for coverage of a revert/require error
-        require(msg.value == 1 ether, "too much ether!");
 
         string[] memory whereClauses = new string[](2);
         string[] memory withChecks = new string[](3);
@@ -56,7 +66,7 @@ contract TestTablelandController is ITablelandController, Ownable {
 
         // Return policy
         return
-            TablelandPolicy({
+            Policy({
                 allowInsert: false,
                 allowUpdate: true,
                 allowDelete: false,

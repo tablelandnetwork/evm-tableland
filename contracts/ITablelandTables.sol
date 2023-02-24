@@ -2,6 +2,7 @@
 pragma solidity ^0.8.4;
 
 import "./ITablelandController.sol";
+import "./TablelandPolicy.sol";
 
 /**
  * @dev Interface of a TablelandTables compliant contract.
@@ -52,7 +53,7 @@ interface ITablelandTables {
         bool isOwner,
         uint256 tableId,
         string statement,
-        ITablelandController.Policy policy
+        TablelandPolicy policy
     );
 
     /**

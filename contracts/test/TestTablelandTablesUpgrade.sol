@@ -9,6 +9,8 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "../ITablelandTables.sol";
 import "../ITablelandController.sol";
+import "../ITablelandControllerV0.sol";
+import "../TablelandPolicy.sol";
 
 contract TestTablelandTablesUpgrade is
     ITablelandTables,
@@ -68,11 +70,27 @@ contract TestTablelandTablesUpgrade is
     function _getPolicy(
         address caller,
         uint256 tableId
-    ) private returns (ITablelandController.Policy memory) {
+    ) private returns (TablelandPolicy memory) {
         address controller = _controllers[tableId];
         if (_isContract(controller)) {
-            return
+            try
                 ITablelandController(controller).getPolicy{value: msg.value}(
+                    caller,
+                    tableId
+                )
+            returns (TablelandPolicy memory policy) {
+                return policy;
+            } catch Error(string memory reason) {
+                revert(reason);
+            } catch (bytes memory err) {
+                if (err.length > 0) {
+                    assembly {
+                        revert(add(32, err), mload(err))
+                    }
+                }
+            }
+            return
+                ITablelandControllerV0(controller).getPolicy{value: msg.value}(
                     caller
                 );
         }
@@ -81,7 +99,7 @@ contract TestTablelandTablesUpgrade is
         }
 
         return
-            ITablelandController.Policy({
+            TablelandPolicy({
                 allowInsert: true,
                 allowUpdate: true,
                 allowDelete: true,

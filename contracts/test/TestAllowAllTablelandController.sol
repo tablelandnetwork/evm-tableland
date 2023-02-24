@@ -2,17 +2,19 @@
 pragma solidity ^0.8.4;
 
 import "../ITablelandController.sol";
+import "../TablelandPolicy.sol";
 import "../policies/Policies.sol";
 import "../policies/ERC721EnumerablePolicies.sol";
 import "../policies/ERC721AQueryablePolicies.sol";
 
 contract TestAllowAllTablelandController is ITablelandController {
     function getPolicy(
-        address
-    ) public payable override returns (ITablelandController.Policy memory) {
+        address,
+        uint256
+    ) public payable override returns (TablelandPolicy memory) {
         // Return allow-all policy
         return
-            ITablelandController.Policy({
+            TablelandPolicy({
                 allowInsert: true,
                 allowUpdate: true,
                 allowDelete: true,

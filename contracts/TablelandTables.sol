@@ -10,6 +10,8 @@ import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.
 import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "./ITablelandTables.sol";
 import "./ITablelandController.sol";
+import "./ITablelandControllerV0.sol";
+import "./TablelandPolicy.sol";
 
 /**
  * @dev Implementation of {ITablelandTables}.
@@ -87,7 +89,7 @@ contract TablelandTables is
     }
 
     /**
-     * @dev Returns an {ITablelandController.Policy} for `caller` and `tableId`.
+     * @dev Returns an {TablelandPolicy} for `caller` and `tableId`.
      *
      * An allow-all policy is returned if the table's controller does not exist.
      *
@@ -99,11 +101,42 @@ contract TablelandTables is
     function _getPolicy(
         address caller,
         uint256 tableId
-    ) private returns (ITablelandController.Policy memory) {
+    ) private returns (TablelandPolicy memory) {
         address controller = _controllers[tableId];
         if (_isContract(controller)) {
-            return
+            // Try {ITablelandController.getPolicy(address, uint256)}.
+            try
                 ITablelandController(controller).getPolicy{value: msg.value}(
+                    caller,
+                    tableId
+                )
+            returns (TablelandPolicy memory policy) {
+                return policy;
+            } catch Error(string memory reason) {
+                // Controller reverted/required with a reason string. Bubble up the error.
+                revert(reason);
+            } catch (bytes memory err) {
+                // We are here for one of two reasons:
+                // 1. We hit an old controller that does not implement {ITablelandController.getPolicy(address, uint256)}.
+                // 2. The controller reverted w/o a reason string, e.g, a custom error, revert(), or require(condition).
+                // We can't differentiate between reverting/requiring w/o a reason string and a v0 controller.
+                // When a controller reverts/requires w/o a reason string it will be treated as a v0 controller,
+                // i.e., we will try to call {ITablelandControllerV0.getPolicy(address)}.
+
+                // Controller reverted with a custom error. Bubble it up.
+                if (err.length > 0) {
+                    assembly {
+                        revert(add(32, err), mload(err))
+                    }
+                }
+            }
+
+            // This is either a v0 controller, or a new controller that reverted/required w/o a reason string.
+            // In the latter case, the following will also error w/o a reason string, i.e., the caller will not
+            // be able to tell the difference.
+            // Try {ITablelandControllerV0.getPolicy(address)}.
+            return
+                ITablelandControllerV0(controller).getPolicy{value: msg.value}(
                     caller
                 );
         }
@@ -112,7 +145,7 @@ contract TablelandTables is
         }
 
         return
-            ITablelandController.Policy({
+            TablelandPolicy({
                 allowInsert: true,
                 allowUpdate: true,
                 allowDelete: true,
