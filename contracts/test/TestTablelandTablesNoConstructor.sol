@@ -7,10 +7,11 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "../ITablelandTables.sol";
 import "../ITablelandController.sol";
 
-contract TestTablelandTablesUpgrade is
+contract TestTablelandTablesNoConstructor is
     ITablelandTables,
     ERC721AUpgradeable,
     ERC721AQueryableUpgradeable,
@@ -23,13 +24,6 @@ contract TestTablelandTablesUpgrade is
     mapping(uint256 => address) internal _controllers;
     mapping(uint256 => bool) internal _locks;
     uint256 internal constant QUERY_MAX_SIZE = 35000;
-
-    mapping(uint256 => address) private _dummyStorage;
-
-    /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor() {
-        _disableInitializers();
-    }
 
     function initialize(
         string memory baseURI
@@ -45,20 +39,29 @@ contract TestTablelandTablesUpgrade is
     }
 
     function createTable(
-        address,
-        string memory
-    ) external payable override whenNotPaused returns (uint256) {} // solhint-disable no-empty-blocks
+        address owner,
+        string memory statement
+    ) external payable override whenNotPaused returns (uint256 tableId) {
+        tableId = _nextTokenId();
+        _safeMint(owner, 1);
+
+        emit CreateTable(owner, tableId, statement);
+
+        return tableId;
+    }
 
     function runSQL(
         address caller,
         uint256 tableId,
         string memory statement
     ) external payable override whenNotPaused nonReentrant {
-        if (
-            !_exists(tableId) ||
-            !(caller == _msgSenderERC721A() || owner() == _msgSenderERC721A())
-        ) {
+        if (!_exists(tableId) || caller != _msgSenderERC721A()) {
             revert Unauthorized();
+        }
+
+        uint256 querySize = bytes(statement).length;
+        if (querySize > QUERY_MAX_SIZE) {
+            revert MaxQuerySizeExceeded(querySize, QUERY_MAX_SIZE);
         }
 
         emit RunSQL(
@@ -101,32 +104,75 @@ contract TestTablelandTablesUpgrade is
     }
 
     function setController(
-        address,
-        uint256,
-        address
-    ) external override whenNotPaused {} // solhint-disable no-empty-blocks
+        address caller,
+        uint256 tableId,
+        address controller
+    ) external override whenNotPaused {
+        if (
+            caller != ownerOf(tableId) ||
+            caller != _msgSenderERC721A() ||
+            _locks[tableId]
+        ) {
+            revert Unauthorized();
+        }
+
+        _controllers[tableId] = controller;
+
+        emit SetController(tableId, controller);
+    }
 
     function getController(
         uint256 tableId
-    ) external view override returns (address) {} // solhint-disable no-empty-blocks
+    ) external view override returns (address) {
+        return _controllers[tableId];
+    }
 
     function lockController(
         address caller,
         uint256 tableId
-    ) external override whenNotPaused {} // solhint-disable no-empty-blocks
+    ) external override whenNotPaused {
+        if (
+            caller != ownerOf(tableId) ||
+            caller != _msgSenderERC721A() ||
+            _locks[tableId]
+        ) {
+            revert Unauthorized();
+        }
 
-    // solhint-disable-next-line no-empty-blocks
-    function setBaseURI(string memory) external override onlyOwner {}
+        _locks[tableId] = true;
+    }
 
-    // solhint-disable-next-line no-empty-blocks
-    function _baseURI() internal view override returns (string memory) {}
+    function setBaseURI(string memory baseURI) external override onlyOwner {
+        _baseURIString = baseURI;
+    }
 
-    // solhint-disable-next-line no-empty-blocks
-    function pause() external override onlyOwner {}
+    function _baseURI() internal view override returns (string memory) {
+        return _baseURIString;
+    }
 
-    // solhint-disable-next-line no-empty-blocks
-    function unpause() external override onlyOwner {}
+    function pause() external override onlyOwner {
+        _pause();
+    }
 
-    // solhint-disable-next-line no-empty-blocks
-    function _authorizeUpgrade(address) internal view override onlyOwner {}
+    function unpause() external override onlyOwner {
+        _unpause();
+    }
+
+    function _startTokenId() internal pure override returns (uint256) {
+        return 1;
+    }
+
+    function _afterTokenTransfers(
+        address from,
+        address to,
+        uint256 startTokenId,
+        uint256 quantity
+    ) internal override {
+        super._afterTokenTransfers(from, to, startTokenId, quantity);
+        if (from != address(0)) {
+            emit TransferTable(from, to, startTokenId);
+        }
+    }
+
+    function _authorizeUpgrade(address) internal view override onlyOwner {} // solhint-disable no-empty-blocks
 }
