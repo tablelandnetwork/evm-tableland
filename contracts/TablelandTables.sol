@@ -32,6 +32,11 @@ contract TablelandTables is
     // The maximum size allowed for a query.
     uint256 internal constant QUERY_MAX_SIZE = 35000;
 
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
     function initialize(
         string memory baseURI
     ) public initializerERC721A initializer {

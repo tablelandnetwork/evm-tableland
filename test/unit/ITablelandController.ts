@@ -2,7 +2,7 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import chai from "chai";
 import chaiAsPromised from "chai-as-promised";
 import { BigNumber } from "ethers";
-import { ethers } from "hardhat";
+import { ethers, upgrades } from "hardhat";
 import type {
   TablelandTables,
   TestERC721Enumerable,
@@ -30,11 +30,12 @@ describe("ITablelandController", function () {
     accounts = await ethers.getSigners();
 
     // Deploy tables
-    tables = (await (
-      await ethers.getContractFactory("TablelandTables")
-    ).deploy()) as TablelandTables;
-    await tables.deployed();
-    await (await tables.initialize("https://foo.xyz/")).wait();
+    const Factory = await ethers.getContractFactory("TablelandTables");
+    tables = await (
+      (await upgrades.deployProxy(Factory, ["https://foo.xyz/"], {
+        kind: "uups",
+      })) as TablelandTables
+    ).deployed();
 
     // Deploy test erc721 contracts
     foos = (await (

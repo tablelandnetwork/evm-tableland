@@ -2,7 +2,7 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import chai from "chai";
 import chaiAsPromised from "chai-as-promised";
 import { BigNumber } from "ethers";
-import { ethers } from "hardhat";
+import { ethers, upgrades } from "hardhat";
 import { TablelandTables } from "../../typechain-types";
 
 chai.use(chaiAsPromised);
@@ -15,15 +15,11 @@ describe("TablelandTables", function () {
   beforeEach(async function () {
     accounts = await ethers.getSigners();
     const Factory = await ethers.getContractFactory("TablelandTables");
-    tables = (await Factory.deploy()) as TablelandTables;
-    await tables.deployed();
-    await (await tables.initialize("https://foo.xyz/")).wait();
-  });
-
-  it("Should not be initializable more than once", async function () {
-    await expect(tables.initialize("https://foo.xyz/")).to.be.revertedWith(
-      "ERC721A__Initializable: contract is already initialized"
-    );
+    tables = await (
+      (await upgrades.deployProxy(Factory, ["https://foo.xyz/"], {
+        kind: "uups",
+      })) as TablelandTables
+    ).deployed();
   });
 
   it("Should have set owner to deployer address", async function () {
