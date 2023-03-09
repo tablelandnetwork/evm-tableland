@@ -32,8 +32,15 @@ async function main() {
   console.log("New proxy address:", tables.address);
 
   // Check new implementation
-  const impl = await upgrades.erc1967.getImplementationAddress(tables.address);
-  console.log("New implementation address:", impl);
+  const impl = Factory.attach(
+    await upgrades.erc1967.getImplementationAddress(tables.address)
+  );
+  console.log("New implementation address:", impl.address);
+  console.log("New implementation owner after deploy proxy: ", await impl.owner());
+
+  // TMP: Try to manually initialize impl
+  await impl.initialize(baseURI);
+  console.log("New implementation owner after manual initialize: ", await impl.owner());
 
   // Create health bot table
   const { chainId } = await account.provider.getNetwork();
