@@ -26,7 +26,7 @@ const homestead = {
 
 const config: HardhatUserConfig = {
   solidity: {
-    version: "0.8.4",
+    version: "0.8.15",
     settings: {
       optimizer: {
         enabled: true,
