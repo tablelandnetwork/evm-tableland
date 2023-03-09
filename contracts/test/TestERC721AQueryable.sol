@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.10 <0.9.0;
 
-import "erc721a/contracts/ERC721A.sol";
-import "erc721a/contracts/extensions/ERC721AQueryable.sol";
-import "erc721a/contracts/extensions/ERC721ABurnable.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import {ERC721A} from "erc721a/contracts/ERC721A.sol";
+import {ERC721AQueryable} from "erc721a/contracts/extensions/ERC721AQueryable.sol";
+import {ERC721ABurnable} from "erc721a/contracts/extensions/ERC721ABurnable.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 contract TestERC721AQueryable is
     ERC721A,
