@@ -23,7 +23,10 @@ contract TestTablelandTablesNoConstructor is
     string internal _baseURIString;
     mapping(uint256 => address) internal _controllers;
     mapping(uint256 => bool) internal _locks;
-    uint256 internal constant QUERY_MAX_SIZE = 35000;
+    // QUERY_MAX_SIZE value differs from TablelandTables in order to make bytecode different.
+    // Without this, contract verification fails:
+    // "NomicLabsHardhatPluginError: More than one contract was found to match the deployed bytecode."
+    uint256 internal constant QUERY_MAX_SIZE = 1000;
 
     function initialize(
         string memory baseURI

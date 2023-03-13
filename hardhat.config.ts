@@ -57,6 +57,7 @@ const config: HardhatUserConfig = {
 
       // arbitrum
       arbitrumOne: process.env.ARBISCAN_API_KEY || "",
+      arbitrumNova: process.env.ARBISCAN_NOVA_API_KEY || "",
       arbitrumGoerli: process.env.ARBISCAN_API_KEY || "",
 
       // polygon
@@ -64,6 +65,14 @@ const config: HardhatUserConfig = {
       polygonMumbai: process.env.POLYSCAN_API_KEY || "",
     },
     customChains: [
+      {
+        network: "arbitrumNova",
+        chainId: 42170,
+        urls: {
+          apiURL: "https://api-nova.arbiscan.io/api",
+          browserURL: "https://nova.arbiscan.io/",
+        },
+      },
       {
         network: "optimisticGoerli",
         chainId: 420,
@@ -102,6 +111,15 @@ const config: HardhatUserConfig = {
       accounts:
         process.env.ARBITRUM_PRIVATE_KEY !== undefined
           ? [process.env.ARBITRUM_PRIVATE_KEY]
+          : [],
+    },
+    "arbitrum-nova": {
+      url: `https://skilled-yolo-mountain.nova-mainnet.discover.quiknode.pro/${
+        process.env.ARBITRUM_NOVA_API_KEY ?? ""
+      }`,
+      accounts:
+        process.env.ARBITRUM_NOVA_PRIVATE_KEY !== undefined
+          ? [process.env.ARBITRUM_NOVA_PRIVATE_KEY]
           : [],
     },
     matic: {

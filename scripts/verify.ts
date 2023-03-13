@@ -1,4 +1,4 @@
-import { run, ethers, upgrades, network, proxy } from "hardhat";
+import { run, network, proxy } from "hardhat";
 
 async function main() {
   console.log(`\nVerifying on '${network.name}'...`);
@@ -8,13 +8,10 @@ async function main() {
     throw Error(`no proxy entry for '${network.name}'`);
   }
 
-  // Verify implementation
-  const tables = (await ethers.getContractFactory("TablelandTables")).attach(
-    proxy
-  );
-  const impl = await upgrades.erc1967.getImplementationAddress(tables.address);
+  // Verify proxy and implementation
+  // This will also link the proxy to the implementation in the explorer UI
   await run("verify:verify", {
-    address: impl,
+    address: proxy,
   });
 }
 
