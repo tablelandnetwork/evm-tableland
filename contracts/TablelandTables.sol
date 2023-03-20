@@ -73,6 +73,7 @@ contract TablelandTables is
 
     /**
      * @custom:depreciated See {ITablelandTables-runSQL}.
+     * This function is deprecated, please use `writeToTable`.
      */
     function runSQL(
         address caller,
