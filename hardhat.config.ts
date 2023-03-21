@@ -178,6 +178,20 @@ const config: HardhatUserConfig = {
           ? [process.env.OPTIMISM_GOERLI_STAGING_PRIVATE_KEY]
           : [],
     },
+    filecoin: {
+      url: "https://rpc.ankr.com/filecoin",
+      accounts:
+        process.env.FILECOIN_PRIVATE_KEY !== undefined
+          ? [process.env.FILECOIN_PRIVATE_KEY]
+          : [],
+    },
+    "filecoin-hyperspace": {
+      url: "https://rpc.ankr.com/filecoin_testnet",
+      accounts:
+        process.env.HYPERSPACE_PRIVATE_KEY !== undefined
+          ? [process.env.HYPERSPACE_PRIVATE_KEY]
+          : [],
+    },
     hardhat: {
       mining: {
         auto: !(process.env.HARDHAT_DISABLE_AUTO_MINING === "true"),
