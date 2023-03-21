@@ -43,8 +43,51 @@ contract TestTablelandTablesNoConstructor is
 
     function createTable(
         address owner,
-        string memory statement
+        string calldata statement
     ) external payable override whenNotPaused returns (uint256 tableId) {
+        return _createTable(owner, statement);
+    }
+
+    function writeToTable(
+        address caller,
+        uint256 tableId,
+        string calldata statement
+    ) external payable override whenNotPaused nonReentrant {
+        _mutateTable(caller, tableId, statement);
+    }
+
+    function runSQL(
+        address caller,
+        uint256 tableId,
+        string calldata statement
+    ) external payable override whenNotPaused nonReentrant {
+        _mutateTable(caller, tableId, statement);
+    }
+
+    function runSQL(
+        address caller,
+        ITablelandTables.Runnable[] calldata runnables
+    ) external payable override whenNotPaused nonReentrant {
+        for (uint256 i = 0; i < runnables.length; i++) {
+            if (runnables[i].tableId > 0) {
+                // simple pass along of each set of runSQL calls
+                _mutateTable(
+                    caller,
+                    runnables[i].tableId,
+                    runnables[i].statement
+                );
+            } else {
+                // if the tableId isn't greater than the default of 0 then the
+                // statement must be a create statement, and we pass it through
+                _createTable(caller, runnables[i].statement);
+            }
+        }
+    }
+
+    function _createTable(
+        address owner,
+        string calldata statement
+    ) private returns (uint256 tableId) {
         tableId = _nextTokenId();
         _safeMint(owner, 1);
 
@@ -53,12 +96,15 @@ contract TestTablelandTablesNoConstructor is
         return tableId;
     }
 
-    function runSQL(
+    function _mutateTable(
         address caller,
         uint256 tableId,
-        string memory statement
-    ) external payable override whenNotPaused nonReentrant {
-        if (!_exists(tableId) || caller != _msgSenderERC721A()) {
+        string calldata statement
+    ) private {
+        if (
+            !_exists(tableId) ||
+            !(caller == _msgSenderERC721A() || owner() == _msgSenderERC721A())
+        ) {
             revert Unauthorized();
         }
 

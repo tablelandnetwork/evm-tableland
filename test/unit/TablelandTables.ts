@@ -31,7 +31,6 @@ describe("TablelandTables", function () {
     ).deployed();
 
     await tables.deployed();
-    await (await tables.initialize("https://foo.xyz/")).wait();
 
     // Deploy test controller contracts
     runSqlLegacyReentrantController = (await (
@@ -149,22 +148,22 @@ describe("TablelandTables", function () {
     // Test contract owner can not run SQL on behalf of another account
     const contractOwner = accounts[0];
 
+    // TODO: remove this once deprecated function is removed
     await expect(
       tables
         .connect(contractOwner)
-        ["runSQL(address,uint256,string)"](caller.address, tableId, runStatement)
+        ["runSQL(address,uint256,string)"](
+          caller.address,
+          tableId,
+          runStatement
+        )
     ).to.be.revertedWithCustomError(tables, "Unauthorized");
 
-    tx = await tables
-      .connect(contractOwner)
-      .writeToTable(caller.address, tableId, runStatement);
-    receipt = await tx.wait();
-    [runEvent] = receipt.events ?? [];
-    expect(runEvent.args!.caller).to.equal(caller.address);
-    expect(runEvent.args!.isOwner).to.equal(false);
-    expect(runEvent.args!.tableId).to.equal(tableId);
-    expect(runEvent.args!.statement).to.equal(runStatement);
-    expect(runEvent.args!.policy).to.not.equal(undefined);
+    await expect(
+      tables
+        .connect(contractOwner)
+        .writeToTable(caller.address, tableId, runStatement)
+    ).to.be.revertedWithCustomError(tables, "Unauthorized");
   });
 
   it("Should not enable reentracy attack via legacy runSQL with policy", async function () {
@@ -461,57 +460,6 @@ describe("TablelandTables", function () {
     ).to.be.revertedWithCustomError(tables, "Unauthorized");
   });
 
-  it("Should allow contract owner to call `runSQL` on behalf of someone else", async function () {
-    // Test contract owner can run SQL on behalf of another account
-    const contractOwner = accounts[0];
-    const tableOwner = accounts[4];
-    const caller = accounts[5];
-
-    const createStatement = "create table testing (int a);";
-    const runStatement1 = "insert into testing values (1);";
-    const runStatement2 = "insert into testing values (2);";
-
-    let tx = await tables
-      .connect(tableOwner)
-      .createTable(tableOwner.address, createStatement);
-    let receipt = await tx.wait();
-    const [, createEvent] = receipt.events ?? [];
-    const tableId = createEvent.args!.tableId;
-
-    tx = await tables
-      .connect(contractOwner)
-      ["runSQL(address,(uint256,string)[])"](caller.address, [
-        { tableId, statement: runStatement1 },
-        { tableId, statement: runStatement2 },
-        { tableId: BigNumber.from(0), statement: createStatement },
-      ]);
-    receipt = await tx.wait();
-    const [runEvent1, runEvent2, transferEvent, createEvent1] =
-      receipt.events ?? [];
-
-    expect(runEvent1.args!.caller).to.equal(caller.address);
-    expect(runEvent1.args!.isOwner).to.equal(false);
-    expect(runEvent1.args!.tableId).to.equal(tableId);
-    expect(runEvent1.args!.statement).to.equal(runStatement1);
-    expect(runEvent1.args!.policy).to.not.equal(undefined);
-
-    expect(runEvent2.args!.caller).to.equal(caller.address);
-    expect(runEvent2.args!.isOwner).to.equal(false);
-    expect(runEvent2.args!.tableId).to.equal(tableId);
-    expect(runEvent2.args!.statement).to.equal(runStatement2);
-    expect(runEvent2.args!.policy).to.not.equal(undefined);
-
-    expect(transferEvent.event).to.equal("Transfer");
-    expect(transferEvent.args!.from).to.equal(
-      "0x0000000000000000000000000000000000000000"
-    );
-    expect(transferEvent.args!.to).to.equal(caller.address);
-
-    expect(createEvent1.event).to.equal("CreateTable");
-    expect(createEvent1.args!.statement).to.equal(createStatement);
-    expect(createEvent1.args!.owner).to.equal(caller.address);
-  });
-
   it("Should NOT allow calling `runSQL` when contract is paused", async function () {
     // Test others cannot run SQL on behalf of another account
     const owner = accounts[4];
@@ -655,7 +603,7 @@ describe("TablelandTables", function () {
     ).to.be.revertedWithCustomError(tables, "Unauthorized");
   });
 
-  it("Should allow contract owner to run a set of SQL statements on behalf of someone else", async function () {
+  it("Should NOT allow contract owner to run a set of SQL statements on behalf of someone else", async function () {
     // Test contract owner can run SQL on behalf of another account
     const contractOwner = accounts[0];
     const tableOwner = accounts[4];
@@ -665,33 +613,21 @@ describe("TablelandTables", function () {
     const runStatement1 = "insert into testing values (1);";
     const runStatement2 = "insert into testing values (2);";
 
-    let tx = await tables
+    const tx = await tables
       .connect(tableOwner)
       .createTable(tableOwner.address, createStatement);
-    let receipt = await tx.wait();
+    const receipt = await tx.wait();
     const [, createEvent] = receipt.events ?? [];
     const tableId = createEvent.args!.tableId;
 
-    tx = await tables
-      .connect(contractOwner)
-      ["runSQL(address,(uint256,string)[])"](caller.address, [
-        { tableId, statement: runStatement1 },
-        { tableId, statement: runStatement2 },
-      ]);
-    receipt = await tx.wait();
-    const [runEvent1, runEvent2] = receipt.events ?? [];
-
-    expect(runEvent1.args!.caller).to.equal(caller.address);
-    expect(runEvent1.args!.isOwner).to.equal(false);
-    expect(runEvent1.args!.tableId).to.equal(tableId);
-    expect(runEvent1.args!.statement).to.equal(runStatement1);
-    expect(runEvent1.args!.policy).to.not.equal(undefined);
-
-    expect(runEvent2.args!.caller).to.equal(caller.address);
-    expect(runEvent2.args!.isOwner).to.equal(false);
-    expect(runEvent2.args!.tableId).to.equal(tableId);
-    expect(runEvent2.args!.statement).to.equal(runStatement2);
-    expect(runEvent2.args!.policy).to.not.equal(undefined);
+    await expect(
+      tables
+        .connect(contractOwner)
+        ["runSQL(address,(uint256,string)[])"](caller.address, [
+          { tableId, statement: runStatement1 },
+          { tableId, statement: runStatement2 },
+        ])
+    ).to.be.revertedWithCustomError(tables, "Unauthorized");
   });
 
   it("Should NOT allow runSQLs to run when paused", async function () {

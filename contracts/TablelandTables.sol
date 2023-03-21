@@ -123,10 +123,7 @@ contract TablelandTables is
         uint256 tableId,
         string calldata statement
     ) private {
-        if (
-            !_exists(tableId) ||
-            !(caller == _msgSenderERC721A() || owner() == _msgSenderERC721A())
-        ) {
+        if (!_exists(tableId) || caller != _msgSenderERC721A()) {
             revert Unauthorized();
         }
 
