@@ -4,6 +4,7 @@ export interface TablelandNetworkConfig {
   homestead: string;
   optimism: string;
   arbitrum: string;
+  "arbitrum-nova": string;
   matic: string;
   // tableland testnet testnets
   goerli: string;
@@ -24,6 +25,7 @@ export const proxies: TablelandNetworkConfig = {
   homestead: homesteadAddr,
   optimism: "0xfad44BF5B843dE943a09D4f3E84949A11d3aa3e6",
   arbitrum: "0x9aBd75E8640871A5a20d3B4eE6330a04c962aFfd",
+  "arbitrum-nova": "0x1A22854c5b1642760a827f20137a67930AE108d2",
   matic: "0x5c4e6A9e5C1e1BF445A062006faF19EA6c49aFeA",
   goerli: "0xDA8EA22d092307874f30A1F277D1388dca0BA97a",
   "optimism-goerli": "0xC72E8a7Be04f2469f8C2dB3F1BdF69A7D516aBbA",
@@ -45,6 +47,7 @@ export const baseURIs: TablelandNetworkConfig = {
   homestead: homesteadURI,
   optimism: "https://tableland.network/api/v1/tables/10/",
   arbitrum: "https://tableland.network/api/v1/tables/42161/",
+  "arbitrum-nova": "https://tableland.network/api/v1/tables/42170/",
   matic: "https://tableland.network/api/v1/tables/137/",
   // testnets
   goerli: "https://testnets.tableland.network/api/v1/tables/5/",
