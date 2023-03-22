@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Unlicense
-pragma solidity ^0.8.4;
+pragma solidity >=0.8.10 <0.9.0;
 
 /**
  * @dev Helper contract for constructing token URIs where the tokenId may not

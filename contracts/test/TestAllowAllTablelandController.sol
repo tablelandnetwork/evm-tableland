@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4;
+pragma solidity >=0.8.10 <0.9.0;
 
-import "../ITablelandController.sol";
-import "../policies/Policies.sol";
-import "../policies/ERC721EnumerablePolicies.sol";
-import "../policies/ERC721AQueryablePolicies.sol";
+import {ITablelandController} from "../ITablelandController.sol";
+import {Policies} from "../policies/Policies.sol";
+import {ERC721EnumerablePolicies} from "../policies/ERC721EnumerablePolicies.sol";
+import {ERC721AQueryablePolicies} from "../policies/ERC721AQueryablePolicies.sol";
 
 contract TestAllowAllTablelandController is ITablelandController {
     function getPolicy(

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4;
+pragma solidity >=0.8.10 <0.9.0;
 
-import "../utils/SQLHelpers.sol";
+import {SQLHelpers} from "../utils/SQLHelpers.sol";
 
 /**
  * @dev SQLHelpers with public methods for testing.

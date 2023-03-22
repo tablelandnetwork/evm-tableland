@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4;
+pragma solidity >=0.8.10 <0.9.0;
 
-import "erc721a/contracts/extensions/ERC721AQueryable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
+import {ERC721AQueryable} from "erc721a/contracts/extensions/ERC721AQueryable.sol";
+import {StringsUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
 
 /**
  * @dev Library containing {ERC721AQueryable}-related helper methods for writing {ITablelandController.Policy}s.
