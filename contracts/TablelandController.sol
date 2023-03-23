@@ -16,7 +16,7 @@ abstract contract TablelandController is ITablelandController {
     }
 
     /**
-     * @notice DEPRECATED. Use {ITablelandController.getPolicy(address, uint256)} instead.
+     * @notice DEPRECATED. Use {TablelandController.getPolicy(address, uint256)} instead.
      */
     function getPolicy(
         address

@@ -21,7 +21,7 @@ interface ITablelandController {
     ) external payable returns (TablelandPolicy memory);
 
     /**
-     * @dev Returns a {TablelandPolicy} struct defining how a table can be accessed by `caller`.
+     * @notice DEPRECATED. Use {ITablelandController.getPolicy(address, uint256)} instead.
      */
     function getPolicy(
         address caller

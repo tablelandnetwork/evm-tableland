@@ -110,7 +110,7 @@ interface ITablelandTables {
      * handled at the contract level, and will accept all transactions.
      *
      * You can unset a controller address for a table by setting it back to the zero address.
-     * This will cause validators to revert back to honoring owner and GRANT bases write access control.
+     * This will cause validators to revert back to honoring owner and GRANT/REVOKE based write access control.
      *
      * caller - the address that is setting the controller
      * tableId - the id of the target table
