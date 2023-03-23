@@ -88,6 +88,7 @@ contract TestTablelandTablesUpgrade is
                 revert(reason);
             } catch (bytes memory err) {
                 if (err.length > 0) {
+                    // solhint-disable-next-line no-inline-assembly
                     assembly {
                         revert(add(32, err), mload(err))
                     }

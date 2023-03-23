@@ -15,6 +15,7 @@ contract TestRawTablelandController2 is TablelandController {
         uint256
     ) external payable virtual override returns (TablelandPolicy memory) {
         // Revert w/o reason string to trigger call to getPolicy(address)
+        // solhint-disable-next-line reason-string
         revert();
     }
 }

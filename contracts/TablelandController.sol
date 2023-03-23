@@ -16,13 +16,12 @@ abstract contract TablelandController is ITablelandController {
     }
 
     /**
-     * @dev See {ITablelandController-getPolicy}.
-     *
-     * Deprecated. Use {ITablelandController.getPolicy(address, uint256)}.
+     * @notice DEPRECATED. Use {ITablelandController.getPolicy(address, uint256)} instead.
      */
     function getPolicy(
         address
     ) external payable override returns (TablelandPolicy memory) {
+        // solhint-disable-next-line reason-string
         revert();
     }
 }

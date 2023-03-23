@@ -7,9 +7,9 @@ import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/U
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {PausableUpgradeable} from "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
-import {AddressUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import {ITablelandTables} from "../ITablelandTables.sol";
 import {ITablelandController} from "../ITablelandController.sol";
+import {TablelandPolicy} from "../TablelandPolicy.sol";
 
 contract TestTablelandTablesNoConstructor is
     ITablelandTables,
@@ -79,9 +79,26 @@ contract TestTablelandTablesNoConstructor is
     function _getPolicy(
         address caller,
         uint256 tableId
-    ) private returns (ITablelandController.Policy memory) {
+    ) private returns (TablelandPolicy memory) {
         address controller = _controllers[tableId];
         if (_isContract(controller)) {
+            try
+                ITablelandController(controller).getPolicy{value: msg.value}(
+                    caller,
+                    tableId
+                )
+            returns (TablelandPolicy memory policy) {
+                return policy;
+            } catch Error(string memory reason) {
+                revert(reason);
+            } catch (bytes memory err) {
+                if (err.length > 0) {
+                    // solhint-disable-next-line no-inline-assembly
+                    assembly {
+                        revert(add(32, err), mload(err))
+                    }
+                }
+            }
             return
                 ITablelandController(controller).getPolicy{value: msg.value}(
                     caller
@@ -92,7 +109,7 @@ contract TestTablelandTablesNoConstructor is
         }
 
         return
-            ITablelandController.Policy({
+            TablelandPolicy({
                 allowInsert: true,
                 allowUpdate: true,
                 allowDelete: true,

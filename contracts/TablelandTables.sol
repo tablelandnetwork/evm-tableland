@@ -7,7 +7,6 @@ import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/U
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {PausableUpgradeable} from "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
-import {AddressUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import {ITablelandTables} from "./ITablelandTables.sol";
 import {ITablelandController} from "./ITablelandController.sol";
 import {TablelandPolicy} from "./TablelandPolicy.sol";
@@ -129,6 +128,7 @@ contract TablelandTables is
 
                 // Controller reverted with a custom error. Bubble it up.
                 if (err.length > 0) {
+                    // solhint-disable-next-line no-inline-assembly
                     assembly {
                         revert(add(32, err), mload(err))
                     }
