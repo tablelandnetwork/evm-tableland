@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.10 <0.9.0;
 
-import {ITablelandTables} from "../ITablelandTables.sol";
+import {ITablelandTables} from "../interfaces/ITablelandTables.sol";
 
 /**
  * @dev Helper library for getting an instance of ITablelandTables for the currently executing EVM chain.

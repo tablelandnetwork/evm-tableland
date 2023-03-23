@@ -2,11 +2,11 @@
 pragma solidity >=0.8.10 <0.9.0;
 
 /**
- * @dev Library containing {ITablelandController.Policy} helper methods.
+ * @dev Library containing {TablelandPolicy} helper methods.
  */
 library Policies {
     /**
-     * @dev Joins multiple conditional clauses for {ITablelandController.Policy}'s `whereClause` and `withCheck` fields.
+     * @dev Joins multiple conditional clauses for {TablelandPolicy}'s `whereClause` and `withCheck` fields.
      */
     function joinClauses(
         string[] memory clauses

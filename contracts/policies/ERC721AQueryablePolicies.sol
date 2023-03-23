@@ -5,7 +5,7 @@ import {ERC721AQueryable} from "erc721a/contracts/extensions/ERC721AQueryable.so
 import {StringsUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
 
 /**
- * @dev Library containing {ERC721AQueryable}-related helper methods for writing {ITablelandController.Policy}s.
+ * @dev Library containing {ERC721AQueryable}-related helper methods for writing {TablelandPolicy}s.
  */
 library ERC721AQueryablePolicies {
     /**
@@ -18,7 +18,7 @@ library ERC721AQueryablePolicies {
      * equal to `target` {ERC721AQueryable} tokens owned by `caller`.
      *
      * Useful when you want to restict table INSERT / UPDATE / DELETE to owners of a given NFT collection.
-     * Intented to be used with {ITablelandController.Policy}'s `whereClause` or `withCheck` fields.
+     * Intented to be used with {TablelandPolicy}'s `whereClause` or `withCheck` fields.
      *
      * caller - the address that the policy if for
      * tableId - the address of the {ERC721AQueryable} token that `caller` must be an owner of

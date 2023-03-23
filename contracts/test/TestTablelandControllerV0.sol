@@ -2,13 +2,27 @@
 pragma solidity >=0.8.10 <0.9.0;
 
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import {TablelandController} from "../TablelandController.sol";
-import {TablelandPolicy} from "../TablelandPolicy.sol";
 import {Policies} from "../policies/Policies.sol";
 import {ERC721EnumerablePolicies} from "../policies/ERC721EnumerablePolicies.sol";
 import {ERC721AQueryablePolicies} from "../policies/ERC721AQueryablePolicies.sol";
 
-contract TestTablelandController is TablelandController, Ownable {
+/**
+ * @dev This is an exact copy of the original ITablelandController, maintained here to ensure backwards compatibility.
+ */
+interface ITablelandControllerV0Test {
+    struct Policy {
+        bool allowInsert;
+        bool allowUpdate;
+        bool allowDelete;
+        string whereClause;
+        string withCheck;
+        string[] updatableColumns;
+    }
+
+    function getPolicy(address caller) external payable returns (Policy memory);
+}
+
+contract TestTablelandControllerV0 is ITablelandControllerV0Test, Ownable {
     error InsufficientValue(uint256 receivedValue, uint256 requiredValue);
 
     uint256 public constant REQUIRED_VALUE = 1 ether;
@@ -17,16 +31,12 @@ contract TestTablelandController is TablelandController, Ownable {
     address private _bars;
 
     function getPolicy(
-        address caller,
-        uint256
-    ) public payable override returns (TablelandPolicy memory) {
+        address caller
+    ) public payable override returns (Policy memory) {
         // Enforce some ether and revert if insufficient
-        if (msg.value < 1 ether) {
+        if (msg.value != 1 ether) {
             revert InsufficientValue(msg.value, REQUIRED_VALUE);
         }
-
-        // The following line is for coverage of a revert/require error
-        require(msg.value == 1 ether, "too much ether!");
 
         string[] memory whereClauses = new string[](2);
         string[] memory withChecks = new string[](3);
@@ -56,7 +66,7 @@ contract TestTablelandController is TablelandController, Ownable {
 
         // Return policy
         return
-            TablelandPolicy({
+            Policy({
                 allowInsert: false,
                 allowUpdate: true,
                 allowDelete: false,

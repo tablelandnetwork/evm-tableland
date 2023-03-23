@@ -12,6 +12,7 @@ contract TestURITemplate is ERC721, Ownable, URITemplate {
     // Track the current value of the ERC-721 token
     Counters.Counter private _tokenIdCounter;
 
+    // solhint-disable-next-line no-empty-blocks
     constructor() ERC721("TestURITemplate", "URI") {}
 
     // Set the token URI by passing a string with exactly one `{id}` substring

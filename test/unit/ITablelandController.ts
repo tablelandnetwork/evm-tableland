@@ -8,7 +8,10 @@ import type {
   TestERC721Enumerable,
   TestERC721AQueryable,
   TestTablelandController,
+  TestTablelandControllerV0,
   TestAllowAllTablelandController,
+  TestRawTablelandController1,
+  TestRawTablelandController2,
   ERC721EnumerablePolicies,
   ERC721AQueryablePolicies,
 } from "../../typechain-types";
@@ -24,7 +27,10 @@ describe("ITablelandController", function () {
   let enumPolicyLib: ERC721EnumerablePolicies;
   let queryablePolicyLib: ERC721AQueryablePolicies;
   let controller: TestTablelandController;
+  let controllerV0: TestTablelandControllerV0;
   let allowAllController: TestAllowAllTablelandController;
+  let rawController1: TestRawTablelandController1;
+  let rawController2: TestRawTablelandController2;
 
   beforeEach(async function () {
     accounts = await ethers.getSigners();
@@ -65,14 +71,31 @@ describe("ITablelandController", function () {
     ).deploy()) as TestTablelandController;
     await controller.deployed();
 
+    controllerV0 = (await (
+      await ethers.getContractFactory("TestTablelandControllerV0")
+    ).deploy()) as TestTablelandControllerV0;
+    await controllerV0.deployed();
+
     allowAllController = (await (
       await ethers.getContractFactory("TestAllowAllTablelandController")
     ).deploy()) as TestAllowAllTablelandController;
     await allowAllController.deployed();
 
-    // Setup controller
+    rawController1 = (await (
+      await ethers.getContractFactory("TestRawTablelandController1")
+    ).deploy()) as TestRawTablelandController1;
+    await rawController1.deployed();
+
+    rawController2 = (await (
+      await ethers.getContractFactory("TestRawTablelandController2")
+    ).deploy()) as TestRawTablelandController2;
+    await rawController2.deployed();
+
+    // Setup controllers
     await (await controller.setFoos(foos.address)).wait();
     await (await controller.setBars(bars.address)).wait();
+    await (await controllerV0.setFoos(foos.address)).wait();
+    await (await controllerV0.setBars(bars.address)).wait();
   });
 
   it("Should set controller for a table", async function () {
@@ -299,12 +322,19 @@ describe("ITablelandController", function () {
       .setController(owner.address, tableId, controller.address);
     await tx.wait();
 
-    // Test that run SQL on table is gated by ether
+    // Test that run SQL on table is gated by ether (with custom error)
     const runStatement = "insert into testing values (0);";
     const caller = accounts[5];
     await expect(
       tables.connect(caller).runSQL(caller.address, tableId, runStatement)
     ).to.be.revertedWithCustomError(controller, "InsufficientValue");
+
+    // Test that run SQL on table is gated by ether (with revert/require)
+    await expect(
+      tables.connect(caller).runSQL(caller.address, tableId, runStatement, {
+        value: ethers.utils.parseEther("2"),
+      })
+    ).to.be.revertedWith("too much ether!");
 
     // Test that run SQL on table is gated by Foo and Bar ownership
     const value = ethers.utils.parseEther("1");
@@ -398,5 +428,152 @@ describe("ITablelandController", function () {
     expect(runEvent.args!.policy.withCheck).to.equal("baz > 0");
     expect(runEvent.args!.policy.updatableColumns.length).to.equal(1);
     expect(runEvent.args!.policy.updatableColumns).to.include("baz");
+  });
+
+  it("Should be able to gate run SQL with controller v0 contract", async function () {
+    const owner = accounts[4];
+    let tx = await tables.createTable(
+      owner.address,
+      "create table testing (int a);"
+    );
+    let receipt = await tx.wait();
+    const [, createEvent] = receipt.events ?? [];
+    const tableId = createEvent.args!.tableId;
+    tx = await tables
+      .connect(owner)
+      .setController(owner.address, tableId, controllerV0.address);
+    await tx.wait();
+
+    // Test that run SQL on table is gated by ether
+    const runStatement = "insert into testing values (0);";
+    const caller = accounts[5];
+    await expect(
+      tables.connect(caller).runSQL(caller.address, tableId, runStatement)
+    ).to.be.revertedWithCustomError(controllerV0, "InsufficientValue");
+
+    // Test that run SQL on table is gated by Foo and Bar ownership
+    const value = ethers.utils.parseEther("1");
+    await expect(
+      tables.connect(caller).runSQL(caller.address, tableId, runStatement, {
+        value,
+      })
+    ).to.be.revertedWithCustomError(
+      enumPolicyLib,
+      "ERC721EnumerablePoliciesUnauthorized"
+    );
+
+    // Test balance was reverted
+    expect(await ethers.provider.getBalance(tables.address)).to.equal(
+      BigNumber.from(0)
+    );
+    expect(await ethers.provider.getBalance(controllerV0.address)).to.equal(
+      BigNumber.from(0)
+    );
+
+    // Mint a Foo
+    tx = await foos.connect(caller).mint();
+    await tx.wait();
+
+    // Still gated (need a Bar too)
+    await expect(
+      tables.connect(caller).runSQL(caller.address, tableId, runStatement, {
+        value,
+      })
+    ).to.be.revertedWithCustomError(
+      queryablePolicyLib,
+      "ERC721AQueryablePoliciesUnauthorized"
+    );
+
+    // Mint a Bar
+    tx = await bars.connect(caller).mint();
+    await tx.wait();
+
+    // Caller should be able to run SQL now
+    tx = await tables
+      .connect(caller)
+      .runSQL(caller.address, tableId, runStatement, { value });
+    receipt = await tx.wait();
+    let [runEvent] = receipt.events ?? [];
+    expect(runEvent.args!.caller).to.equal(caller.address);
+    expect(runEvent.args!.isOwner).to.equal(false);
+    expect(runEvent.args!.tableId).to.equal(tableId);
+    expect(runEvent.args!.statement).to.equal(runStatement);
+    expect(runEvent.args!.policy.allowInsert).to.equal(false);
+    expect(runEvent.args!.policy.allowUpdate).to.equal(true);
+    expect(runEvent.args!.policy.allowDelete).to.equal(false);
+    expect(runEvent.args!.policy.whereClause).to.equal(
+      "foo_id in(0) and bar_id in(0)"
+    );
+    expect(runEvent.args!.policy.withCheck).to.equal("baz > 0");
+    expect(runEvent.args!.policy.updatableColumns.length).to.equal(1);
+    expect(runEvent.args!.policy.updatableColumns).to.include("baz");
+
+    // Test balance was taken by controller
+    expect(await ethers.provider.getBalance(tables.address)).to.equal(
+      BigNumber.from(0)
+    );
+    expect(await ethers.provider.getBalance(controllerV0.address)).to.equal(
+      value
+    );
+
+    // Mint some more
+    tx = await foos.connect(caller).mint();
+    await tx.wait();
+    tx = await bars.connect(caller).mint();
+    await tx.wait();
+    tx = await bars.connect(caller).mint();
+    await tx.wait();
+
+    // Where clause should reflect all owned tokens
+    tx = await tables
+      .connect(caller)
+      .runSQL(caller.address, tableId, runStatement, { value });
+    receipt = await tx.wait();
+    [runEvent] = receipt.events ?? [];
+    expect(runEvent.args!.caller).to.equal(caller.address);
+    expect(runEvent.args!.isOwner).to.equal(false);
+    expect(runEvent.args!.tableId).to.equal(tableId);
+    expect(runEvent.args!.statement).to.equal(runStatement);
+    expect(runEvent.args!.policy.allowInsert).to.equal(false);
+    expect(runEvent.args!.policy.allowUpdate).to.equal(true);
+    expect(runEvent.args!.policy.allowDelete).to.equal(false);
+    expect(runEvent.args!.policy.whereClause).to.equal(
+      "foo_id in(0,1) and bar_id in(0,1,2)"
+    );
+    expect(runEvent.args!.policy.withCheck).to.equal("baz > 0");
+    expect(runEvent.args!.policy.updatableColumns.length).to.equal(1);
+    expect(runEvent.args!.policy.updatableColumns).to.include("baz");
+  });
+
+  it("Should reject raw controllers", async function () {
+    const owner = accounts[4];
+    let tx = await tables.createTable(
+      owner.address,
+      "create table testing (int a);"
+    );
+    const receipt = await tx.wait();
+    const [, createEvent] = receipt.events ?? [];
+    const tableId = createEvent.args!.tableId;
+    tx = await tables
+      .connect(owner)
+      .setController(owner.address, tableId, rawController1.address);
+    await tx.wait();
+
+    // Test that run SQL on table is rejected (not implemented)
+    const runStatement = "insert into testing values (0);";
+    const caller = accounts[5];
+    await expect(
+      tables.connect(caller).runSQL(caller.address, tableId, runStatement)
+    ).to.be.revertedWith("not implemented");
+
+    tx = await tables
+      .connect(owner)
+      .setController(owner.address, tableId, rawController2.address);
+    await tx.wait();
+
+    // Test that run SQL on table is rejected (w/o reason string)
+    await expect(
+      tables.connect(caller).runSQL(caller.address, tableId, runStatement)
+    ).to.be.revertedWithoutReason();
   });
 });
