@@ -3,7 +3,7 @@ pragma solidity >=0.8.10 <0.9.0;
 
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import {ITablelandTables} from "../ITablelandTables.sol";
+import {ITablelandTables} from "../interfaces/ITablelandTables.sol";
 
 contract TestCreateFromContract is ERC721, Ownable {
     mapping(string => uint256) public tables;

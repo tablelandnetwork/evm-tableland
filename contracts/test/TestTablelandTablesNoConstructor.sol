@@ -7,8 +7,8 @@ import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/U
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {PausableUpgradeable} from "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
-import {ITablelandTables} from "../ITablelandTables.sol";
-import {ITablelandController} from "../ITablelandController.sol";
+import {ITablelandTables} from "../interfaces/ITablelandTables.sol";
+import {ITablelandController} from "../interfaces/ITablelandController.sol";
 import {TablelandPolicy} from "../TablelandPolicy.sol";
 
 contract TestTablelandTablesNoConstructor is

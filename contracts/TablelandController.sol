@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.10 <0.9.0;
 
-import {ITablelandController} from "./ITablelandController.sol";
+import {ITablelandController} from "./interfaces/ITablelandController.sol";
 import {TablelandPolicy} from "./TablelandPolicy.sol";
 
 abstract contract TablelandController is ITablelandController {
