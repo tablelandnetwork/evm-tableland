@@ -73,22 +73,6 @@ const config: HardhatUserConfig = {
           browserURL: "https://nova.arbiscan.io/",
         },
       },
-      {
-        network: "optimisticGoerli",
-        chainId: 420,
-        urls: {
-          apiURL: "https://api-goerli-optimism.etherscan.io/api",
-          browserURL: "https://goerli-optimism.etherscan.io/",
-        },
-      },
-      {
-        network: "arbitrumGoerli",
-        chainId: 421613,
-        urls: {
-          apiURL: "https://api-goerli.arbiscan.io/api",
-          browserURL: "https://goerli.arbiscan.io/",
-        },
-      },
     ],
   },
   networks: {
@@ -131,6 +115,13 @@ const config: HardhatUserConfig = {
           ? [process.env.POLYGON_PRIVATE_KEY]
           : [],
     },
+    filecoin: {
+      url: "https://api.node.glif.io/rpc/v1",
+      accounts:
+        process.env.FILECOIN_PRIVATE_KEY !== undefined
+          ? [process.env.FILECOIN_PRIVATE_KEY]
+          : [],
+    },
     // testnets
     goerli: {
       url: `https://eth-goerli.alchemyapi.io/v2/${
@@ -168,6 +159,13 @@ const config: HardhatUserConfig = {
           ? [process.env.POLYGON_MUMBAI_PRIVATE_KEY]
           : [],
     },
+    "filecoin-hyperspace": {
+      url: "https://api.hyperspace.node.glif.io/rpc/v1",
+      accounts:
+        process.env.FILECOIN_HYPERSPACE_PRIVATE_KEY !== undefined
+          ? [process.env.FILECOIN_HYPERSPACE_PRIVATE_KEY]
+          : [],
+    },
     // devnets
     "optimism-goerli-staging": {
       url: `https://opt-goerli.g.alchemy.com/v2/${
@@ -176,20 +174,6 @@ const config: HardhatUserConfig = {
       accounts:
         process.env.OPTIMISM_GOERLI_STAGING_PRIVATE_KEY !== undefined
           ? [process.env.OPTIMISM_GOERLI_STAGING_PRIVATE_KEY]
-          : [],
-    },
-    filecoin: {
-      url: "https://rpc.ankr.com/filecoin",
-      accounts:
-        process.env.FILECOIN_PRIVATE_KEY !== undefined
-          ? [process.env.FILECOIN_PRIVATE_KEY]
-          : [],
-    },
-    "filecoin-hyperspace": {
-      url: "https://rpc.ankr.com/filecoin_testnet",
-      accounts:
-        process.env.HYPERSPACE_PRIVATE_KEY !== undefined
-          ? [process.env.HYPERSPACE_PRIVATE_KEY]
           : [],
     },
     hardhat: {

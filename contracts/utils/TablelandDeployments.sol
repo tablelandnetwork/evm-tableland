@@ -29,6 +29,9 @@ library TablelandDeployments {
     // TablelandTables address on Polygon.
     address internal constant MATIC =
         0x5c4e6A9e5C1e1BF445A062006faF19EA6c49aFeA;
+    // TablelandTables address on Filecoin.
+    address internal constant FILECOIN =
+        0x59EF8Bf2d6c102B4c42AEf9189e1a9F0ABfD652d;
 
     // TablelandTables address on Ethereum Goerli.
     address internal constant GOERLI =
@@ -42,6 +45,9 @@ library TablelandDeployments {
     // TablelandTables address on Polygon Mumbai.
     address internal constant MATICMUM =
         0x4b48841d4b32C4650E4ABc117A03FE8B51f38F68;
+    // TablelandTables address on Filecoin Hyperspace.
+    address internal constant FILECOIN_HYPERSPACE =
+        0x0B9737ab4B3e5303CB67dB031b509697e31c02d3;
 
     // TablelandTables address on for use with https://github.com/tablelandnetwork/local-tableland.
     address internal constant LOCAL_TABLELAND =
@@ -67,6 +73,8 @@ library TablelandDeployments {
             return ITablelandTables(ARBITRUM_NOVA);
         } else if (block.chainid == 137) {
             return ITablelandTables(MATIC);
+        } else if (block.chainid == 314) {
+            return ITablelandTables(FILECOIN);
         } else if (block.chainid == 5) {
             return ITablelandTables(GOERLI);
         } else if (block.chainid == 420) {
@@ -75,6 +83,8 @@ library TablelandDeployments {
             return ITablelandTables(ARBITRUM_GOERLI);
         } else if (block.chainid == 80001) {
             return ITablelandTables(MATICMUM);
+        } else if (block.chainid == 3141) {
+            return ITablelandTables(FILECOIN_HYPERSPACE);
         } else if (block.chainid == 31337) {
             return ITablelandTables(LOCAL_TABLELAND);
         } else {

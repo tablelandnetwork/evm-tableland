@@ -1,6 +1,11 @@
+import { promisify } from "util";
 import { ethers, upgrades, network, baseURI, proxy } from "hardhat";
 import type { TablelandTables } from "../typechain-types";
 import assert from "assert";
+
+const sleep = promisify(setTimeout);
+const pollTimeout = 60 * 10 * 1000; // 10 min timeout (required for Filecoin)
+const pollInterval = 5000;
 
 async function main() {
   console.log(`\nDeploying new proxy to '${network.name}'...`);
@@ -27,13 +32,23 @@ async function main() {
   const tables = await (
     (await upgrades.deployProxy(Factory, [baseURI], {
       kind: "uups",
+      timeout: pollTimeout,
     })) as TablelandTables
   ).deployed();
   console.log("New proxy address:", tables.address);
 
-  // Check new implementation
-  const impl = await upgrades.erc1967.getImplementationAddress(tables.address);
-  console.log("New implementation address:", impl);
+  // Check implementation
+  // Note: We poll here because the impl won't be visible from the proxy until the next tipset on Filecoin.
+  // Note: See https://docs.filecoin.io/smart-contracts/developing-contracts/best-practices/#consistently-generating-transaction-receipts.
+  const startTime = Date.now();
+  while (!(await checkImpl(tables.address))) {
+    const elapsedTime = Date.now() - startTime;
+    if (elapsedTime >= pollTimeout) {
+      throw Error("impl did not become visible from proxy");
+    }
+    console.log("Waiting for implementation to be visible from proxy...");
+    await sleep(pollInterval);
+  }
 
   // Create health bot table
   const { chainId } = await account.provider.getNetwork();
@@ -59,6 +74,16 @@ async function main() {
   console.log(
     `\nSave 'proxies.${network.name}: "${tables.address}"' in 'network.ts'!`
   );
+}
+
+async function checkImpl(proxy: string): Promise<boolean> {
+  try {
+    const impl = await upgrades.erc1967.getImplementationAddress(proxy);
+    console.log("New implementation address:", impl);
+    return true;
+  } catch (error) {
+    return false;
+  }
 }
 
 main().catch((error) => {
