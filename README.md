@@ -1,11 +1,9 @@
 # @tableland/evm
 
 [![GitHub license](https://img.shields.io/github/license/tablelandnetwork/evm-tableland.svg)](./LICENSE)
-[![GitHub package.json version](https://img.shields.io/github/package-json/v/tablelandnetwork/evm-tableland.svg)](./package.json)
 [![Release](https://img.shields.io/github/release/tablelandnetwork/evm-tableland.svg)](https://github.com/tablelandnetwork/evm-tableland/releases/latest)
 [![standard-readme compliant](https://img.shields.io/badge/standard--readme-OK-green.svg)](https://github.com/RichardLitt/standard-readme)
-
-![Tests](https://github.com/tablelandnetwork/evm-tableland/workflows/Test/badge.svg)
+[![Test](https://github.com/tablelandnetwork/evm-tableland/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/tablelandnetwork/evm-tableland/actions/workflows/test.yml)
 
 > Tableland Tables EVM contracts and client components
 
