@@ -26,11 +26,17 @@ const homestead = {
 
 const config: HardhatUserConfig = {
   solidity: {
-    version: "0.8.15",
+    version: "0.8.19",
     settings: {
       optimizer: {
         enabled: true,
-        runs: 200,
+        runs: 9999999,
+      },
+      metadata: {
+        // do not include the metadata hash, since this is machine dependent
+        // and we want all generated code to be deterministic
+        // https://docs.soliditylang.org/en/v0.7.6/metadata.html
+        bytecodeHash: "none",
       },
     },
   },
@@ -71,22 +77,6 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: "https://api-nova.arbiscan.io/api",
           browserURL: "https://nova.arbiscan.io/",
-        },
-      },
-      {
-        network: "optimisticGoerli",
-        chainId: 420,
-        urls: {
-          apiURL: "https://api-goerli-optimism.etherscan.io/api",
-          browserURL: "https://goerli-optimism.etherscan.io/",
-        },
-      },
-      {
-        network: "arbitrumGoerli",
-        chainId: 421613,
-        urls: {
-          apiURL: "https://api-goerli.arbiscan.io/api",
-          browserURL: "https://goerli.arbiscan.io/",
         },
       },
     ],
@@ -131,6 +121,15 @@ const config: HardhatUserConfig = {
           ? [process.env.POLYGON_PRIVATE_KEY]
           : [],
     },
+    filecoin: {
+      url: `https://rpc.ankr.com/filecoin/${
+        process.env.FILECOIN_API_KEY ?? ""
+      }`,
+      accounts:
+        process.env.FILECOIN_PRIVATE_KEY !== undefined
+          ? [process.env.FILECOIN_PRIVATE_KEY]
+          : [],
+    },
     // testnets
     goerli: {
       url: `https://eth-goerli.alchemyapi.io/v2/${
@@ -166,6 +165,15 @@ const config: HardhatUserConfig = {
       accounts:
         process.env.POLYGON_MUMBAI_PRIVATE_KEY !== undefined
           ? [process.env.POLYGON_MUMBAI_PRIVATE_KEY]
+          : [],
+    },
+    "filecoin-hyperspace": {
+      url: `https://rpc.ankr.com/filecoin_testnet/${
+        process.env.FILECOIN_HYPERSPACE_API_KEY ?? ""
+      }`,
+      accounts:
+        process.env.FILECOIN_HYPERSPACE_PRIVATE_KEY !== undefined
+          ? [process.env.FILECOIN_HYPERSPACE_PRIVATE_KEY]
           : [],
     },
     // devnets
