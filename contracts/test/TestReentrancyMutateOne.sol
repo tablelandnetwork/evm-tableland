@@ -1,15 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "../ITablelandTables.sol";
-import "../ITablelandController.sol";
-import "../policies/Policies.sol";
-import "../policies/ERC721EnumerablePolicies.sol";
-import "../policies/ERC721AQueryablePolicies.sol";
+import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {ITablelandTables} from "../interfaces/ITablelandTables.sol";
+import {TablelandController} from "../TablelandController.sol";
+import {Policies} from "../policies/Policies.sol";
+import {TablelandPolicy} from "../TablelandPolicy.sol";
 
-contract TestReentrancyWriteToTable is ITablelandController, ERC721, Ownable {
+contract TestReentrancyMutateOne is TablelandController, ERC721, Ownable {
     ITablelandTables private _tableland;
 
     constructor(address registry) ERC721("TestCreateFromContract", "MTK") {
@@ -17,17 +16,18 @@ contract TestReentrancyWriteToTable is ITablelandController, ERC721, Ownable {
     }
 
     function getPolicy(
-        address
-    ) public payable override returns (ITablelandController.Policy memory) {
+        address,
+        uint256
+    ) public payable override returns (TablelandPolicy memory) {
         uint256 tableId = 1;
-        _tableland.writeToTable(
+        _tableland.mutate(
             msg.sender,
             tableId,
             "delete * from msgsendertableidontown"
         );
         // Return allow-all policy
         return
-            ITablelandController.Policy({
+            TablelandPolicy({
                 allowInsert: true,
                 allowUpdate: true,
                 allowDelete: true,

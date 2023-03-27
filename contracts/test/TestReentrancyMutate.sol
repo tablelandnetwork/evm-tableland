@@ -3,36 +3,39 @@ pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "../ITablelandTables.sol";
-import "../ITablelandController.sol";
-import "../policies/Policies.sol";
+import {ITablelandTables} from "../interfaces/ITablelandTables.sol";
+import {TablelandController} from "../TablelandController.sol";
+import {Policies} from "../policies/Policies.sol";
+import {TablelandPolicy} from "../TablelandPolicy.sol";
 import "../policies/ERC721EnumerablePolicies.sol";
 import "../policies/ERC721AQueryablePolicies.sol";
 
-contract TestReentrancyRunSQL is ITablelandController, ERC721, Ownable {
+contract TestReentrancyMutate is TablelandController, ERC721, Ownable {
     ITablelandTables private _tableland;
-    ITablelandTables.Runnable[] private runnables;
+    ITablelandTables.Statement[] private statements;
 
     constructor(address registry) ERC721("TestCreateFromContract", "MTK") {
         _tableland = ITablelandTables(registry);
     }
 
     function getPolicy(
-        address
-    ) public payable override returns (ITablelandController.Policy memory) {
-        // try to reenter `runSQL` with some kind of malicious call...
+        address,
+        uint256
+    ) public payable override returns (TablelandPolicy memory) {
+        // try to reenter `mutate` with some kind of malicious call...
         uint256 tableId = 1;
-        ITablelandTables.Runnable memory runnable = ITablelandTables.Runnable({
-            tableId: tableId,
-            statement: "delete * from msgsendertableidontown"
-        });
+        ITablelandTables.Statement memory statement = ITablelandTables
+            .Statement({
+                tableId: tableId,
+                statement: "delete * from msgsendertableidontown"
+            });
 
-        runnables.push(runnable);
+        statements.push(statement);
 
-        _tableland.runSQL(msg.sender, runnables);
+        _tableland.mutate(msg.sender, statements);
         // Return allow-all policy
         return
-            ITablelandController.Policy({
+            TablelandPolicy({
                 allowInsert: true,
                 allowUpdate: true,
                 allowDelete: true,

@@ -51,62 +51,81 @@ contract TablelandTables is
     }
 
     /**
-     * @dev See {ITablelandTables-runSQL}.
+     * @custom:deprecated See {ITablelandTables-createTable}.
+     * This function is deprecated, please use `create`.
      */
     function createTable(
         address owner,
         string calldata statement
     ) external payable override whenNotPaused returns (uint256) {
-        return _createTable(owner, statement);
+        return _create(owner, statement);
     }
 
     /**
-     * @dev See {ITablelandTables-writeToTable}.
+     * @dev See {ITablelandTables-create}.
      */
-    function writeToTable(
-        address caller,
-        uint256 tableId,
+    function create(
+        address owner,
         string calldata statement
-    ) external payable override whenNotPaused nonReentrant {
-        _mutateTable(caller, tableId, statement);
+    ) external payable override whenNotPaused returns (uint256) {
+        return _create(owner, statement);
+    }
+
+    /**
+     * @dev See {ITablelandTables-create}.
+     */
+    function create(
+        address owner,
+        string[] calldata statements
+    ) external payable override whenNotPaused returns (uint256[] memory) {
+        if (statements.length < 1) {
+            revert Unauthorized();
+        }
+
+        uint256[] memory tableIds = new uint256[](statements.length);
+        for (uint256 i = 0; i < statements.length; i++) {
+            tableIds[i] = _create(owner, statements[i]);
+        }
+
+        return tableIds;
     }
 
     /**
      * @custom:depreciated See {ITablelandTables-runSQL}.
-     * This function is deprecated, please use `writeToTable`.
+     * This function is deprecated, please use `mutate`.
      */
     function runSQL(
         address caller,
         uint256 tableId,
         string calldata statement
     ) external payable override whenNotPaused nonReentrant {
-        _mutateTable(caller, tableId, statement);
+        _mutate(caller, tableId, statement);
     }
 
     /**
-     * @dev See {ITablelandTables-runSQL}.
+     * @dev See {ITablelandTables-mutate}.
      */
-    function runSQL(
+    function mutate(
         address caller,
-        ITablelandTables.Runnable[] calldata runnables
+        uint256 tableId,
+        string calldata statement
     ) external payable override whenNotPaused nonReentrant {
-        for (uint256 i = 0; i < runnables.length; i++) {
-            if (runnables[i].tableId > 0) {
-                // simple pass along of each set of runSQL calls
-                _mutateTable(
-                    caller,
-                    runnables[i].tableId,
-                    runnables[i].statement
-                );
-            } else {
-                // if the tableId isn't greater than the default of 0 then the
-                // statement must be a create statement, and we pass it through
-                _createTable(caller, runnables[i].statement);
-            }
+        _mutate(caller, tableId, statement);
+    }
+
+    /**
+     * @dev See {ITablelandTables-mutate}.
+     */
+    function mutate(
+        address caller,
+        ITablelandTables.Statement[] calldata statements
+    ) external payable override whenNotPaused nonReentrant {
+        for (uint256 i = 0; i < statements.length; i++) {
+            _mutate(caller, statements[i].tableId, statements[i].statement);
         }
     }
 
-    function _createTable(
+    function _create(
         address owner,
         string calldata statement
     ) private returns (uint256 tableId) {
@@ -118,7 +137,7 @@ contract TablelandTables is
         return tableId;
     }
 
-    function _mutateTable(
+    function _mutate(
         address caller,
         uint256 tableId,
         string calldata statement

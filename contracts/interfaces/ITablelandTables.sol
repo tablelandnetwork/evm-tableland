@@ -64,6 +64,14 @@ interface ITablelandTables {
     event SetController(uint256 tableId, address controller);
 
     /**
+     * @dev Struct containing parameters needed to run a sql statement: tableId and statement.
+     */
+    struct Statement {
+        uint256 tableId;
+        string statement;
+    }
+
+    /**
      * @dev Creates a new table owned by `owner` using `statement` and returns its `tableId`.
      *
      * owner - the to-be owner of the new table
@@ -73,9 +81,32 @@ interface ITablelandTables {
      *
      * - contract must be unpaused
      */
-    function createTable(
+    function create(
         address owner,
         string memory statement
+    ) external payable returns (uint256);
+
+    /**
+     * @dev Creates a new table owned by `owner` using `statement` and returns its `tableId`.
+     *
+     * owner - the to-be owner of the new table
+     * statement - the SQL statement used to create the table
+     *
+     * Requirements:
+     *
+     * - contract must be unpaused
+     */
+    function create(
+        address owner,
+        string[] calldata statement
+    ) external payable returns (uint256[] memory);
+
+    /**
+     * @custom:deprecated This is a temporary alias for `create`, do not use this.
+     */
+    function createTable(
+        address owner,
+        string calldata statement
     ) external payable returns (uint256);
 
     /**
@@ -89,14 +120,42 @@ interface ITablelandTables {
      *
      * - contract must be unpaused
      * - `msg.sender` must be `caller`
-     * - `tableId` must exist
+     * - `tableId` must exist and be the table being mutated
      * - `caller` must be authorized by the table controller
      * - `statement` must be less than or equal to 35000 bytes
+     */
+    function mutate(
+        address caller,
+        uint256 tableId,
+        string calldata statement
+    ) external payable;
+
+    /**
+     * @dev Does Mutate for each of a set SQL statements for `caller` using the `runnables`.
+     *
+     * caller - the address that is running the SQL statement
+     * runnable - a struct optionally containing the id of the target table and coresponding statement
+     *
+     * Requirements:
+     *
+     * - contract must be unpaused
+     * - `msg.sender` must be `caller` or contract owner
+     * - `tableId` is optional in each struct, if it is equal to zero the statement is treated as a create
+     * - `caller` must be authorized by the table controller if the statement is mutating
+     * - `statement` must exist in each struct and be less than or equal to 35000 bytes
+     */
+    function mutate(
+        address caller,
+        ITablelandTables.Statement[] calldata statements
+    ) external payable;
+
+    /**
+     * @custom:deprecated This is a temporary alias for `mutate`, do not use this.
      */
     function runSQL(
         address caller,
         uint256 tableId,
-        string memory statement
+        string calldata statement
     ) external payable;
 
     /**

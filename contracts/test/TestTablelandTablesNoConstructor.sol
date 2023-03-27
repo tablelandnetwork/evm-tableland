@@ -41,50 +41,82 @@ contract TestTablelandTablesNoConstructor is
         _baseURIString = baseURI;
     }
 
+    /**
+     * @custom:deprecated See {ITablelandTables-createTable}.
+     * This function is deprecated, please use `create`.
+     */
     function createTable(
         address owner,
         string calldata statement
-    ) external payable override whenNotPaused returns (uint256 tableId) {
-        return _createTable(owner, statement);
+    ) external payable override whenNotPaused returns (uint256) {
+        return _create(owner, statement);
     }
 
-    function writeToTable(
-        address caller,
-        uint256 tableId,
+    /**
+     * @dev See {ITablelandTables-create}.
+     */
+    function create(
+        address owner,
         string calldata statement
-    ) external payable override whenNotPaused nonReentrant {
-        _mutateTable(caller, tableId, statement);
+    ) external payable override whenNotPaused returns (uint256) {
+        return _create(owner, statement);
     }
 
+    /**
+     * @dev See {ITablelandTables-create}.
+     */
+    function create(
+        address owner,
+        string[] calldata statements
+    ) external payable override whenNotPaused returns (uint256[] memory) {
+        if (statements.length < 1) {
+            revert Unauthorized();
+        }
+
+        uint256[] memory tableIds = new uint256[](statements.length);
+        for (uint256 i = 0; i < statements.length; i++) {
+            tableIds[i] = _create(owner, statements[i]);
+        }
+
+        return tableIds;
+    }
+
+    /**
+     * @custom:depreciated See {ITablelandTables-runSQL}.
+     * This function is deprecated, please use `mutate`.
+     */
     function runSQL(
         address caller,
         uint256 tableId,
         string calldata statement
     ) external payable override whenNotPaused nonReentrant {
-        _mutateTable(caller, tableId, statement);
+        _mutate(caller, tableId, statement);
     }
 
-    function runSQL(
+    /**
+     * @dev See {ITablelandTables-mutate}.
+     */
+    function mutate(
         address caller,
-        ITablelandTables.Runnable[] calldata runnables
+        uint256 tableId,
+        string calldata statement
     ) external payable override whenNotPaused nonReentrant {
-        for (uint256 i = 0; i < runnables.length; i++) {
-            if (runnables[i].tableId > 0) {
-                // simple pass along of each set of runSQL calls
-                _mutateTable(
-                    caller,
-                    runnables[i].tableId,
-                    runnables[i].statement
-                );
-            } else {
-                // if the tableId isn't greater than the default of 0 then the
-                // statement must be a create statement, and we pass it through
-                _createTable(caller, runnables[i].statement);
-            }
+        _mutate(caller, tableId, statement);
+    }
+
+    /**
+     * @dev See {ITablelandTables-mutate}.
+     */
+    function mutate(
+        address caller,
+        ITablelandTables.Statement[] calldata statements
+    ) external payable override whenNotPaused nonReentrant {
+        for (uint256 i = 0; i < statements.length; i++) {
+            _mutate(caller, statements[i].tableId, statements[i].statement);
         }
     }
 
-    function _createTable(
+    function _create(
         address owner,
         string calldata statement
     ) private returns (uint256 tableId) {
@@ -96,15 +128,12 @@ contract TestTablelandTablesNoConstructor is
         return tableId;
     }
 
-    function _mutateTable(
+    function _mutate(
         address caller,
         uint256 tableId,
         string calldata statement
     ) private {
-        if (
-            !_exists(tableId) ||
-            !(caller == _msgSenderERC721A() || owner() == _msgSenderERC721A())
-        ) {
+        if (!_exists(tableId) || caller != _msgSenderERC721A()) {
             revert Unauthorized();
         }
 
@@ -122,12 +151,23 @@ contract TestTablelandTablesNoConstructor is
         );
     }
 
+    /**
+     * @dev Returns an {TablelandPolicy} for `caller` and `tableId`.
+     *
+     * An allow-all policy is returned if the table's controller does not exist.
+     *
+     * Requirements:
+     *
+     * - if the controller is an EOA, caller must be controller
+     * - if the controller is a contract address, it must implement {ITablelandController}
+     */
     function _getPolicy(
         address caller,
         uint256 tableId
     ) private returns (TablelandPolicy memory) {
         address controller = _controllers[tableId];
         if (_isContract(controller)) {
+            // Try {ITablelandController.getPolicy(address, uint256)}.
             try
                 ITablelandController(controller).getPolicy{value: msg.value}(
                     caller,
@@ -136,8 +176,17 @@ contract TestTablelandTablesNoConstructor is
             returns (TablelandPolicy memory policy) {
                 return policy;
             } catch Error(string memory reason) {
+                // Controller reverted/required with a reason string. Bubble up the error.
                 revert(reason);
             } catch (bytes memory err) {
+                // We are here for one of two reasons:
+                // 1. The controller does not implement {ITablelandController.getPolicy(address, uint256)}.
+                // 2. The controller reverted w/o a reason string, e.g, a custom error, revert(), or require(condition).
+                // We can't differentiate between reverting/requiring w/o a reason string and not implemented.
+                // When a controller reverts/requires w/o a reason string it will be treated as not implemented,
+                // i.e., we will try to call {ITablelandController.getPolicy(address)}.
+
+                // Controller reverted with a custom error. Bubble it up.
                 if (err.length > 0) {
                     // solhint-disable-next-line no-inline-assembly
                     assembly {
@@ -145,6 +194,10 @@ contract TestTablelandTablesNoConstructor is
                     }
                 }
             }
+
+            // If the controller reverted w/o a reason string, the following _could_ result in the caller
+            // seeing a different error.
+            // Try {ITablelandController.getPolicy(address)}.
             return
                 ITablelandController(controller).getPolicy{value: msg.value}(
                     caller
@@ -165,10 +218,16 @@ contract TestTablelandTablesNoConstructor is
             });
     }
 
+    /**
+     * @dev Returns whether or not `account` is a contract address.
+     */
     function _isContract(address account) private view returns (bool) {
         return account.code.length > 0;
     }
 
+    /**
+     * @dev See {ITablelandTables-setController}.
+     */
     function setController(
         address caller,
         uint256 tableId,
@@ -187,12 +246,18 @@ contract TestTablelandTablesNoConstructor is
         emit SetController(tableId, controller);
     }
 
+    /**
+     * @dev See {ITablelandTables-getController}.
+     */
     function getController(
         uint256 tableId
     ) external view override returns (address) {
         return _controllers[tableId];
     }
 
+    /**
+     * @dev See {ITablelandTables-lockController}.
+     */
     function lockController(
         address caller,
         uint256 tableId
@@ -208,26 +273,44 @@ contract TestTablelandTablesNoConstructor is
         _locks[tableId] = true;
     }
 
+    /**
+     * @dev See {ITablelandTables-setBaseURI}.
+     */
     function setBaseURI(string memory baseURI) external override onlyOwner {
         _baseURIString = baseURI;
     }
 
+    /**
+     * @dev See {ERC721AUpgradeable-_baseURI}.
+     */
     function _baseURI() internal view override returns (string memory) {
         return _baseURIString;
     }
 
+    /**
+     * @dev See {ITablelandTables-pause}.
+     */
     function pause() external override onlyOwner {
         _pause();
     }
 
+    /**
+     * @dev See {ITablelandTables-unpause}.
+     */
     function unpause() external override onlyOwner {
         _unpause();
     }
 
+    /**
+     * @dev See {ERC721AUpgradeable-_startTokenId}.
+     */
     function _startTokenId() internal pure override returns (uint256) {
         return 1;
     }
 
+    /**
+     * @dev See {ERC721AUpgradeable-_afterTokenTransfers}.
+     */
     function _afterTokenTransfers(
         address from,
         address to,
@@ -236,9 +319,13 @@ contract TestTablelandTablesNoConstructor is
     ) internal override {
         super._afterTokenTransfers(from, to, startTokenId, quantity);
         if (from != address(0)) {
+            // quantity is only > 1 after bulk minting when from == address(0)
             emit TransferTable(from, to, startTokenId);
         }
     }
 
+    /**
+     * @dev See {UUPSUpgradeable-_authorizeUpgrade}.
+     */
     function _authorizeUpgrade(address) internal view override onlyOwner {} // solhint-disable no-empty-blocks
 }
