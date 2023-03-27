@@ -116,7 +116,9 @@ const config: HardhatUserConfig = {
           : [],
     },
     filecoin: {
-      url: "https://api.node.glif.io/rpc/v1",
+      url: `https://rpc.ankr.com/filecoin/${
+        process.env.FILECOIN_API_KEY ?? ""
+      }`,
       accounts:
         process.env.FILECOIN_PRIVATE_KEY !== undefined
           ? [process.env.FILECOIN_PRIVATE_KEY]
@@ -160,7 +162,9 @@ const config: HardhatUserConfig = {
           : [],
     },
     "filecoin-hyperspace": {
-      url: "https://api.hyperspace.node.glif.io/rpc/v1",
+      url: `https://rpc.ankr.com/filecoin_testnet/${
+        process.env.FILECOIN_HYPERSPACE_API_KEY ?? ""
+      }`,
       accounts:
         process.env.FILECOIN_HYPERSPACE_PRIVATE_KEY !== undefined
           ? [process.env.FILECOIN_HYPERSPACE_PRIVATE_KEY]
