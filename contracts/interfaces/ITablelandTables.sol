@@ -140,9 +140,9 @@ interface ITablelandTables {
      *
      * - contract must be unpaused
      * - `msg.sender` must be `caller` or contract owner
-     * - `tableId` is optional in each struct, if it is equal to zero the statement is treated as a create
+     * - `tableId` must be the table being muated in each struct's statement
      * - `caller` must be authorized by the table controller if the statement is mutating
-     * - `statement` must exist in each struct and be less than or equal to 35000 bytes
+     * - `statement` must exist in each struct and be less than or equal to 35000 bytes after normalization
      */
     function mutate(
         address caller,
