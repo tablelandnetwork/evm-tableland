@@ -95,6 +95,69 @@ describe("TablelandTables", function () {
     expect(totalSupply).to.equal(BigNumber.from(2));
   });
 
+  it("Should be able to create multiple tables", async function () {
+    // Test anyone can create a table
+    const owner = accounts[4];
+    const createStatement1 = "create table test1 (int a);";
+    const createStatement2 = "create table test2 (int a);";
+    let tx = await tables
+      .connect(owner)
+      ["create(address,string[])"](owner.address, [
+        createStatement1,
+        createStatement2,
+      ]);
+    let receipt = await tx.wait();
+    let [mintEvent1, createEvent1, mintEvent2, createEvent2] =
+      receipt.events ?? [];
+    // first table
+    expect(mintEvent1.args!.tokenId).to.equal(BigNumber.from(1));
+    expect(createEvent1.args!.tableId).to.equal(BigNumber.from(1));
+    expect(createEvent1.args!.owner).to.equal(owner.address);
+    expect(createEvent1.args!.statement).to.equal(createStatement1);
+    // second table
+    expect(mintEvent2.args!.tokenId).to.equal(BigNumber.from(2));
+    expect(createEvent2.args!.tableId).to.equal(BigNumber.from(2));
+    expect(createEvent2.args!.owner).to.equal(owner.address);
+    expect(createEvent2.args!.statement).to.equal(createStatement2);
+
+    let balance = await tables.balanceOf(owner.address);
+    expect(balance).to.equal(BigNumber.from(2));
+    let totalSupply = await tables.totalSupply();
+    expect(totalSupply).to.equal(BigNumber.from(2));
+
+    // Test an account can create tables for another account
+    const sender = accounts[5];
+    tx = await tables
+      .connect(sender)
+      ["create(address,string[])"](owner.address, [
+        createStatement1,
+        createStatement2,
+      ]);
+    receipt = await tx.wait();
+    [mintEvent1, createEvent1, mintEvent2, createEvent2] = receipt.events ?? [];
+    expect(mintEvent1.args!.tokenId).to.equal(BigNumber.from(3));
+    expect(createEvent1.args!.tableId).to.equal(BigNumber.from(3));
+    expect(createEvent1.args!.owner).to.equal(owner.address);
+    expect(createEvent1.args!.statement).to.equal(createStatement1);
+    expect(mintEvent2.args!.tokenId).to.equal(BigNumber.from(4));
+    expect(createEvent2.args!.tableId).to.equal(BigNumber.from(4));
+    expect(createEvent2.args!.owner).to.equal(owner.address);
+    expect(createEvent2.args!.statement).to.equal(createStatement2);
+
+    balance = await tables.balanceOf(owner.address);
+    expect(balance).to.equal(BigNumber.from(4));
+    totalSupply = await tables.totalSupply();
+    expect(totalSupply).to.equal(BigNumber.from(4));
+  });
+
+  it("Should revert if create is called without statements", async function () {
+    const sender = accounts[5];
+
+    await expect(
+      tables.connect(sender)["create(address,string[])"](sender.address, [])
+    ).to.be.revertedWithCustomError(tables, "Unauthorized");
+  });
+
   it("Should be able to run mutating SQL statements", async function () {
     // Test run SQL fails if table does not exist
     const owner = accounts[4];
@@ -404,7 +467,7 @@ describe("TablelandTables", function () {
     tx = await tables.connect(contractOwner).pause();
     await tx.wait();
 
-    // Test creating tables is paused
+    // Test mutating tables when paused
     await expect(
       tables
         .connect(owner)
@@ -412,6 +475,17 @@ describe("TablelandTables", function () {
           { tableId, statement: runStatement1 },
           { tableId, statement: runStatement2 },
         ])
+    ).to.be.revertedWith("Pausable: paused");
+
+    // Test mutating single table when paused
+    await expect(
+      tables
+        .connect(owner)
+        ["mutate(address,uint256,string)"](
+          owner.address,
+          tableId,
+          runStatement1
+        )
     ).to.be.revertedWith("Pausable: paused");
   });
 
@@ -434,7 +508,7 @@ describe("TablelandTables", function () {
     tx = await tables.connect(contractOwner).pause();
     await tx.wait();
 
-    // Test creating tables is paused
+    // Test mutating when paused
     await expect(
       tables.connect(owner).runSQL(owner.address, tableId, runStatement1)
     ).to.be.revertedWith("Pausable: paused");
@@ -617,22 +691,26 @@ describe("TablelandTables", function () {
     tx = await tables.connect(contractOwner).pause();
     await tx.wait();
 
-    // Test creating tables is paused
+    // Test legacy createTable when paused
+    await expect(
+      tables.connect(owner).createTable(owner.address, createStatement)
+    ).to.be.revertedWith("Pausable: paused");
+
+    // Test creating table when paused
     await expect(
       tables
         .connect(owner)
         ["create(address,string)"](owner.address, createStatement)
     ).to.be.revertedWith("Pausable: paused");
 
-    // Test running SQL is paused
+    // Test creating multiple tables when paused
     await expect(
       tables
         .connect(owner)
-        ["mutate(address,uint256,string)"](
-          owner.address,
-          BigNumber.from(1),
-          "insert into testing values (0);"
-        )
+        ["create(address,string[])"](owner.address, [
+          "insert into testing values (0);",
+          "insert into testing values (0);",
+        ])
     ).to.be.revertedWith("Pausable: paused");
 
     // Test setting controller is paused
