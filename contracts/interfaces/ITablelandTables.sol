@@ -87,10 +87,10 @@ interface ITablelandTables {
     ) external payable returns (uint256);
 
     /**
-     * @dev Creates a new table owned by `owner` using `statement` and returns its `tableId`.
+     * @dev Creates multiple new tables owned by `owner` using `statements` and returns array of `tableId`s.
      *
      * owner - the to-be owner of the new table
-     * statement - the SQL statement used to create the table
+     * statements - the SQL statements used to create the tables
      *
      * Requirements:
      *
@@ -98,7 +98,7 @@ interface ITablelandTables {
      */
     function create(
         address owner,
-        string[] calldata statement
+        string[] calldata statements
     ) external payable returns (uint256[] memory);
 
     /**
@@ -131,10 +131,10 @@ interface ITablelandTables {
     ) external payable;
 
     /**
-     * @dev Does Mutate for each of a set SQL statements for `caller` using the `runnables`.
+     * @dev Does Mutate for each of a set SQL statements for `caller` using the `statements`.
      *
      * caller - the address that is running the SQL statement
-     * runnable - a struct optionally containing the id of the target table and coresponding statement
+     * statements - an array of structs containing the id of the target table and coresponding statement
      *
      * Requirements:
      *
@@ -142,7 +142,7 @@ interface ITablelandTables {
      * - `msg.sender` must be `caller` or contract owner
      * - `tableId` must be the table being muated in each struct's statement
      * - `caller` must be authorized by the table controller if the statement is mutating
-     * - `statement` must exist in each struct and be less than or equal to 35000 bytes after normalization
+     * - `statement` must be less than or equal to 35000 bytes after normalization in each struct
      */
     function mutate(
         address caller,
