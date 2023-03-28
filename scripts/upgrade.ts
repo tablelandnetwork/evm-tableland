@@ -26,6 +26,7 @@ async function main() {
   const tables = await (
     (await upgrades.upgradeProxy(proxy, Factory, {
       kind: "uups",
+      timeout: 60 * 10 * 1000,
     })) as TablelandTables
   ).deployed();
   assert(tables.address === proxy, "proxy address changed");
