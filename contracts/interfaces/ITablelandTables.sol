@@ -64,7 +64,12 @@ interface ITablelandTables {
     event SetController(uint256 tableId, address controller);
 
     /**
-     * @dev Struct containing parameters needed to run a sql statement: tableId and statement.
+     * @dev Struct containing parameters needed to run a mutating sql statement
+     *
+     * tableId - the id of the target table
+     * statement - the SQL statement to run
+     *           - the statement type can be any of INSERT, UPDATE, DELETE, GRANT, REVOKE
+     *
      */
     struct Statement {
         uint256 tableId;
@@ -76,6 +81,7 @@ interface ITablelandTables {
      *
      * owner - the to-be owner of the new table
      * statement - the SQL statement used to create the table
+     *           - the statement type must be CREATE
      *
      * Requirements:
      *
@@ -91,6 +97,7 @@ interface ITablelandTables {
      *
      * owner - the to-be owner of the new table
      * statements - the SQL statements used to create the tables
+     *            - each statement type must be CREATE
      *
      * Requirements:
      *
@@ -110,11 +117,12 @@ interface ITablelandTables {
     ) external payable returns (uint256);
 
     /**
-     * @dev Runs a SQL statement for `caller` using `statement`.
+     * @dev Runs a mutating SQL statement for `caller` using `statement`.
      *
      * caller - the address that is running the SQL statement
      * tableId - the id of the target table
      * statement - the SQL statement to run
+     *           - the statement type can be any of INSERT, UPDATE, DELETE, GRANT, REVOKE
      *
      * Requirements:
      *
@@ -131,18 +139,19 @@ interface ITablelandTables {
     ) external payable;
 
     /**
-     * @dev Does Mutate for each of a set SQL statements for `caller` using the `statements`.
+     * @dev Runs an array of mutating SQL statements for `caller`
      *
      * caller - the address that is running the SQL statement
      * statements - an array of structs containing the id of the target table and coresponding statement
+     *            - the statement type can be any of INSERT, UPDATE, DELETE, GRANT, REVOKE
      *
      * Requirements:
      *
      * - contract must be unpaused
-     * - `msg.sender` must be `caller` or contract owner
+     * - `msg.sender` must be `caller`
      * - `tableId` must be the table being muated in each struct's statement
      * - `caller` must be authorized by the table controller if the statement is mutating
-     * - `statement` must be less than or equal to 35000 bytes after normalization in each struct
+     * - `statements` must be less than or equal to 35000 bytes after normalization in each struct
      */
     function mutate(
         address caller,
