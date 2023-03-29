@@ -3,7 +3,7 @@ pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import {ITablelandTables} from "../interfaces/ITablelandTables.sol";
+import {TablelandTables} from "../TablelandTables.sol";
 import {TablelandController} from "../TablelandController.sol";
 import {Policies} from "../policies/Policies.sol";
 import {TablelandPolicy} from "../TablelandPolicy.sol";
@@ -11,10 +11,10 @@ import "../policies/ERC721EnumerablePolicies.sol";
 import "../policies/ERC721AQueryablePolicies.sol";
 
 contract TestReentrancyRunSQLLegacy is TablelandController, ERC721, Ownable {
-    ITablelandTables private _tableland;
+    TablelandTables private _tableland;
 
     constructor(address registry) ERC721("TestCreateFromContract", "MTK") {
-        _tableland = ITablelandTables(registry);
+        _tableland = TablelandTables(registry);
     }
 
     function getPolicy(

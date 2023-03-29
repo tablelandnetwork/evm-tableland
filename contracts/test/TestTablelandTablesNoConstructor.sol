@@ -44,7 +44,7 @@ contract TestTablelandTablesNoConstructor is
     function createTable(
         address owner,
         string calldata statement
-    ) external payable override whenNotPaused returns (uint256) {
+    ) external payable whenNotPaused returns (uint256) {
         return _create(owner, statement);
     }
 
@@ -75,7 +75,7 @@ contract TestTablelandTablesNoConstructor is
         address caller,
         uint256 tableId,
         string calldata statement
-    ) external payable override whenNotPaused nonReentrant {
+    ) external payable whenNotPaused nonReentrant {
         _mutate(caller, tableId, statement);
     }
 

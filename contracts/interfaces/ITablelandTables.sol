@@ -109,14 +109,6 @@ interface ITablelandTables {
     ) external payable returns (uint256[] memory);
 
     /**
-     * @custom:deprecated This is a temporary alias for `create`, do not use this.
-     */
-    function createTable(
-        address owner,
-        string calldata statement
-    ) external payable returns (uint256);
-
-    /**
      * @dev Runs a mutating SQL statement for `caller` using `statement`.
      *
      * caller - the address that is running the SQL statement
@@ -157,15 +149,6 @@ interface ITablelandTables {
     function mutate(
         address caller,
         ITablelandTables.Statement[] calldata statements
-    ) external payable;
-
-    /**
-     * @custom:deprecated This is a temporary alias for `mutate`, do not use this.
-     */
-    function runSQL(
-        address caller,
-        uint256 tableId,
-        string calldata statement
     ) external payable;
 
     /**

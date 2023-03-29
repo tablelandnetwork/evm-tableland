@@ -51,13 +51,13 @@ contract TablelandTables is
     }
 
     /**
-     * @custom:deprecated See {ITablelandTables-createTable}.
+     * @custom:deprecated
      * This function is deprecated, please use `create`.
      */
     function createTable(
         address owner,
         string calldata statement
-    ) external payable override whenNotPaused returns (uint256) {
+    ) external payable whenNotPaused returns (uint256) {
         return _create(owner, statement);
     }
 
@@ -96,7 +96,7 @@ contract TablelandTables is
         address caller,
         uint256 tableId,
         string calldata statement
-    ) external payable override whenNotPaused nonReentrant {
+    ) external payable whenNotPaused nonReentrant {
         _mutate(caller, tableId, statement);
     }
 
