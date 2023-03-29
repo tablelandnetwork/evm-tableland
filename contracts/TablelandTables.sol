@@ -78,9 +78,7 @@ contract TablelandTables is
         address owner,
         string[] calldata statements
     ) external payable override whenNotPaused returns (uint256[] memory) {
-        if (statements.length < 1) {
-            revert Unauthorized();
-        }
+        if (statements.length < 1) revert Unauthorized();
 
         uint256[] memory tableIds = new uint256[](statements.length);
         for (uint256 i = 0; i < statements.length; i++) {
@@ -142,14 +140,12 @@ contract TablelandTables is
         uint256 tableId,
         string calldata statement
     ) private {
-        if (!_exists(tableId) || caller != _msgSenderERC721A()) {
+        if (!_exists(tableId) || caller != _msgSenderERC721A())
             revert Unauthorized();
-        }
 
         uint256 querySize = bytes(statement).length;
-        if (querySize > QUERY_MAX_SIZE) {
+        if (querySize > QUERY_MAX_SIZE)
             revert MaxQuerySizeExceeded(querySize, QUERY_MAX_SIZE);
-        }
 
         emit RunSQL(
             caller,
@@ -212,9 +208,8 @@ contract TablelandTables is
                     caller
                 );
         }
-        if (!(controller == address(0) || controller == caller)) {
+        if (!(controller == address(0) || controller == caller))
             revert Unauthorized();
-        }
 
         return
             TablelandPolicy({
@@ -246,9 +241,7 @@ contract TablelandTables is
             caller != ownerOf(tableId) ||
             caller != _msgSenderERC721A() ||
             _locks[tableId]
-        ) {
-            revert Unauthorized();
-        }
+        ) revert Unauthorized();
 
         _controllers[tableId] = controller;
 
@@ -275,9 +268,7 @@ contract TablelandTables is
             caller != ownerOf(tableId) ||
             caller != _msgSenderERC721A() ||
             _locks[tableId]
-        ) {
-            revert Unauthorized();
-        }
+        ) revert Unauthorized();
 
         _locks[tableId] = true;
     }
@@ -327,10 +318,8 @@ contract TablelandTables is
         uint256 quantity
     ) internal override {
         super._afterTokenTransfers(from, to, startTokenId, quantity);
-        if (from != address(0)) {
-            // quantity is only > 1 after bulk minting when from == address(0)
-            emit TransferTable(from, to, startTokenId);
-        }
+        // quantity is only > 1 after bulk minting when from == address(0)
+        if (from != address(0)) emit TransferTable(from, to, startTokenId);
     }
 
     /**
