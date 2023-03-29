@@ -33,6 +33,7 @@ async function main() {
     (await upgrades.deployProxy(Factory, [baseURI], {
       kind: "uups",
       timeout: pollTimeout,
+      pollingInterval: pollInterval,
     })) as TablelandTables
   ).deployed();
   console.log("New proxy address:", tables.address);
