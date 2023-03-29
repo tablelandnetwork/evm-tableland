@@ -151,7 +151,8 @@ interface ITablelandTables {
      * - `msg.sender` must be `caller`
      * - `tableId` must be the table being muated in each struct's statement
      * - `caller` must be authorized by the table controller if the statement is mutating
-     * - `statements` must be less than or equal to 35000 bytes after normalization in each struct
+     * - each struct inside `statements` must have a `tableId` that corresponds to table being mutated
+     * - each struct inside `statements` must have a `statement` that is less than or equal to 35000 bytes after normalization
      */
     function mutate(
         address caller,
