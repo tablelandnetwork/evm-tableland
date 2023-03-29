@@ -73,22 +73,6 @@ const config: HardhatUserConfig = {
           browserURL: "https://nova.arbiscan.io/",
         },
       },
-      {
-        network: "optimisticGoerli",
-        chainId: 420,
-        urls: {
-          apiURL: "https://api-goerli-optimism.etherscan.io/api",
-          browserURL: "https://goerli-optimism.etherscan.io/",
-        },
-      },
-      {
-        network: "arbitrumGoerli",
-        chainId: 421613,
-        urls: {
-          apiURL: "https://api-goerli.arbiscan.io/api",
-          browserURL: "https://goerli.arbiscan.io/",
-        },
-      },
     ],
   },
   networks: {
@@ -131,6 +115,15 @@ const config: HardhatUserConfig = {
           ? [process.env.POLYGON_PRIVATE_KEY]
           : [],
     },
+    filecoin: {
+      url: `https://rpc.ankr.com/filecoin/${
+        process.env.FILECOIN_API_KEY ?? ""
+      }`,
+      accounts:
+        process.env.FILECOIN_PRIVATE_KEY !== undefined
+          ? [process.env.FILECOIN_PRIVATE_KEY]
+          : [],
+    },
     // testnets
     goerli: {
       url: `https://eth-goerli.alchemyapi.io/v2/${
@@ -166,6 +159,15 @@ const config: HardhatUserConfig = {
       accounts:
         process.env.POLYGON_MUMBAI_PRIVATE_KEY !== undefined
           ? [process.env.POLYGON_MUMBAI_PRIVATE_KEY]
+          : [],
+    },
+    "filecoin-hyperspace": {
+      url: `https://rpc.ankr.com/filecoin_testnet/${
+        process.env.FILECOIN_HYPERSPACE_API_KEY ?? ""
+      }`,
+      accounts:
+        process.env.FILECOIN_HYPERSPACE_PRIVATE_KEY !== undefined
+          ? [process.env.FILECOIN_HYPERSPACE_PRIVATE_KEY]
           : [],
     },
     // devnets

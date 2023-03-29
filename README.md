@@ -20,17 +20,19 @@ This is the Tableland Tables EVM contracts and client components.
 
 ## Currently supported chains
 
-| Chain           | Chain ID | Contract                                   |
-| --------------- | -------- | ------------------------------------------ |
-| Ethereum        | 1        | 0x012969f7e3439a9B04025b5a049EB9BAD82A8C12 |
-| Optimism        | 10       | 0xfad44BF5B843dE943a09D4f3E84949A11d3aa3e6 |
-| Arbitrum        | 42161    | 0x9aBd75E8640871A5a20d3B4eE6330a04c962aFfd |
-| Arbitrum Nova   | 42170    | 0x1A22854c5b1642760a827f20137a67930AE108d2 |
-| Polygon         | 137      | 0x5c4e6A9e5C1e1BF445A062006faF19EA6c49aFeA |
-| Goerli          | 5        | 0xDA8EA22d092307874f30A1F277D1388dca0BA97a |
-| Optimism Goerli | 420      | 0xC72E8a7Be04f2469f8C2dB3F1BdF69A7D516aBbA |
-| Arbitrum Goerli | 421613   | 0x033f69e8d119205089Ab15D340F5b797732f646b |
-| Polygon Mumbai  | 80001    | 0x4b48841d4b32C4650E4ABc117A03FE8B51f38F68 |
+| Chain               | Chain ID | Contract                                   |
+| ------------------- | -------- | ------------------------------------------ |
+| Ethereum            | 1        | 0x012969f7e3439a9B04025b5a049EB9BAD82A8C12 |
+| Optimism            | 10       | 0xfad44BF5B843dE943a09D4f3E84949A11d3aa3e6 |
+| Arbitrum            | 42161    | 0x9aBd75E8640871A5a20d3B4eE6330a04c962aFfd |
+| Arbitrum Nova       | 42170    | 0x1A22854c5b1642760a827f20137a67930AE108d2 |
+| Polygon             | 137      | 0x5c4e6A9e5C1e1BF445A062006faF19EA6c49aFeA |
+| Filecoin            | 314      | 0x59EF8Bf2d6c102B4c42AEf9189e1a9F0ABfD652d |
+| Goerli              | 5        | 0xDA8EA22d092307874f30A1F277D1388dca0BA97a |
+| Optimism Goerli     | 420      | 0xC72E8a7Be04f2469f8C2dB3F1BdF69A7D516aBbA |
+| Arbitrum Goerli     | 421613   | 0x033f69e8d119205089Ab15D340F5b797732f646b |
+| Polygon Mumbai      | 80001    | 0x4b48841d4b32C4650E4ABc117A03FE8B51f38F68 |
+| Filecoin Hyperspace | 3141     | 0x0B9737ab4B3e5303CB67dB031b509697e31c02d3 |
 
 # Development
 

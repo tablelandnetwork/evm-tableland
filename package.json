@@ -24,7 +24,7 @@
   },
   "scripts": {
     "build": "hardhat compile && npx tsc -p ./tsconfig.build.json",
-    "clean": "hardhat clean && rm -rf artifacts && rm -rf typechain-types && rm -rf cache && rm -rf coverage && rm -f coverage.json && rm -f network.js* && rm -f network.d*",
+    "clean": "hardhat clean && rm -rf artifacts && rm -rf typechain-types && rm -rf cache && rm -rf coverage && rm -f coverage.json && rm -f network.js* && rm -f network.d* && rm -f scripts/*.js* && rm -f scripts/*.d* && rm -f hardhat.config.js* && rm -f hardhat.config.d*",
     "up": "npm install && npx hardhat compile && npm run build && hardhat node",
     "test": "npm run test:unit && npm run test:e2e",
     "test:unit": "hardhat coverage --testfiles \"test/unit\" && istanbul check-coverage ./coverage.json --statements 100 --branches 98 --functions 100 --lines 100",
