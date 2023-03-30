@@ -310,15 +310,22 @@ describe("TablelandTables", function () {
       .connect(owner)
       ["create(address,string)"](owner.address, createStatement);
     let receipt = await tx.wait();
-    const [, createEvent] = receipt.events ?? [];
-    const tableId = createEvent.args!.tableId;
+    const [, createEvent1] = receipt.events ?? [];
+    const tableId1 = createEvent1.args!.tableId;
+
+    tx = await tables
+      .connect(owner)
+      ["create(address,string)"](owner.address, createStatement);
+    receipt = await tx.wait();
+    const [, createEvent2] = receipt.events ?? [];
+    const tableId2 = createEvent2.args!.tableId;
 
     // Test owner can run SQLs on table
     tx = await tables
       .connect(owner)
       ["mutate(address,(uint256,string)[])"](owner.address, [
-        { tableId, statement: runStatement1 },
-        { tableId, statement: runStatement2 },
+        { tableId: tableId1, statement: runStatement1 },
+        { tableId: tableId2, statement: runStatement2 },
       ]);
     receipt = await tx.wait();
     const [runEvent1, runEvent2] = receipt.events ?? [];
@@ -326,14 +333,14 @@ describe("TablelandTables", function () {
     // event 1
     expect(runEvent1.args!.caller).to.equal(owner.address);
     expect(runEvent1.args!.isOwner).to.equal(true);
-    expect(runEvent1.args!.tableId).to.equal(tableId);
+    expect(runEvent1.args!.tableId).to.equal(tableId1);
     expect(runEvent1.args!.statement).to.equal(runStatement1);
     expect(runEvent1.args!.policy).to.not.equal(undefined);
 
     // event 2
     expect(runEvent2.args!.caller).to.equal(owner.address);
     expect(runEvent2.args!.isOwner).to.equal(true);
-    expect(runEvent2.args!.tableId).to.equal(tableId);
+    expect(runEvent2.args!.tableId).to.equal(tableId2);
     expect(runEvent2.args!.statement).to.equal(runStatement2);
     expect(runEvent2.args!.policy).to.not.equal(undefined);
   });
