@@ -55,7 +55,7 @@ contract TablelandTables is
      */
     function createTable(
         address owner,
-        string memory statement
+        string calldata statement
     ) external payable override whenNotPaused returns (uint256 tableId) {
         tableId = _nextTokenId();
         _safeMint(owner, 1);
@@ -71,7 +71,7 @@ contract TablelandTables is
     function runSQL(
         address caller,
         uint256 tableId,
-        string memory statement
+        string calldata statement
     ) external payable override whenNotPaused nonReentrant {
         if (!_exists(tableId) || caller != _msgSenderERC721A()) {
             revert Unauthorized();
