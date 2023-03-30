@@ -26,11 +26,17 @@ const homestead = {
 
 const config: HardhatUserConfig = {
   solidity: {
-    version: "0.8.15",
+    version: "0.8.19",
     settings: {
       optimizer: {
         enabled: true,
-        runs: 200,
+        runs: 9999999,
+      },
+      metadata: {
+        // do not include the metadata hash, since this is machine dependent
+        // and we want all generated code to be deterministic
+        // https://docs.soliditylang.org/en/v0.7.6/metadata.html
+        bytecodeHash: "none",
       },
     },
   },
