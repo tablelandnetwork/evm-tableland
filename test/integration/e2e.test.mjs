@@ -1,4 +1,5 @@
 // @ts-check
+import { join } from "node:path";
 import chai from "chai";
 import chaiAsPromised from "chai-as-promised";
 import { describe, it } from "mocha";
@@ -12,9 +13,10 @@ import {
 
 chai.use(chaiAsPromised);
 const expect = chai.expect;
+
 const lt = new LocalTableland({
   silent: true,
-  registryDir: "../evm-tableland",
+  registryDir: join("..", "evm-tableland"),
 });
 const accounts = getAccounts();
 

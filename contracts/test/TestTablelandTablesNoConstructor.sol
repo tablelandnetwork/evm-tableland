@@ -43,8 +43,63 @@ contract TestTablelandTablesNoConstructor is
 
     function createTable(
         address owner,
-        string memory statement
-    ) external payable override whenNotPaused returns (uint256 tableId) {
+        string calldata statement
+    ) external payable whenNotPaused returns (uint256) {
+        return _create(owner, statement);
+    }
+
+    function create(
+        address owner,
+        string calldata statement
+    ) external payable override whenNotPaused returns (uint256) {
+        return _create(owner, statement);
+    }
+
+    function create(
+        address owner,
+        string[] calldata statements
+    ) external payable override whenNotPaused returns (uint256[] memory) {
+        if (statements.length < 1) {
+            revert Unauthorized();
+        }
+
+        uint256[] memory tableIds = new uint256[](statements.length);
+        for (uint256 i = 0; i < statements.length; i++) {
+            tableIds[i] = _create(owner, statements[i]);
+        }
+
+        return tableIds;
+    }
+
+    function runSQL(
+        address caller,
+        uint256 tableId,
+        string calldata statement
+    ) external payable whenNotPaused nonReentrant {
+        _mutate(caller, tableId, statement);
+    }
+
+    function mutate(
+        address caller,
+        uint256 tableId,
+        string calldata statement
+    ) external payable override whenNotPaused nonReentrant {
+        _mutate(caller, tableId, statement);
+    }
+
+    function mutate(
+        address caller,
+        ITablelandTables.Statement[] calldata statements
+    ) external payable override whenNotPaused nonReentrant {
+        for (uint256 i = 0; i < statements.length; i++) {
+            _mutate(caller, statements[i].tableId, statements[i].statement);
+        }
+    }
+
+    function _create(
+        address owner,
+        string calldata statement
+    ) private returns (uint256 tableId) {
         tableId = _nextTokenId();
         _safeMint(owner, 1);
 
@@ -53,11 +108,11 @@ contract TestTablelandTablesNoConstructor is
         return tableId;
     }
 
-    function runSQL(
+    function _mutate(
         address caller,
         uint256 tableId,
-        string memory statement
-    ) external payable override whenNotPaused nonReentrant {
+        string calldata statement
+    ) private {
         if (!_exists(tableId) || caller != _msgSenderERC721A()) {
             revert Unauthorized();
         }
@@ -82,6 +137,7 @@ contract TestTablelandTablesNoConstructor is
     ) private returns (TablelandPolicy memory) {
         address controller = _controllers[tableId];
         if (_isContract(controller)) {
+            // Try {ITablelandController.getPolicy(address, uint256)}.
             try
                 ITablelandController(controller).getPolicy{value: msg.value}(
                     caller,
@@ -90,8 +146,17 @@ contract TestTablelandTablesNoConstructor is
             returns (TablelandPolicy memory policy) {
                 return policy;
             } catch Error(string memory reason) {
+                // Controller reverted/required with a reason string. Bubble up the error.
                 revert(reason);
             } catch (bytes memory err) {
+                // We are here for one of two reasons:
+                // 1. The controller does not implement {ITablelandController.getPolicy(address, uint256)}.
+                // 2. The controller reverted w/o a reason string, e.g, a custom error, revert(), or require(condition).
+                // We can't differentiate between reverting/requiring w/o a reason string and not implemented.
+                // When a controller reverts/requires w/o a reason string it will be treated as not implemented,
+                // i.e., we will try to call {ITablelandController.getPolicy(address)}.
+
+                // Controller reverted with a custom error. Bubble it up.
                 if (err.length > 0) {
                     // solhint-disable-next-line no-inline-assembly
                     assembly {
@@ -99,6 +164,10 @@ contract TestTablelandTablesNoConstructor is
                     }
                 }
             }
+
+            // If the controller reverted w/o a reason string, the following _could_ result in the caller
+            // seeing a different error.
+            // Try {ITablelandController.getPolicy(address)}.
             return
                 ITablelandController(controller).getPolicy{value: msg.value}(
                     caller
@@ -190,6 +259,7 @@ contract TestTablelandTablesNoConstructor is
     ) internal override {
         super._afterTokenTransfers(from, to, startTokenId, quantity);
         if (from != address(0)) {
+            // quantity is only > 1 after bulk minting when from == address(0)
             emit TransferTable(from, to, startTokenId);
         }
     }

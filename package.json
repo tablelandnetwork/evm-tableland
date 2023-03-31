@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "description": "Tableland Tables EVM contracts and client components",
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=16.0.0"
   },
   "main": "typechain-types/index.js",
   "types": "typechain-types/index.d.ts",
@@ -27,8 +27,8 @@
     "clean": "hardhat clean && rm -rf artifacts && rm -rf typechain-types && rm -rf cache && rm -rf coverage && rm -f coverage.json && rm -f network.js* && rm -f network.d* && rm -f scripts/*.js* && rm -f scripts/*.d* && rm -f hardhat.config.js* && rm -f hardhat.config.d*",
     "up": "npm install && npx hardhat compile && npm run build && hardhat node",
     "test": "npm run test:unit && npm run test:e2e",
-    "test:unit": "hardhat coverage --testfiles \"test/unit\" && istanbul check-coverage ./coverage.json --statements 100 --branches 98 --functions 100 --lines 100",
-    "test:e2e": "node --experimental-fetch ./node_modules/mocha/bin/mocha.js --exit test/integration",
+    "test:unit": "hardhat coverage --testfiles \"test/unit\" && istanbul check-coverage ./coverage.json --statements 100 --branches 100 --functions 100 --lines 100",
+    "test:e2e": "npm run build && node --experimental-fetch ./node_modules/mocha/bin/mocha.js --exit test/integration",
     "test:gas": "REPORT_GAS=true hardhat test",
     "lint": "eslint '**/*.{js,ts}'",
     "lint:fix": "npm run lint -- --fix",
@@ -62,8 +62,9 @@
     "@openzeppelin/contracts": "4.8.2",
     "@openzeppelin/contracts-upgradeable": "4.8.2",
     "@openzeppelin/hardhat-upgrades": "^1.22.1",
-    "@tableland/local": "^1.0.0-pre.3",
+    "@tableland/local": "^1.1.0",
     "@typechain/ethers-v5": "^10.2.0",
+    "@tableland/sdk": "^4.0.2",
     "@typechain/hardhat": "^6.1.5",
     "@types/chai": "^4.3.4",
     "@types/chai-as-promised": "^7.1.5",

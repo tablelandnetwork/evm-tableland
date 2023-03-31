@@ -51,12 +51,82 @@ contract TablelandTables is
     }
 
     /**
-     * @dev See {ITablelandTables-createTable}.
+     * @custom:deprecated
+     * This function is deprecated, please use `create`.
      */
     function createTable(
         address owner,
         string calldata statement
-    ) external payable override whenNotPaused returns (uint256 tableId) {
+    ) external payable whenNotPaused returns (uint256) {
+        return _create(owner, statement);
+    }
+
+    /**
+     * @dev See {ITablelandTables-create}.
+     */
+    function create(
+        address owner,
+        string calldata statement
+    ) external payable override whenNotPaused returns (uint256) {
+        return _create(owner, statement);
+    }
+
+    /**
+     * @dev See {ITablelandTables-create}.
+     */
+    function create(
+        address owner,
+        string[] calldata statements
+    ) external payable override whenNotPaused returns (uint256[] memory) {
+        if (statements.length < 1) revert Unauthorized();
+
+        uint256[] memory tableIds = new uint256[](statements.length);
+        for (uint256 i = 0; i < statements.length; i++) {
+            tableIds[i] = _create(owner, statements[i]);
+        }
+
+        return tableIds;
+    }
+
+    /**
+     * @custom:depreciated See {ITablelandTables-runSQL}.
+     * This function is deprecated, please use `mutate`.
+     */
+    function runSQL(
+        address caller,
+        uint256 tableId,
+        string calldata statement
+    ) external payable whenNotPaused nonReentrant {
+        _mutate(caller, tableId, statement);
+    }
+
+    /**
+     * @dev See {ITablelandTables-mutate}.
+     */
+    function mutate(
+        address caller,
+        uint256 tableId,
+        string calldata statement
+    ) external payable override whenNotPaused nonReentrant {
+        _mutate(caller, tableId, statement);
+    }
+
+    /**
+     * @dev See {ITablelandTables-mutate}.
+     */
+    function mutate(
+        address caller,
+        ITablelandTables.Statement[] calldata statements
+    ) external payable override whenNotPaused nonReentrant {
+        for (uint256 i = 0; i < statements.length; i++) {
+            _mutate(caller, statements[i].tableId, statements[i].statement);
+        }
+    }
+
+    function _create(
+        address owner,
+        string calldata statement
+    ) private returns (uint256 tableId) {
         tableId = _nextTokenId();
         _safeMint(owner, 1);
 
@@ -65,22 +135,17 @@ contract TablelandTables is
         return tableId;
     }
 
-    /**
-     * @dev See {ITablelandTables-runSQL}.
-     */
-    function runSQL(
+    function _mutate(
         address caller,
         uint256 tableId,
         string calldata statement
-    ) external payable override whenNotPaused nonReentrant {
-        if (!_exists(tableId) || caller != _msgSenderERC721A()) {
+    ) private {
+        if (!_exists(tableId) || caller != _msgSenderERC721A())
             revert Unauthorized();
-        }
 
         uint256 querySize = bytes(statement).length;
-        if (querySize > QUERY_MAX_SIZE) {
+        if (querySize > QUERY_MAX_SIZE)
             revert MaxQuerySizeExceeded(querySize, QUERY_MAX_SIZE);
-        }
 
         emit RunSQL(
             caller,
@@ -143,9 +208,8 @@ contract TablelandTables is
                     caller
                 );
         }
-        if (!(controller == address(0) || controller == caller)) {
+        if (!(controller == address(0) || controller == caller))
             revert Unauthorized();
-        }
 
         return
             TablelandPolicy({
@@ -177,9 +241,7 @@ contract TablelandTables is
             caller != ownerOf(tableId) ||
             caller != _msgSenderERC721A() ||
             _locks[tableId]
-        ) {
-            revert Unauthorized();
-        }
+        ) revert Unauthorized();
 
         _controllers[tableId] = controller;
 
@@ -206,9 +268,7 @@ contract TablelandTables is
             caller != ownerOf(tableId) ||
             caller != _msgSenderERC721A() ||
             _locks[tableId]
-        ) {
-            revert Unauthorized();
-        }
+        ) revert Unauthorized();
 
         _locks[tableId] = true;
     }
@@ -258,10 +318,8 @@ contract TablelandTables is
         uint256 quantity
     ) internal override {
         super._afterTokenTransfers(from, to, startTokenId, quantity);
-        if (from != address(0)) {
-            // quantity is only > 1 after bulk minting when from == address(0)
-            emit TransferTable(from, to, startTokenId);
-        }
+        // quantity is only > 1 after bulk minting when from == address(0)
+        if (from != address(0)) emit TransferTable(from, to, startTokenId);
     }
 
     /**
