@@ -78,11 +78,15 @@ contract TablelandTables is
         address owner,
         string[] calldata statements
     ) external payable override whenNotPaused returns (uint256[] memory) {
-        if (statements.length < 1) revert Unauthorized();
+        uint256 statementsLength = statements.length;
+        if (statementsLength < 1) revert Unauthorized();
 
-        uint256[] memory tableIds = new uint256[](statements.length);
-        for (uint256 i = 0; i < statements.length; i++) {
+        uint256[] memory tableIds = new uint256[](statementsLength);
+        for (uint256 i; i < statementsLength;) {
             tableIds[i] = _create(owner, statements[i]);
+            unchecked {
+                ++i;
+            }
         }
 
         return tableIds;
@@ -118,8 +122,12 @@ contract TablelandTables is
         address caller,
         ITablelandTables.Statement[] calldata statements
     ) external payable override whenNotPaused nonReentrant {
-        for (uint256 i = 0; i < statements.length; i++) {
+        uint256 statementsLength = statements.length;
+        for (uint256 i; i < statementsLength;) {
             _mutate(caller, statements[i].tableId, statements[i].statement);
+            unchecked {
+                ++i;
+            }
         }
     }
 
