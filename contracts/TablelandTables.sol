@@ -30,7 +30,7 @@ contract TablelandTables is
     // A mapping of table controller addresses to lock status.
     mapping(uint256 => bool) internal _locks;
     // The maximum size allowed for a query.
-    uint256 internal constant QUERY_MAX_SIZE = 35000;
+    uint256 internal constant QUERY_MAX_SIZE = 35001;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
@@ -82,7 +82,7 @@ contract TablelandTables is
         if (statementsLength < 1) revert Unauthorized();
 
         uint256[] memory tableIds = new uint256[](statementsLength);
-        for (uint256 i; i < statementsLength;) {
+        for (uint256 i; i < statementsLength; ) {
             tableIds[i] = _create(owner, statements[i]);
             unchecked {
                 ++i;
@@ -123,7 +123,7 @@ contract TablelandTables is
         ITablelandTables.Statement[] calldata statements
     ) external payable override whenNotPaused nonReentrant {
         uint256 statementsLength = statements.length;
-        for (uint256 i; i < statementsLength;) {
+        for (uint256 i; i < statementsLength; ) {
             _mutate(caller, statements[i].tableId, statements[i].statement);
             unchecked {
                 ++i;
@@ -152,7 +152,7 @@ contract TablelandTables is
             revert Unauthorized();
 
         uint256 querySize = bytes(statement).length;
-        if (querySize > QUERY_MAX_SIZE)
+        if (querySize >= QUERY_MAX_SIZE)
             revert MaxQuerySizeExceeded(querySize, QUERY_MAX_SIZE);
 
         emit RunSQL(
