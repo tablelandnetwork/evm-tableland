@@ -22,18 +22,25 @@ jobs:
             ${{ runner.os }}-build-
             ${{ runner.os }}-
 
-      - name: Setup Node Environment ⬢
+      - name: Setup ⬢
         uses: actions/setup-node@v1
         with:
           node-version: 18
 
-      - name: Tag release
-        uses: rickstaa/action-create-tag@v1
+      - name: Tag 🏷️
+        uses: actions/github-script@v5
+        id: create-tag
         with:
-          tag: ${{ github.event.inputs.release_version }}
-          message: "Release ${{ github.event.inputs.release_version }}"
+          github-token: ${{secrets.TEXTILEIO_MACHINE_ACCESS_TOKEN}}
+          script: |
+            await github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/tags/${{ github.event.inputs.release_version }}',
+              sha: context.sha
+            })
 
-      - name: Update version in package.json
+      - name: Version 👍
         id: version-bump
         uses: jaywcjlove/github-action-package@v1.3.0
         with:
@@ -42,7 +49,7 @@ jobs:
       - name: Install 🔧
         run: npm install
 
-      - name: Conditional
+      - name: Conditional ✅
         id: cond
         uses: haya14busa/action-cond@v1
         with:
@@ -59,7 +66,7 @@ jobs:
           access: public
           check-version: true
 
-      - name: Release
+      - name: Release 🚀
         if: steps.publish.outputs.type != 'none'
         uses: ncipollo/release-action@v1
         with:
