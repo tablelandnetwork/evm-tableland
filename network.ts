@@ -59,7 +59,8 @@ export const baseURIs: TablelandNetworkConfig = {
   "optimism-goerli": "https://testnets.tableland.network/api/v1/tables/420/",
   "arbitrum-goerli": "https://testnets.tableland.network/api/v1/tables/421613/",
   maticmum: "https://testnets.tableland.network/api/v1/tables/80001/",
-  "filecoin-hyperspace": "https://tableland.network/api/v1/tables/3141/",
+  "filecoin-hyperspace":
+    "https://testnets.tableland.network/api/v1/tables/3141/",
   "optimism-goerli-staging":
     "https://staging.tableland.network/api/v1/tables/420/",
   localhost: localTablelandURI,
