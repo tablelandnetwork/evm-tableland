@@ -55,7 +55,7 @@ const config: HardhatUserConfig = {
     apiKey: {
       // ethereum
       mainnet: process.env.ETHERSCAN_API_KEY || "",
-      goerli: process.env.ETHERSCAN_API_KEY || "",
+      sepolia: process.env.ETHERSCAN_API_KEY || "",
 
       // optimism
       optimisticEthereum: process.env.OPTIMISM_ETHERSCAN_API_KEY || "",
@@ -131,13 +131,13 @@ const config: HardhatUserConfig = {
           : [],
     },
     // testnets
-    goerli: {
-      url: `https://eth-goerli.alchemyapi.io/v2/${
-        process.env.ETHEREUM_GOERLI_API_KEY ?? ""
+    sepolia: {
+      url: `https://eth-sepolia.g.alchemy.com/v2/${
+        process.env.ETHEREUM_SEPOLIA_API_KEY ?? ""
       }`,
       accounts:
-        process.env.ETHEREUM_GOERLI_PRIVATE_KEY !== undefined
-          ? [process.env.ETHEREUM_GOERLI_PRIVATE_KEY]
+        process.env.ETHEREUM_SEPOLIA_PRIVATE_KEY !== undefined
+          ? [process.env.ETHEREUM_SEPOLIA_PRIVATE_KEY]
           : [],
     },
     "optimism-goerli": {
@@ -191,6 +191,8 @@ const config: HardhatUserConfig = {
         auto: !(process.env.HARDHAT_DISABLE_AUTO_MINING === "true"),
         interval: [100, 3000],
       },
+      allowUnlimitedContractSize:
+        process.env.HARDHAT_UNLIMITED_CONTRACT_SIZE === "true",
     },
   },
   baseURIs,

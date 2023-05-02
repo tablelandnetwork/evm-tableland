@@ -8,7 +8,7 @@ export interface TablelandNetworkConfig {
   matic: string;
   filecoin: string;
   // tableland testnet testnets
-  goerli: string;
+  sepolia: string;
   "optimism-goerli": string;
   "arbitrum-goerli": string;
   maticmum: string;
@@ -30,7 +30,7 @@ export const proxies: TablelandNetworkConfig = {
   "arbitrum-nova": "0x1A22854c5b1642760a827f20137a67930AE108d2",
   matic: "0x5c4e6A9e5C1e1BF445A062006faF19EA6c49aFeA",
   filecoin: "0x59EF8Bf2d6c102B4c42AEf9189e1a9F0ABfD652d",
-  goerli: "0xDA8EA22d092307874f30A1F277D1388dca0BA97a",
+  sepolia: "0xc50C62498448ACc8dBdE43DA77f8D5D2E2c7597D",
   "optimism-goerli": "0xC72E8a7Be04f2469f8C2dB3F1BdF69A7D516aBbA",
   "arbitrum-goerli": "0x033f69e8d119205089Ab15D340F5b797732f646b",
   maticmum: "0x4b48841d4b32C4650E4ABc117A03FE8B51f38F68",
@@ -55,7 +55,7 @@ export const baseURIs: TablelandNetworkConfig = {
   matic: "https://tableland.network/api/v1/tables/137/",
   filecoin: "https://tableland.network/api/v1/tables/314/",
   // testnets
-  goerli: "https://testnets.tableland.network/api/v1/tables/5/",
+  sepolia: "https://testnets.tableland.network/api/v1/tables/11155111/",
   "optimism-goerli": "https://testnets.tableland.network/api/v1/tables/420/",
   "arbitrum-goerli": "https://testnets.tableland.network/api/v1/tables/421613/",
   maticmum: "https://testnets.tableland.network/api/v1/tables/80001/",
