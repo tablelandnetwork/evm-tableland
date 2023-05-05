@@ -10,10 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout 🛎️
-        uses: actions/checkout@v2.3.1
+        uses: actions/checkout@v3
 
       - name: Cache 📦
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         with:
           path: ~/.npm # npm cache files are stored in `~/.npm` on Linux/macOS
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -23,12 +23,24 @@ jobs:
             ${{ runner.os }}-
 
       - name: Setup ⬢
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: 18
 
+      - name: Version 👍
+        id: version-bump
+        uses: jaywcjlove/github-action-package@v1.3.0
+        with:
+          version: ${{ github.event.inputs.release_version }}
+
+      - name: Install 🔧
+        run: npm install
+
+      - name: Build 🛠
+        run: npm run build
+
       - name: Tag 🏷️
-        uses: actions/github-script@v5
+        uses: actions/github-script@v6
         id: create-tag
         with:
           github-token: ${{secrets.TEXTILEIO_MACHINE_ACCESS_TOKEN}}
@@ -40,15 +52,6 @@ jobs:
               sha: context.sha
             })
 
-      - name: Version 👍
-        id: version-bump
-        uses: jaywcjlove/github-action-package@v1.3.0
-        with:
-          version: ${{ github.event.inputs.release_version }}
-
-      - name: Install 🔧
-        run: npm install
-
       - name: Conditional ✅
         id: cond
         uses: haya14busa/action-cond@v1
@@ -59,12 +62,11 @@ jobs:
 
       - name: Publish 📦
         id: publish
-        uses: JS-DevTools/npm-publish@v1
+        uses: JS-DevTools/npm-publish@v2
         with:
           token: ${{ secrets.NPM_AUTH_TOKEN }}
           tag: ${{ steps.cond.outputs.value }}
           access: public
-          check-version: true
 
       - name: Release 🚀
         if: steps.publish.outputs.type != 'none'
