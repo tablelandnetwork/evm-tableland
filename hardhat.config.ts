@@ -167,13 +167,13 @@ const config: HardhatUserConfig = {
           ? [process.env.POLYGON_MUMBAI_PRIVATE_KEY]
           : [],
     },
-    "filecoin-hyperspace": {
-      url: `https://rpc.ankr.com/filecoin_testnet/${
-        process.env.FILECOIN_HYPERSPACE_API_KEY ?? ""
+    "filecoin-calibration": {
+      url: `https://api.calibration.node.glif.io/rpc/v1${
+        process.env.FILECOIN_CALIBRATION_API_KEY ?? ""
       }`,
       accounts:
-        process.env.FILECOIN_HYPERSPACE_PRIVATE_KEY !== undefined
-          ? [process.env.FILECOIN_HYPERSPACE_PRIVATE_KEY]
+        process.env.FILECOIN_CALIBRATION_PRIVATE_KEY !== undefined
+          ? [process.env.FILECOIN_CALIBRATION_PRIVATE_KEY]
           : [],
     },
     // devnets
