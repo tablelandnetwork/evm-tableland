@@ -47,7 +47,7 @@ library TablelandDeployments {
         0x4b48841d4b32C4650E4ABc117A03FE8B51f38F68;
     // TablelandTables address on Filecoin Calibration.
     address internal constant FILECOIN_CALIBRATION =
-        0x000000000000000000000000000000000000dEaD;
+        0x030BCf3D50cad04c2e57391B12740982A9308621;
 
     // TablelandTables address on for use with https://github.com/tablelandnetwork/local-tableland.
     address internal constant LOCAL_TABLELAND =
