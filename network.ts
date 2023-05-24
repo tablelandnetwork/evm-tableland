@@ -34,7 +34,7 @@ export const proxies: TablelandNetworkConfig = {
   "optimism-goerli": "0xC72E8a7Be04f2469f8C2dB3F1BdF69A7D516aBbA",
   "arbitrum-goerli": "0x033f69e8d119205089Ab15D340F5b797732f646b",
   maticmum: "0x4b48841d4b32C4650E4ABc117A03FE8B51f38F68",
-  "filecoin-calibration": "0xTODO",
+  "filecoin-calibration": "0x030BCf3D50cad04c2e57391B12740982A9308621",
   "optimism-goerli-staging": "0xfe79824f6E5894a3DD86908e637B7B4AF57eEE28",
   // localhost is a stand alone node
   localhost: "",
