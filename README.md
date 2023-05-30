@@ -20,19 +20,19 @@ This is the Tableland Tables EVM contracts and client components.
 
 ## Currently supported chains
 
-| Chain               | Chain ID | Contract                                   |
-| ------------------- | -------- | ------------------------------------------ |
-| homestead           | 1        | 0x012969f7e3439a9B04025b5a049EB9BAD82A8C12 |
-| optimism            | 10       | 0xfad44BF5B843dE943a09D4f3E84949A11d3aa3e6 |
-| arbitrum            | 42161    | 0x9aBd75E8640871A5a20d3B4eE6330a04c962aFfd |
-| arbitrum-nova       | 42170    | 0x1A22854c5b1642760a827f20137a67930AE108d2 |
-| matic               | 137      | 0x5c4e6A9e5C1e1BF445A062006faF19EA6c49aFeA |
-| filecoin            | 314      | 0x59EF8Bf2d6c102B4c42AEf9189e1a9F0ABfD652d |
-| sepolia             | 11155111 | 0xc50C62498448ACc8dBdE43DA77f8D5D2E2c7597D |
-| optimism-goerli     | 420      | 0xC72E8a7Be04f2469f8C2dB3F1BdF69A7D516aBbA |
-| arbitrum-goerli     | 421613   | 0x033f69e8d119205089Ab15D340F5b797732f646b |
-| maticmum            | 80001    | 0x4b48841d4b32C4650E4ABc117A03FE8B51f38F68 |
-| filecoin-hyperspace | 3141     | 0x0B9737ab4B3e5303CB67dB031b509697e31c02d3 |
+| Chain                | Chain ID | Contract                                   |
+| -------------------- | -------- | ------------------------------------------ |
+| homestead            | 1        | 0x012969f7e3439a9B04025b5a049EB9BAD82A8C12 |
+| optimism             | 10       | 0xfad44BF5B843dE943a09D4f3E84949A11d3aa3e6 |
+| arbitrum             | 42161    | 0x9aBd75E8640871A5a20d3B4eE6330a04c962aFfd |
+| arbitrum-nova        | 42170    | 0x1A22854c5b1642760a827f20137a67930AE108d2 |
+| matic                | 137      | 0x5c4e6A9e5C1e1BF445A062006faF19EA6c49aFeA |
+| filecoin             | 314      | 0x59EF8Bf2d6c102B4c42AEf9189e1a9F0ABfD652d |
+| sepolia              | 11155111 | 0xc50C62498448ACc8dBdE43DA77f8D5D2E2c7597D |
+| optimism-goerli      | 420      | 0xC72E8a7Be04f2469f8C2dB3F1BdF69A7D516aBbA |
+| arbitrum-goerli      | 421613   | 0x033f69e8d119205089Ab15D340F5b797732f646b |
+| maticmum             | 80001    | 0x4b48841d4b32C4650E4ABc117A03FE8B51f38F68 |
+| filecoin-calibration | 314159   | 0x030BCf3D50cad04c2e57391B12740982A9308621 |
 
 # Development
 

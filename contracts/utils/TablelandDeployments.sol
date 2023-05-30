@@ -45,9 +45,9 @@ library TablelandDeployments {
     // TablelandTables address on Polygon Mumbai.
     address internal constant MATICMUM =
         0x4b48841d4b32C4650E4ABc117A03FE8B51f38F68;
-    // TablelandTables address on Filecoin Hyperspace.
-    address internal constant FILECOIN_HYPERSPACE =
-        0x0B9737ab4B3e5303CB67dB031b509697e31c02d3;
+    // TablelandTables address on Filecoin Calibration.
+    address internal constant FILECOIN_CALIBRATION =
+        0x030BCf3D50cad04c2e57391B12740982A9308621;
 
     // TablelandTables address on for use with https://github.com/tablelandnetwork/local-tableland.
     address internal constant LOCAL_TABLELAND =
@@ -83,8 +83,8 @@ library TablelandDeployments {
             return ITablelandTables(ARBITRUM_GOERLI);
         } else if (block.chainid == 80001) {
             return ITablelandTables(MATICMUM);
-        } else if (block.chainid == 3141) {
-            return ITablelandTables(FILECOIN_HYPERSPACE);
+        } else if (block.chainid == 314159) {
+            return ITablelandTables(FILECOIN_CALIBRATION);
         } else if (block.chainid == 31337) {
             return ITablelandTables(LOCAL_TABLELAND);
         } else {
