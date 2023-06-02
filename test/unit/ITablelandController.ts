@@ -142,17 +142,17 @@ describe("ITablelandController", function () {
     );
     expect(setControllerEvent.args!.controller).to.equal(eoaController.address);
 
-    // Test that runSQL is now locked down to this EOA address
+    // Test that mutate is now locked down to this EOA address
     // (not even owner should be able to run SQL now)
     const runStatement = "insert into testing values (0);";
     await expect(
       tables
         .connect(owner)
-        ["runSQL(address,uint256,string)"](owner.address, tableId, runStatement)
+        ["mutate(address,uint256,string)"](owner.address, tableId, runStatement)
     ).to.be.revertedWithCustomError(tables, "Unauthorized");
     tx = await tables
       .connect(eoaController)
-      ["runSQL(address,uint256,string)"](
+      ["mutate(address,uint256,string)"](
         eoaController.address,
         tableId,
         runStatement
@@ -176,7 +176,7 @@ describe("ITablelandController", function () {
     const caller = accounts[7];
     tx = await tables
       .connect(caller)
-      ["runSQL(address,uint256,string)"](caller.address, tableId, runStatement);
+      ["mutate(address,uint256,string)"](caller.address, tableId, runStatement);
     receipt = await tx.wait();
     const [runEvent] = receipt.events ?? [];
     expect(runEvent.args!.caller).to.equal(caller.address);
@@ -335,7 +335,7 @@ describe("ITablelandController", function () {
     await expect(
       tables
         .connect(caller)
-        ["runSQL(address,uint256,string)"](
+        ["mutate(address,uint256,string)"](
           caller.address,
           tableId,
           runStatement
@@ -344,9 +344,16 @@ describe("ITablelandController", function () {
 
     // Test that run SQL on table is gated by ether (with revert/require)
     await expect(
-      tables.connect(caller).runSQL(caller.address, tableId, runStatement, {
-        value: ethers.utils.parseEther("2"),
-      })
+      tables
+        .connect(caller)
+        ["mutate(address,uint256,string)"](
+          caller.address,
+          tableId,
+          runStatement,
+          {
+            value: ethers.utils.parseEther("2"),
+          }
+        )
     ).to.be.revertedWith("too much ether!");
 
     // Test that run SQL on table is gated by Foo and Bar ownership
@@ -354,7 +361,7 @@ describe("ITablelandController", function () {
     await expect(
       tables
         .connect(caller)
-        ["runSQL(address,uint256,string)"](
+        ["mutate(address,uint256,string)"](
           caller.address,
           tableId,
           runStatement,
@@ -383,7 +390,7 @@ describe("ITablelandController", function () {
     await expect(
       tables
         .connect(caller)
-        ["runSQL(address,uint256,string)"](
+        ["mutate(address,uint256,string)"](
           caller.address,
           tableId,
           runStatement,
@@ -403,7 +410,7 @@ describe("ITablelandController", function () {
     // Caller should be able to run SQL now
     tx = await tables
       .connect(caller)
-      ["runSQL(address,uint256,string)"](
+      ["mutate(address,uint256,string)"](
         caller.address,
         tableId,
         runStatement,
@@ -444,7 +451,7 @@ describe("ITablelandController", function () {
     // Where clause should reflect all owned tokens
     tx = await tables
       .connect(caller)
-      ["runSQL(address,uint256,string)"](
+      ["mutate(address,uint256,string)"](
         caller.address,
         tableId,
         runStatement,
@@ -485,15 +492,28 @@ describe("ITablelandController", function () {
     const runStatement = "insert into testing values (0);";
     const caller = accounts[5];
     await expect(
-      tables.connect(caller).runSQL(caller.address, tableId, runStatement)
+      tables
+        .connect(caller)
+        ["mutate(address,uint256,string)"](
+          caller.address,
+          tableId,
+          runStatement
+        )
     ).to.be.revertedWithCustomError(controllerV0, "InsufficientValue");
 
     // Test that run SQL on table is gated by Foo and Bar ownership
     const value = ethers.utils.parseEther("1");
     await expect(
-      tables.connect(caller).runSQL(caller.address, tableId, runStatement, {
-        value,
-      })
+      tables
+        .connect(caller)
+        ["mutate(address,uint256,string)"](
+          caller.address,
+          tableId,
+          runStatement,
+          {
+            value,
+          }
+        )
     ).to.be.revertedWithCustomError(
       enumPolicyLib,
       "ERC721EnumerablePoliciesUnauthorized"
@@ -513,9 +533,16 @@ describe("ITablelandController", function () {
 
     // Still gated (need a Bar too)
     await expect(
-      tables.connect(caller).runSQL(caller.address, tableId, runStatement, {
-        value,
-      })
+      tables
+        .connect(caller)
+        ["mutate(address,uint256,string)"](
+          caller.address,
+          tableId,
+          runStatement,
+          {
+            value,
+          }
+        )
     ).to.be.revertedWithCustomError(
       queryablePolicyLib,
       "ERC721AQueryablePoliciesUnauthorized"
@@ -528,7 +555,12 @@ describe("ITablelandController", function () {
     // Caller should be able to run SQL now
     tx = await tables
       .connect(caller)
-      .runSQL(caller.address, tableId, runStatement, { value });
+      ["mutate(address,uint256,string)"](
+        caller.address,
+        tableId,
+        runStatement,
+        { value }
+      );
     receipt = await tx.wait();
     let [runEvent] = receipt.events ?? [];
     expect(runEvent.args!.caller).to.equal(caller.address);
@@ -564,7 +596,12 @@ describe("ITablelandController", function () {
     // Where clause should reflect all owned tokens
     tx = await tables
       .connect(caller)
-      .runSQL(caller.address, tableId, runStatement, { value });
+      ["mutate(address,uint256,string)"](
+        caller.address,
+        tableId,
+        runStatement,
+        { value }
+      );
     receipt = await tx.wait();
     [runEvent] = receipt.events ?? [];
     expect(runEvent.args!.caller).to.equal(caller.address);
@@ -600,7 +637,13 @@ describe("ITablelandController", function () {
     const runStatement = "insert into testing values (0);";
     const caller = accounts[5];
     await expect(
-      tables.connect(caller).runSQL(caller.address, tableId, runStatement)
+      tables
+        .connect(caller)
+        ["mutate(address,uint256,string)"](
+          caller.address,
+          tableId,
+          runStatement
+        )
     ).to.be.revertedWith("not implemented");
 
     tx = await tables
@@ -610,7 +653,13 @@ describe("ITablelandController", function () {
 
     // Test that run SQL on table is rejected (w/o reason string)
     await expect(
-      tables.connect(caller).runSQL(caller.address, tableId, runStatement)
+      tables
+        .connect(caller)
+        ["mutate(address,uint256,string)"](
+          caller.address,
+          tableId,
+          runStatement
+        )
     ).to.be.revertedWithoutReason();
   });
 });
