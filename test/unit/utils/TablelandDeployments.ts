@@ -11,7 +11,7 @@ import { ITablelandTables__factory as TablelandTablesFactory } from "@tableland/
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe.only("TablelandDeployments", function () {
+describe("TablelandDeployments", function () {
   let accounts: SignerWithAddress[];
   let lib: TestTablelandDeployments;
   let tables: TablelandTables;
