@@ -50,7 +50,7 @@ describe("TablelandDeployments", function () {
         registryLog = log;
       }
     }
-    // Get the mutation caller, table ID, and statement emitted from the event
+    // Get the create table owner, table ID, and statement emitted from the event
     const logParsed = iface.parseLog(registryLog!);
     const { owner, tableId, statement } = logParsed.args;
     expect(owner).to.equal(lib.address);
@@ -93,31 +93,19 @@ describe("TablelandDeployments", function () {
     const { abi } = TablelandTablesFactory;
     const iface = new ethers.utils.Interface(abi);
     let registryLog;
-    for (const log of rec.logs) {
-      if (log.topics.includes(iface.getEventTopic("CreateTable"))) {
-        registryLog = log;
-      }
-    }
-    // Get the mutation caller, table ID, and statement emitted from the event
-    let logParsed = iface.parseLog(registryLog!);
-    const { owner, tableId, statement } = logParsed.args;
-    expect(owner).to.equal(lib.address);
-    expect(tableId).to.equal(3);
-    expect(statement).to.equal(createStatement);
     tx = await lib.safeTransferFrom(receiver.address, 3);
     rec = await tx.wait();
-    // Parse events from the registry
     for (const log of rec.logs) {
       if (log.topics.includes(iface.getEventTopic("TransferTable"))) {
         registryLog = log;
       }
     }
     // Get the table's original owner, new owner, and token ID emitted from the event
-    logParsed = iface.parseLog(registryLog!);
+    const logParsed = iface.parseLog(registryLog!);
     const { from, to, tableId: transferTableId } = logParsed.args;
     expect(from).to.equal(lib.address);
     expect(to).to.equal(receiver.address);
-    expect(transferTableId).to.equal(tableId);
+    expect(transferTableId).to.equal(3);
   });
 
   it("Should get() and set controller for table", async function () {
@@ -130,30 +118,18 @@ describe("TablelandDeployments", function () {
     const { abi } = TablelandTablesFactory;
     const iface = new ethers.utils.Interface(abi);
     let registryLog;
-    for (const log of rec.logs) {
-      if (log.topics.includes(iface.getEventTopic("CreateTable"))) {
-        registryLog = log;
-      }
-    }
-    // Get the mutation caller, table ID, and statement emitted from the event
-    let logParsed = iface.parseLog(registryLog!);
-    const { owner, tableId, statement } = logParsed.args;
-    expect(owner).to.equal(lib.address);
-    expect(tableId).to.equal(4);
-    expect(statement).to.equal(createStatement);
     tx = await lib.setController(4, receiver.address);
     rec = await tx.wait();
-    // Parse events from the registry
     for (const log of rec.logs) {
       if (log.topics.includes(iface.getEventTopic("SetController"))) {
         registryLog = log;
       }
     }
     // Get the table's original owner, new owner, and token ID emitted from the event
-    logParsed = iface.parseLog(registryLog!);
+    const logParsed = iface.parseLog(registryLog!);
     const { tableId: controllerTableId, controller } = logParsed.args;
     expect(controller).to.equal(receiver.address);
-    expect(controllerTableId).to.equal(tableId);
+    expect(controllerTableId).to.equal(4);
   });
 
   it("Should getInterface() and create table", async function () {
@@ -170,7 +146,7 @@ describe("TablelandDeployments", function () {
         registryLog = log;
       }
     }
-    // Get the mutation caller, table ID, and statement emitted from the event
+    // Get the create table owner, table ID, and statement emitted from the event
     const logParsed = iface.parseLog(registryLog!);
     const { owner, tableId, statement } = logParsed.args;
     expect(owner).to.equal(lib.address);
