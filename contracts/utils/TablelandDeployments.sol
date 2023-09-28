@@ -2,6 +2,9 @@
 pragma solidity >=0.8.10 <0.9.0;
 
 import {ITablelandTables} from "../interfaces/ITablelandTables.sol";
+import {IERC721AUpgradeable} from "erc721a-upgradeable/contracts/IERC721AUpgradeable.sol";
+
+interface TablelandTablesImpl is ITablelandTables, IERC721AUpgradeable {}
 
 /**
  * @dev Helper library for getting an instance of ITablelandTables for the currently executing EVM chain.
@@ -49,7 +52,7 @@ library TablelandDeployments {
     address internal constant FILECOIN_CALIBRATION =
         0x030BCf3D50cad04c2e57391B12740982A9308621;
 
-    // TablelandTables address on for use with https://github.com/tablelandnetwork/local-tableland.
+    // TablelandTables address on for use with https://github.com/tablelandnetwork/tableland-js/tree/main/packages/local.
     address internal constant LOCAL_TABLELAND =
         0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512;
 
@@ -62,7 +65,46 @@ library TablelandDeployments {
      *
      * - block.chainid must refer to a supported chain.
      */
-    function get() internal view returns (ITablelandTables) {
+    function get() internal view returns (TablelandTablesImpl) {
+        if (block.chainid == 1) {
+            return TablelandTablesImpl(MAINNET);
+        } else if (block.chainid == 10) {
+            return TablelandTablesImpl(OPTIMISM);
+        } else if (block.chainid == 42161) {
+            return TablelandTablesImpl(ARBITRUM);
+        } else if (block.chainid == 42170) {
+            return TablelandTablesImpl(ARBITRUM_NOVA);
+        } else if (block.chainid == 137) {
+            return TablelandTablesImpl(MATIC);
+        } else if (block.chainid == 314) {
+            return TablelandTablesImpl(FILECOIN);
+        } else if (block.chainid == 11155111) {
+            return TablelandTablesImpl(SEPOLIA);
+        } else if (block.chainid == 420) {
+            return TablelandTablesImpl(OPTIMISM_GOERLI);
+        } else if (block.chainid == 421613) {
+            return TablelandTablesImpl(ARBITRUM_GOERLI);
+        } else if (block.chainid == 80001) {
+            return TablelandTablesImpl(MATICMUM);
+        } else if (block.chainid == 314159) {
+            return TablelandTablesImpl(FILECOIN_CALIBRATION);
+        } else if (block.chainid == 31337) {
+            return TablelandTablesImpl(LOCAL_TABLELAND);
+        } else {
+            revert ChainNotSupported(block.chainid);
+        }
+    }
+
+    /**
+     * @dev Returns an interface to Tableland for the currently executing EVM chain.
+     *
+     * The selection order is meant to reduce gas on more expensive chains.
+     *
+     * Requirements:
+     *
+     * - block.chainid must refer to a supported chain.
+     */
+    function getInterface() internal view returns (ITablelandTables) {
         if (block.chainid == 1) {
             return ITablelandTables(MAINNET);
         } else if (block.chainid == 10) {
@@ -87,6 +129,45 @@ library TablelandDeployments {
             return ITablelandTables(FILECOIN_CALIBRATION);
         } else if (block.chainid == 31337) {
             return ITablelandTables(LOCAL_TABLELAND);
+        } else {
+            revert ChainNotSupported(block.chainid);
+        }
+    }
+
+    /**
+     * @dev Returns the Tableland gateway base URI for the currently executing EVM chain.
+     *
+     * The selection order is meant to reduce gas on more expensive chains.
+     *
+     * Requirements:
+     *
+     * - block.chainid must refer to a supported chain.
+     */
+    function getBaseURI() internal view returns (string memory) {
+        if (block.chainid == 1) {
+            return "https://tableland.network/api/v1/";
+        } else if (block.chainid == 10) {
+            return "https://tableland.network/api/v1/";
+        } else if (block.chainid == 42161) {
+            return "https://tableland.network/api/v1/";
+        } else if (block.chainid == 42170) {
+            return "https://tableland.network/api/v1/";
+        } else if (block.chainid == 137) {
+            return "https://tableland.network/api/v1/";
+        } else if (block.chainid == 314) {
+            return "https://tableland.network/api/v1/";
+        } else if (block.chainid == 11155111) {
+            return "https://testnets.tableland.network/api/v1/";
+        } else if (block.chainid == 420) {
+            return "https://testnets.tableland.network/api/v1/";
+        } else if (block.chainid == 421613) {
+            return "https://testnets.tableland.network/api/v1/";
+        } else if (block.chainid == 80001) {
+            return "https://testnets.tableland.network/api/v1/";
+        } else if (block.chainid == 314159) {
+            return "https://testnets.tableland.network/api/v1/";
+        } else if (block.chainid == 31337) {
+            return "http://localhost:8080/api/v1/";
         } else {
             revert ChainNotSupported(block.chainid);
         }
