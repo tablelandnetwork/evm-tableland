@@ -1,15 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.10 <0.9.0;
 
-import {TablelandDeployments, TablelandTablesImpl, ITablelandTables} from "../utils/TablelandDeployments.sol";
+import {TablelandDeployments} from "../utils/TablelandDeployments.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import {SQLHelpers} from "../utils/SQLHelpers.sol";
 
 /**
  * @dev TablelandDeployments with public methods for testing.
  */
 contract TestTablelandDeployments {
+    uint256 private _tableId;
+    string private constant _TABLE_PREFIX = "test";
+
     function create(string memory statement) public {
-        TablelandDeployments.get().create(address(this), statement);
+        _tableId = TablelandDeployments.get().create(address(this), statement);
     }
 
     function mutate(uint256 id, string memory statement) public {
@@ -28,16 +32,14 @@ contract TestTablelandDeployments {
         return TablelandDeployments.getBaseURI();
     }
 
-    function createWithInterface(string memory statement) public {
-        TablelandDeployments.getInterface().create(address(this), statement);
+    // Get the table ID for testing purposes
+    function getTableId() external view returns (uint256) {
+        return _tableId;
     }
 
-    function mutateWithInterface(uint256 id, string memory statement) public {
-        TablelandDeployments.getInterface().mutate(
-            address(this),
-            id,
-            statement
-        );
+    // Get the table name for testing purposes
+    function getTableName() external view returns (string memory) {
+        return SQLHelpers.toNameFromId(_TABLE_PREFIX, _tableId);
     }
 
     function onERC721Received(

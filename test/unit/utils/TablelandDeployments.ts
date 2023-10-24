@@ -36,7 +36,7 @@ describe("TablelandDeployments", function () {
     expect(res).to.equal("http://localhost:8080/api/v1/");
   });
 
-  it("Should get() and create table", async function () {
+  it("Should get deployment and create table", async function () {
     const createStatement =
       "CREATE TABLE test_31337(id integer primary key,val text)";
     const tx = await lib.create(createStatement);
@@ -52,91 +52,18 @@ describe("TablelandDeployments", function () {
     }
     // Get the create table owner, table ID, and statement emitted from the event
     const logParsed = iface.parseLog(registryLog!);
-    const { owner, tableId, statement } = logParsed.args;
+    const { owner, tableId: tableIdFromLog, statement } = logParsed.args;
+    const tableId = await lib.getTableId();
     expect(owner).to.equal(lib.address);
-    expect(tableId).to.equal(1);
+    expect(tableIdFromLog).to.equal(tableId);
     expect(statement).to.equal(createStatement);
   });
 
-  it("Should get() and mutate table", async function () {
-    const createStatement =
-      "CREATE TABLE test_31337(id integer primary key,val text)";
-    let tx = await lib.create(createStatement);
-    await tx.wait();
-    const mutateStatement = "INSERT INTO test_31337_1 VALUES(1,'foo')";
-    tx = await lib.mutate(2, mutateStatement);
-    const rec = await tx.wait();
-    // Parse events from the registry
-    const { abi } = TablelandTablesFactory;
-    const iface = new ethers.utils.Interface(abi);
-    let registryLog;
-    for (const log of rec.logs) {
-      if (log.topics.includes(iface.getEventTopic("RunSQL"))) {
-        registryLog = log;
-      }
-    }
-    // Get the mutation caller, table ID, and statement emitted from the event
-    const logParsed = iface.parseLog(registryLog!);
-    const { caller, tableId, statement } = logParsed.args;
-    expect(caller).to.equal(lib.address);
-    expect(tableId).to.equal(2);
-    expect(statement).to.equal(mutateStatement);
-  });
-
-  it("Should get() and transfer table", async function () {
-    const receiver = accounts[4];
+  it("Should get deployment and mutate table", async function () {
     const createStatement =
       "CREATE TABLE test_31337(id integer primary key,val text)";
     let tx = await lib.create(createStatement);
     let rec = await tx.wait();
-    // Parse events from the registry
-    const { abi } = TablelandTablesFactory;
-    const iface = new ethers.utils.Interface(abi);
-    let registryLog;
-    tx = await lib.safeTransferFrom(receiver.address, 3);
-    rec = await tx.wait();
-    for (const log of rec.logs) {
-      if (log.topics.includes(iface.getEventTopic("TransferTable"))) {
-        registryLog = log;
-      }
-    }
-    // Get the table's original owner, new owner, and token ID emitted from the event
-    const logParsed = iface.parseLog(registryLog!);
-    const { from, to, tableId: transferTableId } = logParsed.args;
-    expect(from).to.equal(lib.address);
-    expect(to).to.equal(receiver.address);
-    expect(transferTableId).to.equal(3);
-  });
-
-  it("Should get() and set controller for table", async function () {
-    const receiver = accounts[4];
-    const createStatement =
-      "CREATE TABLE test_31337(id integer primary key,val text)";
-    let tx = await lib.create(createStatement);
-    let rec = await tx.wait();
-    // Parse events from the registry
-    const { abi } = TablelandTablesFactory;
-    const iface = new ethers.utils.Interface(abi);
-    let registryLog;
-    tx = await lib.setController(4, receiver.address);
-    rec = await tx.wait();
-    for (const log of rec.logs) {
-      if (log.topics.includes(iface.getEventTopic("SetController"))) {
-        registryLog = log;
-      }
-    }
-    // Get the table's original owner, new owner, and token ID emitted from the event
-    const logParsed = iface.parseLog(registryLog!);
-    const { tableId: controllerTableId, controller } = logParsed.args;
-    expect(controller).to.equal(receiver.address);
-    expect(controllerTableId).to.equal(4);
-  });
-
-  it("Should getInterface() and create table", async function () {
-    const createStatement =
-      "CREATE TABLE test_31337(id integer primary key,val text)";
-    const tx = await lib.createWithInterface(createStatement);
-    const rec = await tx.wait();
     // Parse events from the registry
     const { abi } = TablelandTablesFactory;
     const iface = new ethers.utils.Interface(abi);
@@ -147,35 +74,107 @@ describe("TablelandDeployments", function () {
       }
     }
     // Get the create table owner, table ID, and statement emitted from the event
-    const logParsed = iface.parseLog(registryLog!);
-    const { owner, tableId, statement } = logParsed.args;
+    let logParsed = iface.parseLog(registryLog!);
+    let { owner, tableId: tableIdFromLog, statement } = logParsed.args;
+    const tableId = await lib.getTableId();
     expect(owner).to.equal(lib.address);
-    expect(tableId).to.equal(5);
+    expect(tableIdFromLog).to.equal(tableId);
     expect(statement).to.equal(createStatement);
-  });
 
-  it("Should getInterface() and mutate table", async function () {
-    const createStatement =
-      "CREATE TABLE test_31337(id integer primary key,val text)";
-    let tx = await lib.createWithInterface(createStatement);
-    await tx.wait();
-    const mutateStatement = "INSERT INTO test_31337_1 VALUES(1,'foo')";
-    tx = await lib.mutateWithInterface(6, mutateStatement);
-    const rec = await tx.wait();
+    // Mutate the table
+    const tableName = await lib.getTableName();
+    const mutateStatement = `INSERT INTO ${tableName} VALUES(1,'foo')`;
+    tx = await lib.mutate(tableId, mutateStatement);
+    rec = await tx.wait();
     // Parse events from the registry
-    const { abi } = TablelandTablesFactory;
-    const iface = new ethers.utils.Interface(abi);
-    let registryLog;
     for (const log of rec.logs) {
       if (log.topics.includes(iface.getEventTopic("RunSQL"))) {
         registryLog = log;
       }
     }
     // Get the mutation caller, table ID, and statement emitted from the event
-    const logParsed = iface.parseLog(registryLog!);
-    const { caller, tableId, statement } = logParsed.args;
+    logParsed = iface.parseLog(registryLog!);
+    const { caller } = logParsed.args;
+    ({ tableId: tableIdFromLog, statement } = logParsed.args);
     expect(caller).to.equal(lib.address);
-    expect(tableId).to.equal(6);
+    expect(tableIdFromLog).to.equal(tableId);
     expect(statement).to.equal(mutateStatement);
+  });
+
+  it("Should get deployment and transfer table", async function () {
+    const receiver = accounts[4];
+    const createStatement =
+      "CREATE TABLE test_31337(id integer primary key,val text)";
+    let tx = await lib.create(createStatement);
+    let rec = await tx.wait();
+    // Parse events from the registry
+    const { abi } = TablelandTablesFactory;
+    const iface = new ethers.utils.Interface(abi);
+    let registryLog;
+    for (const log of rec.logs) {
+      if (log.topics.includes(iface.getEventTopic("CreateTable"))) {
+        registryLog = log;
+      }
+    }
+    // Get the create table owner, table ID, and statement emitted from the event
+    let logParsed = iface.parseLog(registryLog!);
+    const { owner, tableId: tableIdFromLog, statement } = logParsed.args;
+    const tableId = await lib.getTableId();
+    expect(owner).to.equal(lib.address);
+    expect(tableIdFromLog).to.equal(tableId);
+    expect(statement).to.equal(createStatement);
+
+    // Transfer table and parse events from the registry
+    tx = await lib.safeTransferFrom(receiver.address, tableId);
+    rec = await tx.wait();
+    for (const log of rec.logs) {
+      if (log.topics.includes(iface.getEventTopic("TransferTable"))) {
+        registryLog = log;
+      }
+    }
+    // Get the table's original owner, new owner, and token ID emitted from the event
+    logParsed = iface.parseLog(registryLog!);
+    const { from, to, tableId: transferTableId } = logParsed.args;
+    expect(from).to.equal(lib.address);
+    expect(to).to.equal(receiver.address);
+    expect(transferTableId).to.equal(tableId);
+  });
+
+  it("Should get deployment and set controller for table", async function () {
+    const receiver = accounts[4];
+    const createStatement =
+      "CREATE TABLE test_31337(id integer primary key,val text)";
+    let tx = await lib.create(createStatement);
+    let rec = await tx.wait();
+    // Parse events from the registry
+    const { abi } = TablelandTablesFactory;
+    const iface = new ethers.utils.Interface(abi);
+    let registryLog;
+    for (const log of rec.logs) {
+      if (log.topics.includes(iface.getEventTopic("CreateTable"))) {
+        registryLog = log;
+      }
+    }
+    // Get the create table owner, table ID, and statement emitted from the event
+    let logParsed = iface.parseLog(registryLog!);
+    const { owner, tableId: tableIdFromLog, statement } = logParsed.args;
+    const tableId = await lib.getTableId();
+    expect(owner).to.equal(lib.address);
+    expect(tableIdFromLog).to.equal(tableId);
+    expect(statement).to.equal(createStatement);
+
+    // Set controller & parse events from the registry
+    tx = await lib.setController(tableId, receiver.address);
+    rec = await tx.wait();
+    for (const log of rec.logs) {
+      if (log.topics.includes(iface.getEventTopic("SetController"))) {
+        registryLog = log;
+      }
+    }
+    // Get the table's original owner, new owner, and token ID emitted from the event
+    logParsed = iface.parseLog(registryLog!);
+    const { tableId: controllerTableId, controller } = logParsed.args;
+    expect(controller).to.equal(receiver.address);
+    expect(controllerTableId).to.equal(tableId);
   });
 });
