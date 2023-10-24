@@ -1,23 +1,23 @@
 export interface TablelandNetworkConfig {
   // tableland testnet mainnets
-  mainnet: string;
-  homestead: string;
-  optimism: string;
-  arbitrum: string;
-  "arbitrum-nova": string;
-  matic: string;
-  filecoin: string;
+  mainnet: string | number;
+  homestead: string | number;
+  optimism: string | number;
+  arbitrum: string | number;
+  "arbitrum-nova": string | number;
+  matic: string | number;
+  filecoin: string | number;
   // tableland testnet testnets
-  sepolia: string;
-  "optimism-goerli": string;
-  "arbitrum-goerli": string;
-  maticmum: string;
-  "filecoin-calibration": string;
+  sepolia: string | number;
+  "optimism-goerli": string | number;
+  "arbitrum-goerli": string | number;
+  maticmum: string | number;
+  "filecoin-calibration": string | number;
   // tableland staging testnets
-  "optimism-goerli-staging": string;
+  "optimism-goerli-staging": string | number;
   // local tableland
-  localhost: string; // hardhat
-  "local-tableland": string; // hardhat backed by a local validator
+  localhost: string | number; // hardhat
+  "local-tableland": string | number; // hardhat backed by a local validator
 }
 
 const homesteadAddr = "0x012969f7e3439a9B04025b5a049EB9BAD82A8C12";
@@ -65,4 +65,27 @@ export const baseURIs: TablelandNetworkConfig = {
     "https://staging.tableland.network/api/v1/tables/420/",
   localhost: localTablelandURI,
   "local-tableland": localTablelandURI,
+};
+
+// See validator for config for more details; these times consider the `NewBlockPollFreq` & `MinBlockDepth` values
+// Mainnets: https://github.com/tablelandnetwork/go-tableland/blob/main/docker/deployed/mainnet/api/config.json
+// Testnets: https://github.com/tablelandnetwork/go-tableland/blob/main/docker/deployed/testnet/api/config.json
+export const blockPollingTimes: TablelandNetworkConfig = {
+  // mainnets
+  mainnet: 20_000, // 10s polling with 1 block depth
+  homestead: 20_000, // 10s polling with 1 block depth
+  optimism: 5_000, // 5s polling with zero block depth
+  arbitrum: 5_000, // 5s polling with zero block depth
+  "arbitrum-nova": 5_000, // 5s polling with zero block depth
+  matic: 10_000, // 5s polling with 1 block depth
+  filecoin: 90_000, // 15s polling with 5 block depth
+  // testnets
+  sepolia: 20_000, // 10s polling with 1 block depth
+  "optimism-goerli": 5_000, // 5s polling with zero block depth
+  "arbitrum-goerli": 5_000, // 5s polling with zero block depth
+  maticmum: 10_000, // 5s polling with 1 block depth
+  "filecoin-calibration": 90_000, // 15s polling with 5 block depth
+  "optimism-goerli-staging": 5_000, // 5s polling with zero block depth
+  localhost: 5_000, // 1s polling with zero block depth
+  "local-tableland": 5_000, // 1s polling with zero block depth
 };
