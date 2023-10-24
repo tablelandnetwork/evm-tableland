@@ -1,10 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.10 <0.9.0;
 
-import {ITablelandTables} from "../interfaces/ITablelandTables.sol";
-import {IERC721AUpgradeable} from "erc721a-upgradeable/contracts/IERC721AUpgradeable.sol";
-
-interface TablelandTablesImpl is ITablelandTables, IERC721AUpgradeable {}
+import {TablelandTables} from "../TablelandTables.sol";
 
 /**
  * @dev Helper library for getting an instance of ITablelandTables for the currently executing EVM chain.
@@ -65,70 +62,31 @@ library TablelandDeployments {
      *
      * - block.chainid must refer to a supported chain.
      */
-    function get() internal view returns (TablelandTablesImpl) {
+    function get() internal view returns (TablelandTables) {
         if (block.chainid == 1) {
-            return TablelandTablesImpl(MAINNET);
+            return TablelandTables(MAINNET);
         } else if (block.chainid == 10) {
-            return TablelandTablesImpl(OPTIMISM);
+            return TablelandTables(OPTIMISM);
         } else if (block.chainid == 42161) {
-            return TablelandTablesImpl(ARBITRUM);
+            return TablelandTables(ARBITRUM);
         } else if (block.chainid == 42170) {
-            return TablelandTablesImpl(ARBITRUM_NOVA);
+            return TablelandTables(ARBITRUM_NOVA);
         } else if (block.chainid == 137) {
-            return TablelandTablesImpl(MATIC);
+            return TablelandTables(MATIC);
         } else if (block.chainid == 314) {
-            return TablelandTablesImpl(FILECOIN);
+            return TablelandTables(FILECOIN);
         } else if (block.chainid == 11155111) {
-            return TablelandTablesImpl(SEPOLIA);
+            return TablelandTables(SEPOLIA);
         } else if (block.chainid == 420) {
-            return TablelandTablesImpl(OPTIMISM_GOERLI);
+            return TablelandTables(OPTIMISM_GOERLI);
         } else if (block.chainid == 421613) {
-            return TablelandTablesImpl(ARBITRUM_GOERLI);
+            return TablelandTables(ARBITRUM_GOERLI);
         } else if (block.chainid == 80001) {
-            return TablelandTablesImpl(MATICMUM);
+            return TablelandTables(MATICMUM);
         } else if (block.chainid == 314159) {
-            return TablelandTablesImpl(FILECOIN_CALIBRATION);
+            return TablelandTables(FILECOIN_CALIBRATION);
         } else if (block.chainid == 31337) {
-            return TablelandTablesImpl(LOCAL_TABLELAND);
-        } else {
-            revert ChainNotSupported(block.chainid);
-        }
-    }
-
-    /**
-     * @dev Returns an interface to Tableland for the currently executing EVM chain.
-     *
-     * The selection order is meant to reduce gas on more expensive chains.
-     *
-     * Requirements:
-     *
-     * - block.chainid must refer to a supported chain.
-     */
-    function getInterface() internal view returns (ITablelandTables) {
-        if (block.chainid == 1) {
-            return ITablelandTables(MAINNET);
-        } else if (block.chainid == 10) {
-            return ITablelandTables(OPTIMISM);
-        } else if (block.chainid == 42161) {
-            return ITablelandTables(ARBITRUM);
-        } else if (block.chainid == 42170) {
-            return ITablelandTables(ARBITRUM_NOVA);
-        } else if (block.chainid == 137) {
-            return ITablelandTables(MATIC);
-        } else if (block.chainid == 314) {
-            return ITablelandTables(FILECOIN);
-        } else if (block.chainid == 11155111) {
-            return ITablelandTables(SEPOLIA);
-        } else if (block.chainid == 420) {
-            return ITablelandTables(OPTIMISM_GOERLI);
-        } else if (block.chainid == 421613) {
-            return ITablelandTables(ARBITRUM_GOERLI);
-        } else if (block.chainid == 80001) {
-            return ITablelandTables(MATICMUM);
-        } else if (block.chainid == 314159) {
-            return ITablelandTables(FILECOIN_CALIBRATION);
-        } else if (block.chainid == 31337) {
-            return ITablelandTables(LOCAL_TABLELAND);
+            return TablelandTables(LOCAL_TABLELAND);
         } else {
             revert ChainNotSupported(block.chainid);
         }
