@@ -67,25 +67,28 @@ export const baseURIs: TablelandNetworkConfig = {
   "local-tableland": localTablelandURI,
 };
 
-// See validator for config for more details; these times consider the `NewBlockPollFreq` & `MinBlockDepth` values
+// Block polling periods in milliseconds. Takes into account the chain's block
+// time, validator block depth, and an additional block for a margin of safety.
+// See validator config for more details:
 // Mainnets: https://github.com/tablelandnetwork/go-tableland/blob/main/docker/deployed/mainnet/api/config.json
 // Testnets: https://github.com/tablelandnetwork/go-tableland/blob/main/docker/deployed/testnet/api/config.json
 export const blockPollingTimes: TablelandNetworkConfig = {
   // mainnets
-  mainnet: 20_000, // 10s polling with 1 block depth
-  homestead: 20_000, // 10s polling with 1 block depth
-  optimism: 5_000, // 5s polling with zero block depth
-  arbitrum: 5_000, // 5s polling with zero block depth
-  "arbitrum-nova": 5_000, // 5s polling with zero block depth
-  matic: 10_000, // 5s polling with 1 block depth
-  filecoin: 90_000, // 15s polling with 5 block depth
+  mainnet: 40_000,
+  homestead: 40_000,
+  optimism: 10_000,
+  arbitrum: 10_000,
+  "arbitrum-nova": 10_000,
+  matic: 15_000,
+  filecoin: 210_000,
   // testnets
-  sepolia: 20_000, // 10s polling with 1 block depth
-  "optimism-goerli": 5_000, // 5s polling with zero block depth
-  "arbitrum-goerli": 5_000, // 5s polling with zero block depth
-  maticmum: 10_000, // 5s polling with 1 block depth
-  "filecoin-calibration": 90_000, // 15s polling with 5 block depth
-  "optimism-goerli-staging": 5_000, // 5s polling with zero block depth
-  localhost: 5_000, // 1s polling with zero block depth
-  "local-tableland": 5_000, // 1s polling with zero block depth
+  sepolia: 40_000,
+  "optimism-goerli": 10_000,
+  "arbitrum-goerli": 10_000,
+  maticmum: 15_000,
+  "filecoin-calibration": 210_000,
+  "optimism-goerli-staging": 10_000,
+  // local
+  localhost: 5_000,
+  "local-tableland": 5_000,
 };
