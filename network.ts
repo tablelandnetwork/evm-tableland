@@ -72,7 +72,7 @@ export const baseURIs: TablelandNetworkConfig = {
 // See validator config for more details:
 // Mainnets: https://github.com/tablelandnetwork/go-tableland/blob/main/docker/deployed/mainnet/api/config.json
 // Testnets: https://github.com/tablelandnetwork/go-tableland/blob/main/docker/deployed/testnet/api/config.json
-export const blockPollingTimes: TablelandNetworkConfig = {
+export const validatorPollingTimeouts: TablelandNetworkConfig = {
   // mainnets
   mainnet: 40_000,
   homestead: 40_000,
