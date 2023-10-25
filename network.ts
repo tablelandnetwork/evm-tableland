@@ -1,23 +1,23 @@
 export interface TablelandNetworkConfig {
   // tableland testnet mainnets
-  mainnet: string;
-  homestead: string;
-  optimism: string;
-  arbitrum: string;
-  "arbitrum-nova": string;
-  matic: string;
-  filecoin: string;
+  mainnet: string | number;
+  homestead: string | number;
+  optimism: string | number;
+  arbitrum: string | number;
+  "arbitrum-nova": string | number;
+  matic: string | number;
+  filecoin: string | number;
   // tableland testnet testnets
-  sepolia: string;
-  "optimism-goerli": string;
-  "arbitrum-goerli": string;
-  maticmum: string;
-  "filecoin-calibration": string;
+  sepolia: string | number;
+  "optimism-goerli": string | number;
+  "arbitrum-goerli": string | number;
+  maticmum: string | number;
+  "filecoin-calibration": string | number;
   // tableland staging testnets
-  "optimism-goerli-staging": string;
+  "optimism-goerli-staging": string | number;
   // local tableland
-  localhost: string; // hardhat
-  "local-tableland": string; // hardhat backed by a local validator
+  localhost: string | number; // hardhat
+  "local-tableland": string | number; // hardhat backed by a local validator
 }
 
 const homesteadAddr = "0x012969f7e3439a9B04025b5a049EB9BAD82A8C12";
@@ -65,4 +65,30 @@ export const baseURIs: TablelandNetworkConfig = {
     "https://staging.tableland.network/api/v1/tables/420/",
   localhost: localTablelandURI,
   "local-tableland": localTablelandURI,
+};
+
+// Block polling periods in milliseconds. Takes into account the chain's block
+// time, validator block depth, and an additional block for a margin of safety.
+// See validator config for more details:
+// Mainnets: https://github.com/tablelandnetwork/go-tableland/blob/main/docker/deployed/mainnet/api/config.json
+// Testnets: https://github.com/tablelandnetwork/go-tableland/blob/main/docker/deployed/testnet/api/config.json
+export const validatorPollingTimeouts: TablelandNetworkConfig = {
+  // mainnets
+  mainnet: 40_000,
+  homestead: 40_000,
+  optimism: 10_000,
+  arbitrum: 10_000,
+  "arbitrum-nova": 10_000,
+  matic: 15_000,
+  filecoin: 210_000,
+  // testnets
+  sepolia: 40_000,
+  "optimism-goerli": 10_000,
+  "arbitrum-goerli": 10_000,
+  maticmum: 15_000,
+  "filecoin-calibration": 210_000,
+  "optimism-goerli-staging": 10_000,
+  // local
+  localhost: 5_000,
+  "local-tableland": 5_000,
 };

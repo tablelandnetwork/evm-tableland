@@ -102,9 +102,7 @@ describe("Validator, Chain, and SDK work end to end", function () {
       "db query execution failed (code: ACL, msg: not enough privileges)"
     );
 
-    const data2 = await db2
-      .prepare(`SELECT * FROM ${queryableName};`)
-      .raw();
+    const data2 = await db2.prepare(`SELECT * FROM ${queryableName};`).raw();
     expect(data2).to.eql([]);
   });
 
@@ -379,7 +377,7 @@ describe("Validator, Chain, and SDK work end to end", function () {
     );
 
     expect(typeof tableSchema.columns).to.eql("object");
-    expect(tableSchema.tableConstraints).to.eql(undefined);
+    expect(tableSchema.table_constraints).to.eql(undefined);
     expect(tableSchema.columns.length).to.eql(1);
     expect(tableSchema.columns[0].name).to.eql("a");
     expect(tableSchema.columns[0].type).to.eql("int");
