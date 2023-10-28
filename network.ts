@@ -43,26 +43,25 @@ export const proxies: TablelandNetworkConfig = {
   "local-tableland": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
 };
 
-const homesteadURI = "https://tableland.network/api/v1/tables/1/";
-const localTablelandURI = "http://localhost:8080/api/v1/tables/31337/";
+const homesteadURI = "https://tableland.network/api/v1/";
+const localTablelandURI = "http://localhost:8080/api/v1/";
 export const baseURIs: TablelandNetworkConfig = {
   // mainnets
   mainnet: homesteadURI,
   homestead: homesteadURI,
-  optimism: "https://tableland.network/api/v1/tables/10/",
-  arbitrum: "https://tableland.network/api/v1/tables/42161/",
-  "arbitrum-nova": "https://tableland.network/api/v1/tables/42170/",
-  matic: "https://tableland.network/api/v1/tables/137/",
-  filecoin: "https://tableland.network/api/v1/tables/314/",
+  optimism: "https://tableland.network/api/v1/",
+  arbitrum: "https://tableland.network/api/v1/",
+  "arbitrum-nova": "https://tableland.network/api/v1/",
+  matic: "https://tableland.network/api/v1/",
+  filecoin: "https://tableland.network/api/v1/",
   // testnets
-  sepolia: "https://testnets.tableland.network/api/v1/tables/11155111/",
-  "optimism-goerli": "https://testnets.tableland.network/api/v1/tables/420/",
-  "arbitrum-goerli": "https://testnets.tableland.network/api/v1/tables/421613/",
-  maticmum: "https://testnets.tableland.network/api/v1/tables/80001/",
-  "filecoin-calibration":
-    "https://testnets.tableland.network/api/v1/tables/314159/",
-  "optimism-goerli-staging":
-    "https://staging.tableland.network/api/v1/tables/420/",
+  sepolia: "https://testnets.tableland.network/api/v1/",
+  "optimism-goerli": "https://testnets.tableland.network/api/v1/",
+  "arbitrum-goerli": "https://testnets.tableland.network/api/v1/",
+  maticmum: "https://testnets.tableland.network/api/v1/",
+  "filecoin-calibration": "https://testnets.tableland.network/api/v1/",
+  "optimism-goerli-staging": "https://staging.tableland.network/api/v1/",
+  // local
   localhost: localTablelandURI,
   "local-tableland": localTablelandURI,
 };
