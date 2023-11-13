@@ -39,9 +39,9 @@ library TablelandDeployments {
     // TablelandTables address on Optimism Goerli.
     address internal constant OPTIMISM_GOERLI =
         0xC72E8a7Be04f2469f8C2dB3F1BdF69A7D516aBbA;
-    // TablelandTables address on Arbitrum Goerli.
-    address internal constant ARBITRUM_GOERLI =
-        0x033f69e8d119205089Ab15D340F5b797732f646b;
+    // TablelandTables address on Arbitrum Sepolia.
+    address internal constant ARBITRUM_SEPOLIA =
+        0x000000000000000000000000000000000000dEaD;
     // TablelandTables address on Polygon Mumbai.
     address internal constant MATICMUM =
         0x4b48841d4b32C4650E4ABc117A03FE8B51f38F68;
@@ -79,8 +79,8 @@ library TablelandDeployments {
             return TablelandTables(SEPOLIA);
         } else if (block.chainid == 420) {
             return TablelandTables(OPTIMISM_GOERLI);
-        } else if (block.chainid == 421613) {
-            return TablelandTables(ARBITRUM_GOERLI);
+        } else if (block.chainid == 421614) {
+            return TablelandTables(ARBITRUM_SEPOLIA);
         } else if (block.chainid == 80001) {
             return TablelandTables(MATICMUM);
         } else if (block.chainid == 314159) {

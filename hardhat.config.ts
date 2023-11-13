@@ -149,13 +149,13 @@ const config: HardhatUserConfig = {
           ? [process.env.OPTIMISM_GOERLI_PRIVATE_KEY]
           : [],
     },
-    "arbitrum-goerli": {
-      url: `https://arb-goerli.g.alchemy.com/v2/${
-        process.env.ARBITRUM_GOERLI_API_KEY ?? ""
+    "arbitrum-sepolia": {
+      url: `https://arb-sepolia.g.alchemy.com/v2/${
+        process.env.ARBITRUM_SEPOLIA_API_KEY ?? ""
       }`,
       accounts:
-        process.env.ARBITRUM_GOERLI_PRIVATE_KEY !== undefined
-          ? [process.env.ARBITRUM_GOERLI_PRIVATE_KEY]
+        process.env.ARBITRUM_SEPOLIA_PRIVATE_KEY !== undefined
+          ? [process.env.ARBITRUM_SEPOLIA_PRIVATE_KEY]
           : [],
     },
     maticmum: {

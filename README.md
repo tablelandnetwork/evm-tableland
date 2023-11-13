@@ -30,7 +30,7 @@ This is the Tableland Tables EVM contracts and client components.
 | filecoin             | 314      | 0x59EF8Bf2d6c102B4c42AEf9189e1a9F0ABfD652d |
 | sepolia              | 11155111 | 0xc50C62498448ACc8dBdE43DA77f8D5D2E2c7597D |
 | optimism-goerli      | 420      | 0xC72E8a7Be04f2469f8C2dB3F1BdF69A7D516aBbA |
-| arbitrum-goerli      | 421613   | 0x033f69e8d119205089Ab15D340F5b797732f646b |
+| arbitrum-sepolia     | 421614   | 0xTODO                                     |
 | maticmum             | 80001    | 0x4b48841d4b32C4650E4ABc117A03FE8B51f38F68 |
 | filecoin-calibration | 314159   | 0x030BCf3D50cad04c2e57391B12740982A9308621 |
 
