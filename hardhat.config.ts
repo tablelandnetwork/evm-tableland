@@ -64,7 +64,7 @@ const config: HardhatUserConfig = {
       // arbitrum
       arbitrumOne: process.env.ARBISCAN_API_KEY || "",
       arbitrumNova: process.env.ARBISCAN_NOVA_API_KEY || "",
-      arbitrumGoerli: process.env.ARBISCAN_API_KEY || "",
+      arbitrumSepolia: process.env.ARBISCAN_API_KEY || "",
 
       // polygon
       polygon: process.env.POLYSCAN_API_KEY || "",
@@ -77,6 +77,14 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: "https://api-nova.arbiscan.io/api",
           browserURL: "https://nova.arbiscan.io/",
+        },
+      },
+      {
+        network: "arbitrumSepolia",
+        chainId: 421614,
+        urls: {
+          apiURL: "https://api-sepolia.arbiscan.io/api",
+          browserURL: "https://sepolia.arbiscan.io/",
         },
       },
     ],

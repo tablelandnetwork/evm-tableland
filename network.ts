@@ -32,7 +32,7 @@ export const proxies: TablelandNetworkConfig = {
   filecoin: "0x59EF8Bf2d6c102B4c42AEf9189e1a9F0ABfD652d",
   sepolia: "0xc50C62498448ACc8dBdE43DA77f8D5D2E2c7597D",
   "optimism-goerli": "0xC72E8a7Be04f2469f8C2dB3F1BdF69A7D516aBbA",
-  "arbitrum-sepolia": "0xTODO",
+  "arbitrum-sepolia": "0x223A74B8323914afDC3ff1e5005564dC17231d6e",
   maticmum: "0x4b48841d4b32C4650E4ABc117A03FE8B51f38F68",
   "filecoin-calibration": "0x030BCf3D50cad04c2e57391B12740982A9308621",
   "optimism-goerli-staging": "0xfe79824f6E5894a3DD86908e637B7B4AF57eEE28",

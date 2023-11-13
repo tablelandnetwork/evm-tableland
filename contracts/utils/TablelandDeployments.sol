@@ -41,7 +41,7 @@ library TablelandDeployments {
         0xC72E8a7Be04f2469f8C2dB3F1BdF69A7D516aBbA;
     // TablelandTables address on Arbitrum Sepolia.
     address internal constant ARBITRUM_SEPOLIA =
-        0x000000000000000000000000000000000000dEaD;
+        0x223A74B8323914afDC3ff1e5005564dC17231d6e;
     // TablelandTables address on Polygon Mumbai.
     address internal constant MATICMUM =
         0x4b48841d4b32C4650E4ABc117A03FE8B51f38F68;
