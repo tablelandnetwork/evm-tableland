@@ -64,7 +64,7 @@ const config: HardhatUserConfig = {
       // arbitrum
       arbitrumOne: process.env.ARBISCAN_API_KEY || "",
       arbitrumNova: process.env.ARBISCAN_NOVA_API_KEY || "",
-      arbitrumGoerli: process.env.ARBISCAN_API_KEY || "",
+      arbitrumSepolia: process.env.ARBISCAN_API_KEY || "",
 
       // polygon
       polygon: process.env.POLYSCAN_API_KEY || "",
@@ -77,6 +77,14 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: "https://api-nova.arbiscan.io/api",
           browserURL: "https://nova.arbiscan.io/",
+        },
+      },
+      {
+        network: "arbitrumSepolia",
+        chainId: 421614,
+        urls: {
+          apiURL: "https://api-sepolia.arbiscan.io/api",
+          browserURL: "https://sepolia.arbiscan.io/",
         },
       },
     ],
@@ -149,13 +157,13 @@ const config: HardhatUserConfig = {
           ? [process.env.OPTIMISM_GOERLI_PRIVATE_KEY]
           : [],
     },
-    "arbitrum-goerli": {
-      url: `https://arb-goerli.g.alchemy.com/v2/${
-        process.env.ARBITRUM_GOERLI_API_KEY ?? ""
+    "arbitrum-sepolia": {
+      url: `https://arb-sepolia.g.alchemy.com/v2/${
+        process.env.ARBITRUM_SEPOLIA_API_KEY ?? ""
       }`,
       accounts:
-        process.env.ARBITRUM_GOERLI_PRIVATE_KEY !== undefined
-          ? [process.env.ARBITRUM_GOERLI_PRIVATE_KEY]
+        process.env.ARBITRUM_SEPOLIA_PRIVATE_KEY !== undefined
+          ? [process.env.ARBITRUM_SEPOLIA_PRIVATE_KEY]
           : [],
     },
     maticmum: {
