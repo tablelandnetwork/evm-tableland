@@ -1,7 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.10 <0.9.0;
 
-import {TablelandTables} from "../TablelandTables.sol";
+import {ITablelandTables} from "../interfaces/ITablelandTables.sol";
+import {IERC721AUpgradeable} from "erc721a-upgradeable/contracts/IERC721AUpgradeable.sol";
+
+interface TablelandTablesImpl is ITablelandTables, IERC721AUpgradeable {}
 
 /**
  * @dev Helper library for getting an instance of ITablelandTables for the currently executing EVM chain.
@@ -62,31 +65,31 @@ library TablelandDeployments {
      *
      * - block.chainid must refer to a supported chain.
      */
-    function get() internal view returns (TablelandTables) {
+    function get() internal view returns (TablelandTablesImpl) {
         if (block.chainid == 1) {
-            return TablelandTables(MAINNET);
+            return TablelandTablesImpl(MAINNET);
         } else if (block.chainid == 10) {
-            return TablelandTables(OPTIMISM);
+            return TablelandTablesImpl(OPTIMISM);
         } else if (block.chainid == 42161) {
-            return TablelandTables(ARBITRUM);
+            return TablelandTablesImpl(ARBITRUM);
         } else if (block.chainid == 42170) {
-            return TablelandTables(ARBITRUM_NOVA);
+            return TablelandTablesImpl(ARBITRUM_NOVA);
         } else if (block.chainid == 137) {
-            return TablelandTables(MATIC);
+            return TablelandTablesImpl(MATIC);
         } else if (block.chainid == 314) {
-            return TablelandTables(FILECOIN);
+            return TablelandTablesImpl(FILECOIN);
         } else if (block.chainid == 11155111) {
-            return TablelandTables(SEPOLIA);
+            return TablelandTablesImpl(SEPOLIA);
         } else if (block.chainid == 420) {
-            return TablelandTables(OPTIMISM_GOERLI);
+            return TablelandTablesImpl(OPTIMISM_GOERLI);
         } else if (block.chainid == 421614) {
-            return TablelandTables(ARBITRUM_SEPOLIA);
+            return TablelandTablesImpl(ARBITRUM_SEPOLIA);
         } else if (block.chainid == 80001) {
-            return TablelandTables(MATICMUM);
+            return TablelandTablesImpl(MATICMUM);
         } else if (block.chainid == 314159) {
-            return TablelandTables(FILECOIN_CALIBRATION);
+            return TablelandTablesImpl(FILECOIN_CALIBRATION);
         } else if (block.chainid == 31337) {
-            return TablelandTables(LOCAL_TABLELAND);
+            return TablelandTablesImpl(LOCAL_TABLELAND);
         } else {
             revert ChainNotSupported(block.chainid);
         }
