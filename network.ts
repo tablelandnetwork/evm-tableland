@@ -9,12 +9,10 @@ export interface TablelandNetworkConfig {
   filecoin: string | number;
   // tableland testnet testnets
   sepolia: string | number;
-  "optimism-goerli": string | number;
+  "optimism-sepolia": string | number;
   "arbitrum-sepolia": string | number;
   maticmum: string | number;
   "filecoin-calibration": string | number;
-  // tableland staging testnets
-  "optimism-goerli-staging": string | number;
   // local tableland
   localhost: string | number; // hardhat
   "local-tableland": string | number; // hardhat backed by a local validator
@@ -31,11 +29,10 @@ export const proxies: TablelandNetworkConfig = {
   matic: "0x5c4e6A9e5C1e1BF445A062006faF19EA6c49aFeA",
   filecoin: "0x59EF8Bf2d6c102B4c42AEf9189e1a9F0ABfD652d",
   sepolia: "0xc50C62498448ACc8dBdE43DA77f8D5D2E2c7597D",
-  "optimism-goerli": "0xC72E8a7Be04f2469f8C2dB3F1BdF69A7D516aBbA",
+  "optimism-sepolia": ... TODO,
   "arbitrum-sepolia": "0x223A74B8323914afDC3ff1e5005564dC17231d6e",
   maticmum: "0x4b48841d4b32C4650E4ABc117A03FE8B51f38F68",
   "filecoin-calibration": "0x030BCf3D50cad04c2e57391B12740982A9308621",
-  "optimism-goerli-staging": "0xfe79824f6E5894a3DD86908e637B7B4AF57eEE28",
   // localhost is a stand alone node
   localhost: "",
   // local-tableland implies that a validator is also running. the proxy address will always be
@@ -56,14 +53,12 @@ export const baseURIs: TablelandNetworkConfig = {
   filecoin: "https://tableland.network/api/v1/tables/314/",
   // testnets
   sepolia: "https://testnets.tableland.network/api/v1/tables/11155111/",
-  "optimism-goerli": "https://testnets.tableland.network/api/v1/tables/420/",
+  "optimism-sepolia": "https://testnets.tableland.network/api/v1/tables/11155420/",
   "arbitrum-sepolia":
     "https://testnets.tableland.network/api/v1/tables/421614/",
   maticmum: "https://testnets.tableland.network/api/v1/tables/80001/",
   "filecoin-calibration":
     "https://testnets.tableland.network/api/v1/tables/314159/",
-  "optimism-goerli-staging":
-    "https://staging.tableland.network/api/v1/tables/420/",
   localhost: localTablelandURI,
   "local-tableland": localTablelandURI,
 };
@@ -84,11 +79,10 @@ export const validatorPollingTimeouts: TablelandNetworkConfig = {
   filecoin: 210_000,
   // testnets
   sepolia: 40_000,
-  "optimism-goerli": 10_000,
+  "optimism-sepolia": 10_000,
   "arbitrum-sepolia": 10_000,
   maticmum: 15_000,
   "filecoin-calibration": 210_000,
-  "optimism-goerli-staging": 10_000,
   // local
   localhost: 5_000,
   "local-tableland": 5_000,
