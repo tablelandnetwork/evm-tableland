@@ -59,7 +59,7 @@ const config: HardhatUserConfig = {
 
       // optimism
       optimisticEthereum: process.env.OPTIMISM_ETHERSCAN_API_KEY || "",
-      optimisticGoerli: process.env.OPTIMISM_ETHERSCAN_API_KEY || "",
+      optimisticSepolia: process.env.OPTIMISM_ETHERSCAN_API_KEY || "",
 
       // arbitrum
       arbitrumOne: process.env.ARBISCAN_API_KEY || "",
@@ -71,6 +71,14 @@ const config: HardhatUserConfig = {
       polygonMumbai: process.env.POLYSCAN_API_KEY || "",
     },
     customChains: [
+      {
+        network: "optimisticSepolia",
+        chainId: 11155420,
+        urls: {
+          apiURL: "https://api-sepolia-optimistic.etherscan.io/api",
+          browserURL: "https://sepolia-optimism.etherscan.io/",
+        },
+      },
       {
         network: "arbitrumNova",
         chainId: 42170,
@@ -148,13 +156,13 @@ const config: HardhatUserConfig = {
           ? [process.env.ETHEREUM_SEPOLIA_PRIVATE_KEY]
           : [],
     },
-    "optimism-goerli": {
-      url: `https://opt-goerli.g.alchemy.com/v2/${
-        process.env.OPTIMISM_GOERLI_API_KEY ?? ""
+    "optimism-sepolia": {
+      url: `https://opt-sepolia.g.alchemy.com/v2/${
+        process.env.OPTIMISM_SEPOLIA_API_KEY ?? ""
       }`,
       accounts:
-        process.env.OPTIMISM_GOERLI_PRIVATE_KEY !== undefined
-          ? [process.env.OPTIMISM_GOERLI_PRIVATE_KEY]
+        process.env.OPTIMISM_SEPOLIA_PRIVATE_KEY !== undefined
+          ? [process.env.OPTIMISM_SEPOLIA_PRIVATE_KEY]
           : [],
     },
     "arbitrum-sepolia": {
@@ -185,13 +193,13 @@ const config: HardhatUserConfig = {
           : [],
     },
     // devnets
-    "optimism-goerli-staging": {
-      url: `https://opt-goerli.g.alchemy.com/v2/${
-        process.env.OPTIMISM_GOERLI_STAGING_API_KEY ?? ""
+    "optimism-sepolia-staging": {
+      url: `https://opt-sepolia.g.alchemy.com/v2/${
+        process.env.OPTIMISM_SEPOLIA_STAGING_API_KEY ?? ""
       }`,
       accounts:
-        process.env.OPTIMISM_GOERLI_STAGING_PRIVATE_KEY !== undefined
-          ? [process.env.OPTIMISM_GOERLI_STAGING_PRIVATE_KEY]
+        process.env.OPTIMISM_SEPOLIA_STAGING_PRIVATE_KEY !== undefined
+          ? [process.env.OPTIMISM_SEPOLIA_STAGING_PRIVATE_KEY]
           : [],
     },
     hardhat: {
