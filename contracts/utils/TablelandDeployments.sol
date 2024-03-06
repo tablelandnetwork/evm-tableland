@@ -39,9 +39,9 @@ library TablelandDeployments {
     // TablelandTables address on Ethereum Sepolia.
     address internal constant SEPOLIA =
         0xc50C62498448ACc8dBdE43DA77f8D5D2E2c7597D;
-    // TablelandTables address on Optimism Goerli.
-    address internal constant OPTIMISM_GOERLI =
-        0xC72E8a7Be04f2469f8C2dB3F1BdF69A7D516aBbA;
+    // TablelandTables address on Optimism Sepolia.
+    address internal constant OPTIMISM_SEPOLIA =
+        0x68A2f4423ad3bf5139Db563CF3bC80aA09ed7079;
     // TablelandTables address on Arbitrum Sepolia.
     address internal constant ARBITRUM_SEPOLIA =
         0x223A74B8323914afDC3ff1e5005564dC17231d6e;
@@ -80,8 +80,8 @@ library TablelandDeployments {
             return TablelandTablesImpl(FILECOIN);
         } else if (block.chainid == 11155111) {
             return TablelandTablesImpl(SEPOLIA);
-        } else if (block.chainid == 420) {
-            return TablelandTablesImpl(OPTIMISM_GOERLI);
+        } else if (block.chainid == 11155420) {
+            return TablelandTablesImpl(OPTIMISM_SEPOLIA);
         } else if (block.chainid == 421614) {
             return TablelandTablesImpl(ARBITRUM_SEPOLIA);
         } else if (block.chainid == 80001) {
@@ -119,9 +119,9 @@ library TablelandDeployments {
             return "https://tableland.network/api/v1/";
         } else if (block.chainid == 11155111) {
             return "https://testnets.tableland.network/api/v1/";
-        } else if (block.chainid == 420) {
+        } else if (block.chainid == 11155420) {
             return "https://testnets.tableland.network/api/v1/";
-        } else if (block.chainid == 421613) {
+        } else if (block.chainid == 421614) {
             return "https://testnets.tableland.network/api/v1/";
         } else if (block.chainid == 80001) {
             return "https://testnets.tableland.network/api/v1/";
