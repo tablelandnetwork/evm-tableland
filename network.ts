@@ -13,8 +13,8 @@ export interface TablelandNetworkConfig {
   "arbitrum-sepolia": string | number;
   maticmum: string | number;
   "filecoin-calibration": string | number;
-  // tableland testnet devnets
-  "optimism-sepolia-staging": string | number;
+  // tableland testnet devnets (uncomment when needed for admin)
+  // "optimism-sepolia-staging": string | number;
   // local tableland
   localhost: string | number; // hardhat
   "local-tableland": string | number; // hardhat backed by a local validator
@@ -37,8 +37,8 @@ export const proxies: TablelandNetworkConfig = {
   "arbitrum-sepolia": "0x223A74B8323914afDC3ff1e5005564dC17231d6e",
   maticmum: "0x4b48841d4b32C4650E4ABc117A03FE8B51f38F68",
   "filecoin-calibration": "0x030BCf3D50cad04c2e57391B12740982A9308621",
-  // devnets
-  "optimism-sepolia-staging": "0xinternal",
+  // devnets (uncomment when needed for admin)
+  // "optimism-sepolia-staging": "0xinternal",
   // localhost is a stand alone node
   localhost: "",
   // local-tableland implies that a validator is also running. the proxy address will always be
@@ -66,9 +66,9 @@ export const baseURIs: TablelandNetworkConfig = {
   maticmum: "https://testnets.tableland.network/api/v1/tables/80001/",
   "filecoin-calibration":
     "https://testnets.tableland.network/api/v1/tables/314159/",
-  // devnets
-  "optimism-sepolia-staging":
-    "https://testnets.tableland.network/api/v1/tables/11155420/",
+  // devnets (uncomment when needed for admin)
+  // "optimism-sepolia-staging":
+  //   "https://testnets.tableland.network/api/v1/tables/11155420/",
   // local
   localhost: localTablelandURI,
   "local-tableland": localTablelandURI,
@@ -94,8 +94,8 @@ export const validatorPollingTimeouts: TablelandNetworkConfig = {
   "arbitrum-sepolia": 10_000,
   maticmum: 15_000,
   "filecoin-calibration": 210_000,
-  // devnets
-  "optimism-sepolia-staging": 10_000,
+  // devnets (uncomment when needed for admin)
+  // "optimism-sepolia-staging": 10_000,
   // local
   localhost: 5_000,
   "local-tableland": 5_000,
