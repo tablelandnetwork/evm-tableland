@@ -5,13 +5,13 @@ export interface TablelandNetworkConfig {
   optimism: string | number;
   arbitrum: string | number;
   "arbitrum-nova": string | number;
-  matic: string | number;
+  polygon: string | number;
   filecoin: string | number;
   // tableland testnet testnets
   sepolia: string | number;
   "optimism-sepolia": string | number;
   "arbitrum-sepolia": string | number;
-  maticmum: string | number;
+  "polygon-amoy": string | number;
   "filecoin-calibration": string | number;
   // tableland testnet devnets (uncomment when needed for admin)
   // "optimism-sepolia-staging": string | number;
@@ -29,13 +29,13 @@ export const proxies: TablelandNetworkConfig = {
   optimism: "0xfad44BF5B843dE943a09D4f3E84949A11d3aa3e6",
   arbitrum: "0x9aBd75E8640871A5a20d3B4eE6330a04c962aFfd",
   "arbitrum-nova": "0x1A22854c5b1642760a827f20137a67930AE108d2",
-  matic: "0x5c4e6A9e5C1e1BF445A062006faF19EA6c49aFeA",
+  polygon: "0x5c4e6A9e5C1e1BF445A062006faF19EA6c49aFeA",
   filecoin: "0x59EF8Bf2d6c102B4c42AEf9189e1a9F0ABfD652d",
   // testnets
   sepolia: "0xc50C62498448ACc8dBdE43DA77f8D5D2E2c7597D",
   "optimism-sepolia": "0x68A2f4423ad3bf5139Db563CF3bC80aA09ed7079",
   "arbitrum-sepolia": "0x223A74B8323914afDC3ff1e5005564dC17231d6e",
-  maticmum: "0x4b48841d4b32C4650E4ABc117A03FE8B51f38F68",
+  "polygon-amoy": "TODO: add the address once it deployed",
   "filecoin-calibration": "0x030BCf3D50cad04c2e57391B12740982A9308621",
   // devnets (uncomment when needed for admin)
   // "optimism-sepolia-staging": "0xinternal",
@@ -55,7 +55,7 @@ export const baseURIs: TablelandNetworkConfig = {
   optimism: "https://tableland.network/api/v1/tables/10/",
   arbitrum: "https://tableland.network/api/v1/tables/42161/",
   "arbitrum-nova": "https://tableland.network/api/v1/tables/42170/",
-  matic: "https://tableland.network/api/v1/tables/137/",
+  polygon: "https://tableland.network/api/v1/tables/137/",
   filecoin: "https://tableland.network/api/v1/tables/314/",
   // testnets
   sepolia: "https://testnets.tableland.network/api/v1/tables/11155111/",
@@ -63,7 +63,7 @@ export const baseURIs: TablelandNetworkConfig = {
     "https://testnets.tableland.network/api/v1/tables/11155420/",
   "arbitrum-sepolia":
     "https://testnets.tableland.network/api/v1/tables/421614/",
-  maticmum: "https://testnets.tableland.network/api/v1/tables/80001/",
+  "polygon-amoy": "https://testnets.tableland.network/api/v1/tables/80002/",
   "filecoin-calibration":
     "https://testnets.tableland.network/api/v1/tables/314159/",
   // devnets (uncomment when needed for admin)
@@ -86,13 +86,13 @@ export const validatorPollingTimeouts: TablelandNetworkConfig = {
   optimism: 10_000,
   arbitrum: 10_000,
   "arbitrum-nova": 10_000,
-  matic: 15_000,
+  polygon: 15_000,
   filecoin: 210_000,
   // testnets
   sepolia: 40_000,
   "optimism-sepolia": 10_000,
   "arbitrum-sepolia": 10_000,
-  maticmum: 15_000,
+  "polygon-amoy": 15_000,
   "filecoin-calibration": 210_000,
   // devnets (uncomment when needed for admin)
   // "optimism-sepolia-staging": 10_000,
