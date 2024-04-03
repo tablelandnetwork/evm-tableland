@@ -68,7 +68,7 @@ const config: HardhatUserConfig = {
 
       // polygon
       polygon: process.env.POLYSCAN_API_KEY || "",
-      polygonMumbai: process.env.POLYSCAN_API_KEY || "",
+      polygonAmoy: process.env.OKLINK_API_KEY || "",
     },
     customChains: [
       {
@@ -93,6 +93,15 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: "https://api-sepolia.arbiscan.io/api",
           browserURL: "https://sepolia.arbiscan.io/",
+        },
+      },
+      {
+        network: "polygonAmoy",
+        chainId: 80002,
+        urls: {
+          apiURL:
+            "https://www.oklink.com/api/explorer/v1/polygonamoy/contract/verify/async",
+          browserURL: "https://www.oklink.com/amoy",
         },
       },
     ],
@@ -128,7 +137,7 @@ const config: HardhatUserConfig = {
           ? [process.env.ARBITRUM_NOVA_PRIVATE_KEY]
           : [],
     },
-    matic: {
+    polygon: {
       url: `https://polygon-mainnet.g.alchemy.com/v2/${
         process.env.POLYGON_API_KEY ?? ""
       }`,
@@ -174,13 +183,13 @@ const config: HardhatUserConfig = {
           ? [process.env.ARBITRUM_SEPOLIA_PRIVATE_KEY]
           : [],
     },
-    maticmum: {
-      url: `https://polygon-mumbai.g.alchemy.com/v2/${
-        process.env.POLYGON_MUMBAI_API_KEY ?? ""
+    "polygon-amoy": {
+      url: `https://polygon-amoy.g.alchemy.com/v2/${
+        process.env.POLYGON_AMOY_API_KEY ?? ""
       }`,
       accounts:
-        process.env.POLYGON_MUMBAI_PRIVATE_KEY !== undefined
-          ? [process.env.POLYGON_MUMBAI_PRIVATE_KEY]
+        process.env.POLYGON_AMOY_PRIVATE_KEY !== undefined
+          ? [process.env.POLYGON_AMOY_PRIVATE_KEY]
           : [],
     },
     "filecoin-calibration": {
