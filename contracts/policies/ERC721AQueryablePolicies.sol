@@ -2,7 +2,7 @@
 pragma solidity >=0.8.10 <0.9.0;
 
 import {ERC721AQueryable} from "erc721a/contracts/extensions/ERC721AQueryable.sol";
-import {StringsUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
+import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 
 /**
  * @dev Library containing {ERC721AQueryable}-related helper methods for writing {TablelandPolicy}s.
@@ -44,7 +44,7 @@ library ERC721AQueryablePolicies {
         // Build in set clause with list of the tokens owned by caller
         bytes memory inSet = bytes.concat(bytes(column), " in(");
         for (uint256 i = 0; i < tokens.length; i++) {
-            bytes memory id = bytes(StringsUpgradeable.toString(tokens[i]));
+            bytes memory id = bytes(Strings.toString(tokens[i]));
             if (i == 0) {
                 inSet = bytes.concat(inSet, id);
             } else {

@@ -102,10 +102,9 @@ describe("TablelandTables", function () {
     const createStatement2 = "create table test2 (int a);";
     let tx = await tables
       .connect(owner)
-      ["create(address,string[])"](owner.address, [
-        createStatement1,
-        createStatement2,
-      ]);
+      [
+        "create(address,string[])"
+      ](owner.address, [createStatement1, createStatement2]);
     let receipt = await tx.wait();
     let [mintEvent1, createEvent1, mintEvent2, createEvent2] =
       receipt.events ?? [];
@@ -129,10 +128,9 @@ describe("TablelandTables", function () {
     const sender = accounts[5];
     tx = await tables
       .connect(sender)
-      ["create(address,string[])"](owner.address, [
-        createStatement1,
-        createStatement2,
-      ]);
+      [
+        "create(address,string[])"
+      ](owner.address, [createStatement1, createStatement2]);
     receipt = await tx.wait();
     [mintEvent1, createEvent1, mintEvent2, createEvent2] = receipt.events ?? [];
     expect(mintEvent1.args!.tokenId).to.equal(BigNumber.from(3));
@@ -165,11 +163,9 @@ describe("TablelandTables", function () {
     await expect(
       tables
         .connect(owner)
-        ["mutate(address,uint256,string)"](
-          owner.address,
-          BigNumber.from(1),
-          runStatement
-        )
+        [
+          "mutate(address,uint256,string)"
+        ](owner.address, BigNumber.from(1), runStatement)
     ).to.be.revertedWithCustomError(tables, "Unauthorized");
 
     const createStatement = "create table testing (int a);";
@@ -196,11 +192,9 @@ describe("TablelandTables", function () {
     const nonOwner = accounts[5];
     tx = await tables
       .connect(nonOwner)
-      ["mutate(address,uint256,string)"](
-        nonOwner.address,
-        tableId,
-        runStatement
-      );
+      [
+        "mutate(address,uint256,string)"
+      ](nonOwner.address, tableId, runStatement);
     receipt = await tx.wait();
     [runEvent] = receipt.events ?? [];
     expect(runEvent.args!.caller).to.equal(nonOwner.address);
@@ -215,11 +209,9 @@ describe("TablelandTables", function () {
     await expect(
       tables
         .connect(sender)
-        ["mutate(address,uint256,string)"](
-          caller.address,
-          tableId,
-          runStatement
-        )
+        [
+          "mutate(address,uint256,string)"
+        ](caller.address, tableId, runStatement)
     ).to.be.revertedWithCustomError(tables, "Unauthorized");
 
     // Test contract owner can not run SQL on behalf of another account
@@ -235,11 +227,9 @@ describe("TablelandTables", function () {
     await expect(
       tables
         .connect(contractOwner)
-        ["mutate(address,uint256,string)"](
-          caller.address,
-          tableId,
-          runStatement
-        )
+        [
+          "mutate(address,uint256,string)"
+        ](caller.address, tableId, runStatement)
     ).to.be.revertedWithCustomError(tables, "Unauthorized");
   });
 
@@ -488,11 +478,9 @@ describe("TablelandTables", function () {
     await expect(
       tables
         .connect(owner)
-        ["mutate(address,uint256,string)"](
-          owner.address,
-          tableId,
-          runStatement1
-        )
+        [
+          "mutate(address,uint256,string)"
+        ](owner.address, tableId, runStatement1)
     ).to.be.revertedWith("Pausable: paused");
   });
 
@@ -671,10 +659,9 @@ describe("TablelandTables", function () {
 
     tx = await tables
       .connect(owner)
-      ["create(address,string)"](
-        owner.address,
-        "create table testing (int a);"
-      );
+      [
+        "create(address,string)"
+      ](owner.address, "create table testing (int a);");
     await tx.wait();
     const tokenURI = await tables.tokenURI(1);
     expect(tokenURI).includes("https://fake.com/");
@@ -714,10 +701,9 @@ describe("TablelandTables", function () {
     await expect(
       tables
         .connect(owner)
-        ["create(address,string[])"](owner.address, [
-          "insert into testing values (0);",
-          "insert into testing values (0);",
-        ])
+        [
+          "create(address,string[])"
+        ](owner.address, ["insert into testing values (0);", "insert into testing values (0);"])
     ).to.be.revertedWith("Pausable: paused");
 
     // Test setting controller is paused

@@ -4,7 +4,7 @@ import type { TablelandTables } from "../typechain-types";
 import assert from "assert";
 
 const sleep = promisify(setTimeout);
-const pollTimeout = 60 * 10 * 1000; // 10 min timeout (required for Filecoin)
+const pollTimeout = 60 * 1 * 1000; // 10 min timeout (required for Filecoin)
 const pollInterval = 5000;
 
 async function main() {
@@ -16,6 +16,8 @@ async function main() {
     throw Error("missing provider");
   }
 
+  const feeData = await account.provider.getFeeData();
+  console.log("fee data: ", feeData);
   // Get base URI
   if (baseURI === undefined || baseURI === "") {
     throw Error(`missing baseURIs entry for '${network.name}'`);
@@ -29,8 +31,13 @@ async function main() {
 
   // Deploy proxy
   const Factory = await ethers.getContractFactory("TablelandTables");
+  console.log("got factory");
   const tables = await (
     (await upgrades.deployProxy(Factory, [baseURI], {
+      maxFeePerGas: 2000000030,
+      maxPriorityFeePerGas: 2000000000,
+      gasPrice: 700000000015,
+
       kind: "uups",
       timeout: pollTimeout,
       pollingInterval: pollInterval,

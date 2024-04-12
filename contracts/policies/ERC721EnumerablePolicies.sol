@@ -2,7 +2,7 @@
 pragma solidity >=0.8.10 <0.9.0;
 
 import {ERC721Enumerable} from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import {StringsUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
+import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 
 /**
  * @dev Library containing {ERC721Enumerable}-related helper methods for writing {TablelandPolicy}s.
@@ -42,7 +42,7 @@ library ERC721EnumerablePolicies {
         bytes memory inSet = bytes.concat(bytes(column), " in(");
         for (uint256 i = 0; i < balance; i++) {
             bytes memory id = bytes(
-                StringsUpgradeable.toString(
+                Strings.toString(
                     token.tokenOfOwnerByIndex(caller, i)
                 )
             );

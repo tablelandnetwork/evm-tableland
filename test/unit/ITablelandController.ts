@@ -152,11 +152,9 @@ describe("ITablelandController", function () {
     ).to.be.revertedWithCustomError(tables, "Unauthorized");
     tx = await tables
       .connect(eoaController)
-      ["runSQL(address,uint256,string)"](
-        eoaController.address,
-        tableId,
-        runStatement
-      );
+      [
+        "runSQL(address,uint256,string)"
+      ](eoaController.address, tableId, runStatement);
     await tx.wait();
 
     // Test setting controller to a contract address
@@ -335,11 +333,9 @@ describe("ITablelandController", function () {
     await expect(
       tables
         .connect(caller)
-        ["runSQL(address,uint256,string)"](
-          caller.address,
-          tableId,
-          runStatement
-        )
+        [
+          "runSQL(address,uint256,string)"
+        ](caller.address, tableId, runStatement)
     ).to.be.revertedWithCustomError(controller, "InsufficientValue");
 
     // Test that run SQL on table is gated by ether (with revert/require)
@@ -354,14 +350,11 @@ describe("ITablelandController", function () {
     await expect(
       tables
         .connect(caller)
-        ["runSQL(address,uint256,string)"](
-          caller.address,
-          tableId,
-          runStatement,
-          {
-            value,
-          }
-        )
+        [
+          "runSQL(address,uint256,string)"
+        ](caller.address, tableId, runStatement, {
+          value,
+        })
     ).to.be.revertedWithCustomError(
       enumPolicyLib,
       "ERC721EnumerablePoliciesUnauthorized"
@@ -383,14 +376,11 @@ describe("ITablelandController", function () {
     await expect(
       tables
         .connect(caller)
-        ["runSQL(address,uint256,string)"](
-          caller.address,
-          tableId,
-          runStatement,
-          {
-            value,
-          }
-        )
+        [
+          "runSQL(address,uint256,string)"
+        ](caller.address, tableId, runStatement, {
+          value,
+        })
     ).to.be.revertedWithCustomError(
       queryablePolicyLib,
       "ERC721AQueryablePoliciesUnauthorized"
@@ -403,12 +393,9 @@ describe("ITablelandController", function () {
     // Caller should be able to run SQL now
     tx = await tables
       .connect(caller)
-      ["runSQL(address,uint256,string)"](
-        caller.address,
-        tableId,
-        runStatement,
-        { value }
-      );
+      [
+        "runSQL(address,uint256,string)"
+      ](caller.address, tableId, runStatement, { value });
     receipt = await tx.wait();
     let [runEvent] = receipt.events ?? [];
     expect(runEvent.args!.caller).to.equal(caller.address);
@@ -444,12 +431,9 @@ describe("ITablelandController", function () {
     // Where clause should reflect all owned tokens
     tx = await tables
       .connect(caller)
-      ["runSQL(address,uint256,string)"](
-        caller.address,
-        tableId,
-        runStatement,
-        { value }
-      );
+      [
+        "runSQL(address,uint256,string)"
+      ](caller.address, tableId, runStatement, { value });
     receipt = await tx.wait();
     [runEvent] = receipt.events ?? [];
     expect(runEvent.args!.caller).to.equal(caller.address);
