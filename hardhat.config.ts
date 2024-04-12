@@ -68,7 +68,7 @@ const config: HardhatUserConfig = {
 
       // polygon
       polygon: process.env.POLYSCAN_API_KEY || "",
-      polygonAmoy: process.env.POLYSCAN_API_KEY || "",
+      polygonAmoy: process.env.OKLINK_API_KEY || "",
     },
     customChains: [
       {
@@ -93,6 +93,15 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: "https://api-sepolia.arbiscan.io/api",
           browserURL: "https://sepolia.arbiscan.io/",
+        },
+      },
+      {
+        network: "polygonAmoy",
+        chainId: 80002,
+        urls: {
+          apiURL:
+            "https://www.oklink.com/api/explorer/v1/polygonamoy/contract/verify/async",
+          browserURL: "https://www.oklink.com/amoy",
         },
       },
     ],
