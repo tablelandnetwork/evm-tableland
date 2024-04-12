@@ -28,20 +28,22 @@ async function main() {
 
   // Upgrade proxy
   const Factory = await ethers.getContractFactory("TablelandTables");
-  const tables = await (
-    (await upgrades.upgradeProxy(proxy, Factory, {
-      kind: "uups",
-      timeout: pollTimeout,
-      pollingInterval: pollInterval,
-    })) as TablelandTables
-  ).deployed();
-  assert(tables.address === proxy, "proxy address changed");
+  // @ts-expect-error ignore `Conversion of type 'Contract'` error since this returns a
+  // `BaseContract` of which `TablelandTables` extends
+  const proxyInstance = (await upgrades.upgradeProxy(proxy, Factory, {
+    kind: "uups",
+    timeout: pollTimeout,
+    pollingInterval: pollInterval,
+  })) as TablelandTables;
+  const tables = await proxyInstance.waitForDeployment();
+
+  assert((await tables.getAddress()) === proxy, "proxy address changed");
 
   // Check new implementation
   // Note: We poll here because the new impl won't be visible from the proxy until the next tipset on Filecoin.
   // Note: See https://docs.filecoin.io/smart-contracts/developing-contracts/best-practices/#consistently-generating-transaction-receipts.
   const startTime = Date.now();
-  while (!(await checkNewImpl(tables.address, impl))) {
+  while (!(await checkNewImpl(await tables.getAddress(), impl))) {
     const elapsedTime = Date.now() - startTime;
     if (elapsedTime >= pollTimeout) {
       console.warn("\nProxy implementation did not change. Is this expected?");
