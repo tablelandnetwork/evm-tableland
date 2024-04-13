@@ -30,12 +30,16 @@ async function main() {
 
   // Deploy proxy
   const Factory = await ethers.getContractFactory("TablelandTables");
+  // Needed for Polygon Amoy—doesn't hurt to include elsewhere, though
+  const { maxFeePerGas, maxPriorityFeePerGas } =
+    await ethers.provider.getFeeData();
   // @ts-expect-error ignore `Conversion of type 'Contract'` error since
   // `Contract` is subclass of `BaseContract` of which `TablelandTables` extends
   const proxyDeploy = (await upgrades.deployProxy(Factory, [baseURI], {
     kind: "uups",
     timeout: pollTimeout,
     pollingInterval: pollInterval,
+    txOverrides: { maxFeePerGas, maxPriorityFeePerGas },
   })) as TablelandTables;
   const tables = await proxyDeploy.waitForDeployment();
 
