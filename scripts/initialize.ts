@@ -4,6 +4,7 @@
 // implementation, making this script unnecessary after the next upgrade.
 
 import { ethers, network, baseURI, proxy, upgrades } from "hardhat";
+import type { TablelandTables } from "../typechain-types";
 
 async function main() {
   console.log(`\nInitializing on '${network.name}'...`);
@@ -33,10 +34,10 @@ async function main() {
   // Initialize
   const tables = (await ethers.getContractFactory("TablelandTables")).attach(
     impl
-  );
+  ) as TablelandTables;
   const tx = await tables.initialize(baseURI);
   const receipt = await tx.wait();
-  console.log(`initialized with tx '${receipt.transactionHash}'`);
+  console.log(`initialized with tx '${receipt?.hash}'`);
 }
 
 main().catch((error) => {

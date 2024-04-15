@@ -1,4 +1,5 @@
 import { ethers, network, baseURI, proxy } from "hardhat";
+import type { TablelandTables } from "../typechain-types";
 
 async function main() {
   console.log(`\nUpdating base URI on '${network.name}'...`);
@@ -24,10 +25,10 @@ async function main() {
   // Update base URI
   const tables = (await ethers.getContractFactory("TablelandTables")).attach(
     proxy
-  );
+  ) as TablelandTables;
   const tx = await tables.setBaseURI(baseURI);
   const receipt = await tx.wait();
-  console.log(`base URI set with tx '${receipt.transactionHash}'`);
+  console.log(`base URI set with tx '${receipt?.hash}'`);
 }
 
 main().catch((error) => {

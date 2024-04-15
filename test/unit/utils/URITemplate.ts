@@ -1,8 +1,9 @@
 import chai from "chai";
 import chaiAsPromised from "chai-as-promised";
-import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
+import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
 import { ethers } from "hardhat";
 import { TestURITemplate } from "../../../typechain-types";
+import { isEventLog } from "../../../scripts/utils";
 
 chai.use(chaiAsPromised);
 const expect = chai.expect;
@@ -15,7 +16,7 @@ describe("URITemplate", function () {
   beforeEach(async function () {
     const UriTemplate = await ethers.getContractFactory("TestURITemplate");
     contract = (await UriTemplate.deploy()) as TestURITemplate;
-    await contract.deployed();
+    await contract.waitForDeployment();
     accounts = await ethers.getSigners();
   });
 
@@ -25,7 +26,7 @@ describe("URITemplate", function () {
       const minter = accounts[1];
       const tx = await contract.connect(minter).mint();
       const receipt = await tx.wait();
-      const [event] = receipt.events ?? [];
+      const [event] = receipt?.logs.filter(isEventLog) ?? [];
       const tokenId = event.args?.tokenId;
       // Check that empty strings are returned
       expect(await contract.tokenURI(tokenId)).to.equal(``);
@@ -39,7 +40,7 @@ describe("URITemplate", function () {
       const minter = accounts[1];
       const tx = await contract.connect(minter).mint();
       const receipt = await tx.wait();
-      const [event] = receipt.events ?? [];
+      const [event] = receipt?.logs.filter(isEventLog) ?? [];
       const tokenId = event.args?.tokenId;
       // Get the token URI, which uses the template URI
       expect(await contract.tokenURI(tokenId)).to.equal(uriString + tokenId);
@@ -58,7 +59,7 @@ describe("URITemplate", function () {
       const minter = accounts[1];
       const tx = await contract.connect(minter).mint();
       const receipt = await tx.wait();
-      const [event] = receipt.events ?? [];
+      const [event] = receipt?.logs.filter(isEventLog) ?? [];
       const tokenId = event.args?.tokenId;
       // Get the token URI, which uses the template URI
       expect(await contract.tokenURI(tokenId)).to.equal(uri.join(tokenId));
@@ -77,7 +78,7 @@ describe("URITemplate", function () {
       const minter = accounts[1];
       const tx = await contract.connect(minter).mint();
       const receipt = await tx.wait();
-      const [event] = receipt.events ?? [];
+      const [event] = receipt?.logs.filter(isEventLog) ?? [];
       const tokenId = event.args?.tokenId;
       // Get the token URI, which uses the template URI
       expect(await contract.tokenURI(tokenId)).to.equal(uri.join(tokenId));

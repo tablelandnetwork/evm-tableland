@@ -11,7 +11,7 @@ describe("SQLHelpers", function () {
   beforeEach(async function () {
     const Lib = await ethers.getContractFactory("TestSQLHelpers");
     lib = (await Lib.deploy()) as TestSQLHelpers;
-    await lib.deployed();
+    await lib.waitForDeployment();
   });
 
   it("Should return a name from a prefix", async function () {

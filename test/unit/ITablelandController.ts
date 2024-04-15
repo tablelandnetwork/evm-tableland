@@ -1,7 +1,6 @@
-import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
+import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
 import chai from "chai";
 import chaiAsPromised from "chai-as-promised";
-import { BigNumber } from "ethers";
 import { ethers, upgrades } from "hardhat";
 import type {
   TablelandTables,
@@ -15,6 +14,7 @@ import type {
   ERC721EnumerablePolicies,
   ERC721AQueryablePolicies,
 } from "../../typechain-types";
+import { isEventLog } from "../../scripts/utils";
 
 chai.use(chaiAsPromised);
 const expect = chai.expect;
@@ -37,65 +37,70 @@ describe("ITablelandController", function () {
 
     // Deploy tables
     const Factory = await ethers.getContractFactory("TablelandTables");
-    tables = await (
-      (await upgrades.deployProxy(Factory, ["https://foo.xyz/"], {
+    // @ts-expect-error ignore `Conversion of type 'Contract'` error since
+    // `Contract` is subclass of `BaseContract` of which `TablelandTables` extends
+    const proxyDeploy = (await upgrades.deployProxy(
+      Factory,
+      ["https://foo.xyz/"],
+      {
         kind: "uups",
-      })) as TablelandTables
-    ).deployed();
+      }
+    )) as TablelandTables;
+    tables = await proxyDeploy.waitForDeployment();
 
     // Deploy test erc721 contracts
     foos = (await (
       await ethers.getContractFactory("TestERC721Enumerable")
     ).deploy()) as TestERC721Enumerable;
-    await foos.deployed();
+    await foos.waitForDeployment();
     bars = (await (
       await ethers.getContractFactory("TestERC721AQueryable")
     ).deploy()) as TestERC721AQueryable;
-    await bars.deployed();
+    await bars.waitForDeployment();
 
     // Get the enumerablePolicies library
     enumPolicyLib = (await (
       await ethers.getContractFactory("ERC721EnumerablePolicies")
     ).deploy()) as TestTablelandController;
-    await enumPolicyLib.deployed();
+    await enumPolicyLib.waitForDeployment();
 
     // Get the queryablePolicies library
     queryablePolicyLib = (await (
       await ethers.getContractFactory("ERC721AQueryablePolicies")
     ).deploy()) as TestTablelandController;
-    await queryablePolicyLib.deployed();
+    await queryablePolicyLib.waitForDeployment();
 
     // Deploy test controllers
     controller = (await (
       await ethers.getContractFactory("TestTablelandController")
     ).deploy()) as TestTablelandController;
-    await controller.deployed();
+    await controller.waitForDeployment();
 
     controllerV0 = (await (
       await ethers.getContractFactory("TestTablelandControllerV0")
     ).deploy()) as TestTablelandControllerV0;
-    await controllerV0.deployed();
+    await controllerV0.waitForDeployment();
 
     allowAllController = (await (
       await ethers.getContractFactory("TestAllowAllTablelandController")
     ).deploy()) as TestAllowAllTablelandController;
-    await allowAllController.deployed();
+    await allowAllController.waitForDeployment();
 
     rawController1 = (await (
       await ethers.getContractFactory("TestRawTablelandController1")
     ).deploy()) as TestRawTablelandController1;
-    await rawController1.deployed();
+    await rawController1.waitForDeployment();
 
     rawController2 = (await (
       await ethers.getContractFactory("TestRawTablelandController2")
     ).deploy()) as TestRawTablelandController2;
-    await rawController2.deployed();
+    await rawController2.waitForDeployment();
 
     // Setup controllers
-    await (await controller.setFoos(foos.address)).wait();
-    await (await controller.setBars(bars.address)).wait();
-    await (await controllerV0.setFoos(foos.address)).wait();
-    await (await controllerV0.setBars(bars.address)).wait();
+    await (await controller.setFoos(await foos.getAddress())).wait();
+    await (await controller.setBars(await bars.getAddress())).wait();
+    await (await controllerV0.setFoos(await foos.getAddress())).wait();
+    await (await controllerV0.setBars(await bars.getAddress())).wait();
   });
 
   it("Should set controller for a table", async function () {
@@ -104,7 +109,7 @@ describe("ITablelandController", function () {
     await expect(
       tables
         .connect(owner)
-        .setController(owner.address, BigNumber.from(1), accounts[3].address)
+        .setController(owner.address, BigInt(1), accounts[3].address)
     ).to.be.revertedWithCustomError(tables, "OwnerQueryForNonexistentToken");
 
     let tx = await tables.createTable(
@@ -112,7 +117,7 @@ describe("ITablelandController", function () {
       "create table testing (int a);"
     );
     let receipt = await tx.wait();
-    const [, createEvent] = receipt.events ?? [];
+    const [, createEvent] = receipt?.logs.filter(isEventLog) ?? [];
     const tableId = createEvent.args!.tableId;
 
     // Test caller must be table owner
@@ -136,7 +141,7 @@ describe("ITablelandController", function () {
       .connect(owner)
       .setController(owner.address, tableId, eoaController.address);
     receipt = await tx.wait();
-    let [setControllerEvent] = receipt.events ?? [];
+    let [setControllerEvent] = receipt?.logs.filter(isEventLog) ?? [];
     expect(setControllerEvent.args!.tableId).to.equal(
       createEvent.args!.tableId
     );
@@ -146,39 +151,37 @@ describe("ITablelandController", function () {
     // (not even owner should be able to run SQL now)
     const runStatement = "insert into testing values (0);";
     await expect(
-      tables
-        .connect(owner)
-        ["runSQL(address,uint256,string)"](owner.address, tableId, runStatement)
+      tables.connect(owner).runSQL(owner.address, tableId, runStatement)
     ).to.be.revertedWithCustomError(tables, "Unauthorized");
     tx = await tables
       .connect(eoaController)
-      ["runSQL(address,uint256,string)"](
-        eoaController.address,
-        tableId,
-        runStatement
-      );
+      .runSQL(eoaController.address, tableId, runStatement);
     await tx.wait();
 
     // Test setting controller to a contract address
     tx = await tables
       .connect(owner)
-      .setController(owner.address, tableId, allowAllController.address);
+      .setController(
+        owner.address,
+        tableId,
+        await allowAllController.getAddress()
+      );
     receipt = await tx.wait();
-    [setControllerEvent] = receipt.events ?? [];
+    [setControllerEvent] = receipt?.logs.filter(isEventLog) ?? [];
     expect(setControllerEvent.args!.tableId).to.equal(
       createEvent.args!.tableId
     );
     expect(setControllerEvent.args!.controller).to.equal(
-      allowAllController.address
+      await allowAllController.getAddress()
     );
 
     // Test that anyone can run SQL through contract controller
     const caller = accounts[7];
     tx = await tables
       .connect(caller)
-      ["runSQL(address,uint256,string)"](caller.address, tableId, runStatement);
+      .runSQL(caller.address, tableId, runStatement);
     receipt = await tx.wait();
-    const [runEvent] = receipt.events ?? [];
+    const [runEvent] = receipt?.logs.filter(isEventLog) ?? [];
     expect(runEvent.args!.caller).to.equal(caller.address);
     expect(runEvent.args!.isOwner).to.equal(false);
     expect(runEvent.args!.tableId).to.equal(tableId);
@@ -198,7 +201,7 @@ describe("ITablelandController", function () {
       "create table testing (int a);"
     );
     const receipt = await tx.wait();
-    const [, createEvent] = receipt.events ?? [];
+    const [, createEvent] = receipt?.logs.filter(isEventLog) ?? [];
     const tableId = createEvent.args!.tableId;
 
     const eoaController = accounts[6];
@@ -217,7 +220,7 @@ describe("ITablelandController", function () {
       "create table testing (int a);"
     );
     let receipt = await tx.wait();
-    const [, createEvent] = receipt.events ?? [];
+    const [, createEvent] = receipt?.logs.filter(isEventLog) ?? [];
     const tableId = createEvent.args!.tableId;
 
     const eoaController = accounts[6];
@@ -229,23 +232,19 @@ describe("ITablelandController", function () {
 
     tx = await tables
       .connect(owner)
-      .setController(owner.address, tableId, ethers.constants.AddressZero);
+      .setController(owner.address, tableId, ethers.ZeroAddress);
     receipt = await tx.wait();
-    const [setControllerEvent] = receipt.events ?? [];
-    expect(setControllerEvent.args!.controller).to.equal(
-      ethers.constants.AddressZero
-    );
+    const [setControllerEvent] = receipt?.logs.filter(isEventLog) ?? [];
+    expect(setControllerEvent.args!.controller).to.equal(ethers.ZeroAddress);
 
-    expect(await tables.getController(tableId)).to.equal(
-      ethers.constants.AddressZero
-    );
+    expect(await tables.getController(tableId)).to.equal(ethers.ZeroAddress);
   });
 
   it("Should lock controller for a table", async function () {
     // Test locking controller fails if table does not exist
     const owner = accounts[4];
     await expect(
-      tables.connect(owner).lockController(owner.address, BigNumber.from(1))
+      tables.connect(owner).lockController(owner.address, BigInt(1))
     ).to.be.revertedWithCustomError(tables, "OwnerQueryForNonexistentToken");
 
     let tx = await tables.createTable(
@@ -253,7 +252,7 @@ describe("ITablelandController", function () {
       "create table testing (int a);"
     );
     let receipt = await tx.wait();
-    const [, createEvent] = receipt.events ?? [];
+    const [, createEvent] = receipt?.logs.filter(isEventLog) ?? [];
     const tableId = createEvent.args!.tableId;
 
     // Test caller must be table owner
@@ -298,7 +297,7 @@ describe("ITablelandController", function () {
       "create table testing (int a);"
     );
     const receipt = await tx.wait();
-    const [, createEvent] = receipt.events ?? [];
+    const [, createEvent] = receipt?.logs.filter(isEventLog) ?? [];
     const tableId = createEvent.args!.tableId;
 
     // Test contract owner can not set or lock the controller
@@ -322,58 +321,45 @@ describe("ITablelandController", function () {
       "create table testing (int a);"
     );
     let receipt = await tx.wait();
-    const [, createEvent] = receipt.events ?? [];
+    const [, createEvent] = receipt?.logs.filter(isEventLog) ?? [];
     const tableId = createEvent.args!.tableId;
     tx = await tables
       .connect(owner)
-      .setController(owner.address, tableId, controller.address);
+      .setController(owner.address, tableId, await controller.getAddress());
     await tx.wait();
 
     // Test that run SQL on table is gated by ether (with custom error)
     const runStatement = "insert into testing values (0);";
     const caller = accounts[5];
     await expect(
-      tables
-        .connect(caller)
-        ["runSQL(address,uint256,string)"](
-          caller.address,
-          tableId,
-          runStatement
-        )
+      tables.connect(caller).runSQL(caller.address, tableId, runStatement)
     ).to.be.revertedWithCustomError(controller, "InsufficientValue");
 
     // Test that run SQL on table is gated by ether (with revert/require)
     await expect(
       tables.connect(caller).runSQL(caller.address, tableId, runStatement, {
-        value: ethers.utils.parseEther("2"),
+        value: ethers.parseEther("2"),
       })
     ).to.be.revertedWith("too much ether!");
 
     // Test that run SQL on table is gated by Foo and Bar ownership
-    const value = ethers.utils.parseEther("1");
+    const value = ethers.parseEther("1");
     await expect(
-      tables
-        .connect(caller)
-        ["runSQL(address,uint256,string)"](
-          caller.address,
-          tableId,
-          runStatement,
-          {
-            value,
-          }
-        )
+      tables.connect(caller).runSQL(caller.address, tableId, runStatement, {
+        value,
+      })
     ).to.be.revertedWithCustomError(
       enumPolicyLib,
       "ERC721EnumerablePoliciesUnauthorized"
     );
 
     // Test balance was reverted
-    expect(await ethers.provider.getBalance(tables.address)).to.equal(
-      BigNumber.from(0)
-    );
-    expect(await ethers.provider.getBalance(controller.address)).to.equal(
-      BigNumber.from(0)
-    );
+    expect(
+      await ethers.provider.getBalance(await tables.getAddress())
+    ).to.equal(BigInt(0));
+    expect(
+      await ethers.provider.getBalance(await controller.getAddress())
+    ).to.equal(BigInt(0));
 
     // Mint a Foo
     tx = await foos.connect(caller).mint();
@@ -381,16 +367,9 @@ describe("ITablelandController", function () {
 
     // Still gated (need a Bar too)
     await expect(
-      tables
-        .connect(caller)
-        ["runSQL(address,uint256,string)"](
-          caller.address,
-          tableId,
-          runStatement,
-          {
-            value,
-          }
-        )
+      tables.connect(caller).runSQL(caller.address, tableId, runStatement, {
+        value,
+      })
     ).to.be.revertedWithCustomError(
       queryablePolicyLib,
       "ERC721AQueryablePoliciesUnauthorized"
@@ -403,14 +382,9 @@ describe("ITablelandController", function () {
     // Caller should be able to run SQL now
     tx = await tables
       .connect(caller)
-      ["runSQL(address,uint256,string)"](
-        caller.address,
-        tableId,
-        runStatement,
-        { value }
-      );
+      .runSQL(caller.address, tableId, runStatement, { value });
     receipt = await tx.wait();
-    let [runEvent] = receipt.events ?? [];
+    let [runEvent] = receipt?.logs.filter(isEventLog) ?? [];
     expect(runEvent.args!.caller).to.equal(caller.address);
     expect(runEvent.args!.isOwner).to.equal(false);
     expect(runEvent.args!.tableId).to.equal(tableId);
@@ -426,12 +400,12 @@ describe("ITablelandController", function () {
     expect(runEvent.args!.policy.updatableColumns).to.include("baz");
 
     // Test balance was taken by controller
-    expect(await ethers.provider.getBalance(tables.address)).to.equal(
-      BigNumber.from(0)
-    );
-    expect(await ethers.provider.getBalance(controller.address)).to.equal(
-      value
-    );
+    expect(
+      await ethers.provider.getBalance(await tables.getAddress())
+    ).to.equal(BigInt(0));
+    expect(
+      await ethers.provider.getBalance(await controller.getAddress())
+    ).to.equal(value);
 
     // Mint some more
     tx = await foos.connect(caller).mint();
@@ -444,14 +418,9 @@ describe("ITablelandController", function () {
     // Where clause should reflect all owned tokens
     tx = await tables
       .connect(caller)
-      ["runSQL(address,uint256,string)"](
-        caller.address,
-        tableId,
-        runStatement,
-        { value }
-      );
+      .runSQL(caller.address, tableId, runStatement, { value });
     receipt = await tx.wait();
-    [runEvent] = receipt.events ?? [];
+    [runEvent] = receipt?.logs.filter(isEventLog) ?? [];
     expect(runEvent.args!.caller).to.equal(caller.address);
     expect(runEvent.args!.isOwner).to.equal(false);
     expect(runEvent.args!.tableId).to.equal(tableId);
@@ -474,11 +443,11 @@ describe("ITablelandController", function () {
       "create table testing (int a);"
     );
     let receipt = await tx.wait();
-    const [, createEvent] = receipt.events ?? [];
+    const [, createEvent] = receipt?.logs.filter(isEventLog) ?? [];
     const tableId = createEvent.args!.tableId;
     tx = await tables
       .connect(owner)
-      .setController(owner.address, tableId, controllerV0.address);
+      .setController(owner.address, tableId, await controllerV0.getAddress());
     await tx.wait();
 
     // Test that run SQL on table is gated by ether
@@ -489,7 +458,7 @@ describe("ITablelandController", function () {
     ).to.be.revertedWithCustomError(controllerV0, "InsufficientValue");
 
     // Test that run SQL on table is gated by Foo and Bar ownership
-    const value = ethers.utils.parseEther("1");
+    const value = ethers.parseEther("1");
     await expect(
       tables.connect(caller).runSQL(caller.address, tableId, runStatement, {
         value,
@@ -500,12 +469,12 @@ describe("ITablelandController", function () {
     );
 
     // Test balance was reverted
-    expect(await ethers.provider.getBalance(tables.address)).to.equal(
-      BigNumber.from(0)
-    );
-    expect(await ethers.provider.getBalance(controllerV0.address)).to.equal(
-      BigNumber.from(0)
-    );
+    expect(
+      await ethers.provider.getBalance(await tables.getAddress())
+    ).to.equal(BigInt(0));
+    expect(
+      await ethers.provider.getBalance(await controllerV0.getAddress())
+    ).to.equal(BigInt(0));
 
     // Mint a Foo
     tx = await foos.connect(caller).mint();
@@ -530,7 +499,7 @@ describe("ITablelandController", function () {
       .connect(caller)
       .runSQL(caller.address, tableId, runStatement, { value });
     receipt = await tx.wait();
-    let [runEvent] = receipt.events ?? [];
+    let [runEvent] = receipt?.logs.filter(isEventLog) ?? [];
     expect(runEvent.args!.caller).to.equal(caller.address);
     expect(runEvent.args!.isOwner).to.equal(false);
     expect(runEvent.args!.tableId).to.equal(tableId);
@@ -546,12 +515,12 @@ describe("ITablelandController", function () {
     expect(runEvent.args!.policy.updatableColumns).to.include("baz");
 
     // Test balance was taken by controller
-    expect(await ethers.provider.getBalance(tables.address)).to.equal(
-      BigNumber.from(0)
-    );
-    expect(await ethers.provider.getBalance(controllerV0.address)).to.equal(
-      value
-    );
+    expect(
+      await ethers.provider.getBalance(await tables.getAddress())
+    ).to.equal(BigInt(0));
+    expect(
+      await ethers.provider.getBalance(await controllerV0.getAddress())
+    ).to.equal(value);
 
     // Mint some more
     tx = await foos.connect(caller).mint();
@@ -566,7 +535,7 @@ describe("ITablelandController", function () {
       .connect(caller)
       .runSQL(caller.address, tableId, runStatement, { value });
     receipt = await tx.wait();
-    [runEvent] = receipt.events ?? [];
+    [runEvent] = receipt?.logs.filter(isEventLog) ?? [];
     expect(runEvent.args!.caller).to.equal(caller.address);
     expect(runEvent.args!.isOwner).to.equal(false);
     expect(runEvent.args!.tableId).to.equal(tableId);
@@ -589,11 +558,11 @@ describe("ITablelandController", function () {
       "create table testing (int a);"
     );
     const receipt = await tx.wait();
-    const [, createEvent] = receipt.events ?? [];
+    const [, createEvent] = receipt?.logs.filter(isEventLog) ?? [];
     const tableId = createEvent.args!.tableId;
     tx = await tables
       .connect(owner)
-      .setController(owner.address, tableId, rawController1.address);
+      .setController(owner.address, tableId, await rawController1.getAddress());
     await tx.wait();
 
     // Test that run SQL on table is rejected (not implemented)
@@ -605,7 +574,7 @@ describe("ITablelandController", function () {
 
     tx = await tables
       .connect(owner)
-      .setController(owner.address, tableId, rawController2.address);
+      .setController(owner.address, tableId, await rawController2.getAddress());
     await tx.wait();
 
     // Test that run SQL on table is rejected (w/o reason string)

@@ -377,7 +377,7 @@ describe("Validator, Chain, and SDK work end to end", function () {
     );
 
     expect(typeof tableSchema.columns).to.eql("object");
-    expect(tableSchema.table_constraints).to.eql(undefined);
+    expect(tableSchema.tableConstraints).to.eql(undefined);
     expect(tableSchema.columns.length).to.eql(1);
     expect(tableSchema.columns[0].name).to.eql("a");
     expect(tableSchema.columns[0].type).to.eql("int");

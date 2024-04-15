@@ -1,5 +1,6 @@
 import { promisify } from "util";
 import { ethers, upgrades, network, baseURI, proxy } from "hardhat";
+import { isEventLog } from "./utils";
 import type { TablelandTables } from "../typechain-types";
 import assert from "assert";
 
@@ -29,20 +30,22 @@ async function main() {
 
   // Deploy proxy
   const Factory = await ethers.getContractFactory("TablelandTables");
-  const tables = await (
-    (await upgrades.deployProxy(Factory, [baseURI], {
-      kind: "uups",
-      timeout: pollTimeout,
-      pollingInterval: pollInterval,
-    })) as TablelandTables
-  ).deployed();
-  console.log("New proxy address:", tables.address);
+  // @ts-expect-error ignore `Conversion of type 'Contract'` error since
+  // `Contract` is subclass of `BaseContract` of which `TablelandTables` extends
+  const proxyDeploy = (await upgrades.deployProxy(Factory, [baseURI], {
+    kind: "uups",
+    timeout: pollTimeout,
+    pollingInterval: pollInterval,
+  })) as TablelandTables;
+  const tables = await proxyDeploy.waitForDeployment();
+
+  console.log("New proxy address:", await tables.getAddress());
 
   // Check implementation
   // Note: We poll here because the impl won't be visible from the proxy until the next tipset on Filecoin.
   // Note: See https://docs.filecoin.io/smart-contracts/developing-contracts/best-practices/#consistently-generating-transaction-receipts.
   const startTime = Date.now();
-  while (!(await checkImpl(tables.address))) {
+  while (!(await checkImpl(await tables.getAddress()))) {
     const elapsedTime = Date.now() - startTime;
     if (elapsedTime >= pollTimeout) {
       throw Error("impl did not become visible from proxy");
@@ -59,19 +62,28 @@ async function main() {
     createStatement
   );
   let receipt = await tx.wait();
-  const [, createEvent] = receipt.events ?? [];
+  const [, createEvent] = receipt?.logs.filter(isEventLog) ?? [];
   const tableId = createEvent.args!.tableId;
   console.log("Healthbot table created as:", `healthbot_${chainId}_${tableId}`);
 
   // Insert first row into health bot table
   const runStatement = `insert into healthbot_${chainId}_${tableId} values (1);`;
+  // Add 20% buffer to gas limit to avoid out-of-gas errors
+  const estimatedGasLimit = await tables[
+    "mutate(address,uint256,string)"
+  ].estimateGas(account.address, tableId, runStatement);
+  const gasLimit =
+    estimatedGasLimit + (estimatedGasLimit * BigInt(20)) / BigInt(100);
   tx = await tables["mutate(address,uint256,string)"](
     account.address,
     tableId,
-    runStatement
+    runStatement,
+    {
+      gasLimit,
+    }
   );
   receipt = await tx.wait();
-  const [runEvent] = receipt.events ?? [];
+  const [runEvent] = receipt?.logs.filter(isEventLog) ?? [];
   assert(
     runEvent.args!.statement === runStatement,
     "insert statement mismatch"
@@ -80,7 +92,9 @@ async function main() {
 
   // Warn that proxy address needs to be saved in config
   console.log(
-    `\nSave 'proxies.${network.name}: "${tables.address}"' in 'network.ts'!`
+    `\nSave 'proxies.${
+      network.name
+    }: "${await tables.getAddress()}"' in 'network.ts'!`
   );
 }
 
