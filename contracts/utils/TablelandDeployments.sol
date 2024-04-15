@@ -47,7 +47,7 @@ library TablelandDeployments {
         0x223A74B8323914afDC3ff1e5005564dC17231d6e;
     // TablelandTables address on Polygon Amoy.
     address internal constant POLYGON_AMOY =
-        0x4b48841d4b32C4650E4ABc117A03FE8B51f38F68;
+        0x170fb206132b693e38adFc8727dCfa303546Cec1;
     // TablelandTables address on Filecoin Calibration.
     address internal constant FILECOIN_CALIBRATION =
         0x030BCf3D50cad04c2e57391B12740982A9308621;

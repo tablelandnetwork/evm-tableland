@@ -31,7 +31,7 @@ This is the Tableland Tables EVM contracts and client components.
 | sepolia              | 11155111 | 0xc50C62498448ACc8dBdE43DA77f8D5D2E2c7597D |
 | optimism-sepolia     | 11155420 | 0x68A2f4423ad3bf5139Db563CF3bC80aA09ed7079 |
 | arbitrum-sepolia     | 421614   | 0x223A74B8323914afDC3ff1e5005564dC17231d6e |
-| polygon-amoy         | 80002    | 0x4b48841d4b32C4650E4ABc117A03FE8B51f38F68 |
+| polygon-amoy         | 80002    | 0x170fb206132b693e38adFc8727dCfa303546Cec1 |
 | filecoin-calibration | 314159   | 0x030BCf3D50cad04c2e57391B12740982A9308621 |
 
 # Development
