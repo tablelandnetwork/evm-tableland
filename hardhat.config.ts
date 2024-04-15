@@ -100,7 +100,7 @@ const config: HardhatUserConfig = {
         chainId: 80002,
         urls: {
           apiURL:
-            "https://www.oklink.com/api/explorer/v1/polygonamoy/contract/verify/async",
+            "https://www.oklink.com/api/v5/explorer/contract/verify-source-code-plugin/AMOY_TESTNET",
           browserURL: "https://www.oklink.com/amoy",
         },
       },
