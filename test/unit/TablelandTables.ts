@@ -1,7 +1,6 @@
-import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
+import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
 import chai from "chai";
 import chaiAsPromised from "chai-as-promised";
-import { BigNumber } from "ethers";
 import { ethers, upgrades } from "hardhat";
 import {
   TablelandTables,
@@ -9,6 +8,7 @@ import {
   TestReentrancyMutateOne,
   TestReentrancyMutate,
 } from "../../typechain-types";
+import { isEventLog } from "../../scripts/utils";
 
 chai.use(chaiAsPromised);
 const expect = chai.expect;
@@ -23,30 +23,32 @@ describe("TablelandTables", function () {
   beforeEach(async function () {
     accounts = await ethers.getSigners();
     const Factory = await ethers.getContractFactory("TablelandTables");
-
-    tables = await (
-      (await upgrades.deployProxy(Factory, ["https://foo.xyz/"], {
+    // @ts-expect-error ignore `Conversion of type 'Contract'` error since
+    // `Contract` is subclass of `BaseContract` of which `TablelandTables` extends
+    const proxyDeploy = (await upgrades.deployProxy(
+      Factory,
+      ["https://foo.xyz/"],
+      {
         kind: "uups",
-      })) as TablelandTables
-    ).deployed();
-
-    await tables.deployed();
+      }
+    )) as TablelandTables;
+    tables = await proxyDeploy.waitForDeployment();
 
     // Deploy test controller contracts
     runSqlLegacyReentrantController = (await (
       await ethers.getContractFactory("TestReentrancyRunSQLLegacy")
-    ).deploy(tables.address)) as TestReentrancyRunSQLLegacy;
-    await runSqlLegacyReentrantController.deployed();
+    ).deploy(await tables.getAddress())) as TestReentrancyRunSQLLegacy;
+    await runSqlLegacyReentrantController.waitForDeployment();
 
     mutateOneReentrantController = (await (
       await ethers.getContractFactory("TestReentrancyMutateOne")
-    ).deploy(tables.address)) as TestReentrancyMutateOne;
-    await mutateOneReentrantController.deployed();
+    ).deploy(await tables.getAddress())) as TestReentrancyMutateOne;
+    await mutateOneReentrantController.waitForDeployment();
 
     mutateReentrantController = (await (
       await ethers.getContractFactory("TestReentrancyMutate")
-    ).deploy(tables.address)) as TestReentrancyMutate;
-    await mutateReentrantController.deployed();
+    ).deploy(await tables.getAddress())) as TestReentrancyMutate;
+    await mutateReentrantController.waitForDeployment();
   });
 
   it("Should not be initializable more than once", async function () {
@@ -68,15 +70,15 @@ describe("TablelandTables", function () {
       .connect(owner)
       ["create(address,string)"](owner.address, createStatement);
     let receipt = await tx.wait();
-    let [mintEvent, createEvent] = receipt.events ?? [];
-    expect(mintEvent.args!.tokenId).to.equal(BigNumber.from(1));
-    expect(createEvent.args!.tableId).to.equal(BigNumber.from(1));
+    let [mintEvent, createEvent] = receipt?.logs.filter(isEventLog) ?? [];
+    expect(mintEvent.args!.tokenId).to.equal(BigInt(1));
+    expect(createEvent.args!.tableId).to.equal(BigInt(1));
     expect(createEvent.args!.owner).to.equal(owner.address);
     expect(createEvent.args!.statement).to.equal(createStatement);
     let balance = await tables.balanceOf(owner.address);
-    expect(balance).to.equal(BigNumber.from(1));
+    expect(balance).to.equal(BigInt(1));
     let totalSupply = await tables.totalSupply();
-    expect(totalSupply).to.equal(BigNumber.from(1));
+    expect(totalSupply).to.equal(BigInt(1));
 
     // Test an account can create a table for another account
     const sender = accounts[5];
@@ -84,15 +86,15 @@ describe("TablelandTables", function () {
       .connect(sender)
       ["create(address,string)"](owner.address, createStatement);
     receipt = await tx.wait();
-    [mintEvent, createEvent] = receipt.events ?? [];
-    expect(mintEvent.args!.tokenId).to.equal(BigNumber.from(2));
-    expect(createEvent.args!.tableId).to.equal(BigNumber.from(2));
+    [mintEvent, createEvent] = receipt?.logs.filter(isEventLog) ?? [];
+    expect(mintEvent.args!.tokenId).to.equal(BigInt(2));
+    expect(createEvent.args!.tableId).to.equal(BigInt(2));
     expect(createEvent.args!.owner).to.equal(owner.address);
     expect(createEvent.args!.statement).to.equal(createStatement);
     balance = await tables.balanceOf(owner.address);
-    expect(balance).to.equal(BigNumber.from(2));
+    expect(balance).to.equal(BigInt(2));
     totalSupply = await tables.totalSupply();
-    expect(totalSupply).to.equal(BigNumber.from(2));
+    expect(totalSupply).to.equal(BigInt(2));
   });
 
   it("Should be able to create multiple tables", async function () {
@@ -108,22 +110,22 @@ describe("TablelandTables", function () {
       ]);
     let receipt = await tx.wait();
     let [mintEvent1, createEvent1, mintEvent2, createEvent2] =
-      receipt.events ?? [];
+      receipt?.logs.filter(isEventLog) ?? [];
     // first table
-    expect(mintEvent1.args!.tokenId).to.equal(BigNumber.from(1));
-    expect(createEvent1.args!.tableId).to.equal(BigNumber.from(1));
+    expect(mintEvent1.args!.tokenId).to.equal(BigInt(1));
+    expect(createEvent1.args!.tableId).to.equal(BigInt(1));
     expect(createEvent1.args!.owner).to.equal(owner.address);
     expect(createEvent1.args!.statement).to.equal(createStatement1);
     // second table
-    expect(mintEvent2.args!.tokenId).to.equal(BigNumber.from(2));
-    expect(createEvent2.args!.tableId).to.equal(BigNumber.from(2));
+    expect(mintEvent2.args!.tokenId).to.equal(BigInt(2));
+    expect(createEvent2.args!.tableId).to.equal(BigInt(2));
     expect(createEvent2.args!.owner).to.equal(owner.address);
     expect(createEvent2.args!.statement).to.equal(createStatement2);
 
     let balance = await tables.balanceOf(owner.address);
-    expect(balance).to.equal(BigNumber.from(2));
+    expect(balance).to.equal(BigInt(2));
     let totalSupply = await tables.totalSupply();
-    expect(totalSupply).to.equal(BigNumber.from(2));
+    expect(totalSupply).to.equal(BigInt(2));
 
     // Test an account can create tables for another account
     const sender = accounts[5];
@@ -134,20 +136,21 @@ describe("TablelandTables", function () {
         createStatement2,
       ]);
     receipt = await tx.wait();
-    [mintEvent1, createEvent1, mintEvent2, createEvent2] = receipt.events ?? [];
-    expect(mintEvent1.args!.tokenId).to.equal(BigNumber.from(3));
-    expect(createEvent1.args!.tableId).to.equal(BigNumber.from(3));
+    [mintEvent1, createEvent1, mintEvent2, createEvent2] =
+      receipt?.logs.filter(isEventLog) ?? [];
+    expect(mintEvent1.args!.tokenId).to.equal(BigInt(3));
+    expect(createEvent1.args!.tableId).to.equal(BigInt(3));
     expect(createEvent1.args!.owner).to.equal(owner.address);
     expect(createEvent1.args!.statement).to.equal(createStatement1);
-    expect(mintEvent2.args!.tokenId).to.equal(BigNumber.from(4));
-    expect(createEvent2.args!.tableId).to.equal(BigNumber.from(4));
+    expect(mintEvent2.args!.tokenId).to.equal(BigInt(4));
+    expect(createEvent2.args!.tableId).to.equal(BigInt(4));
     expect(createEvent2.args!.owner).to.equal(owner.address);
     expect(createEvent2.args!.statement).to.equal(createStatement2);
 
     balance = await tables.balanceOf(owner.address);
-    expect(balance).to.equal(BigNumber.from(4));
+    expect(balance).to.equal(BigInt(4));
     totalSupply = await tables.totalSupply();
-    expect(totalSupply).to.equal(BigNumber.from(4));
+    expect(totalSupply).to.equal(BigInt(4));
   });
 
   it("Should revert if create is called without statements", async function () {
@@ -167,7 +170,7 @@ describe("TablelandTables", function () {
         .connect(owner)
         ["mutate(address,uint256,string)"](
           owner.address,
-          BigNumber.from(1),
+          BigInt(1),
           runStatement
         )
     ).to.be.revertedWithCustomError(tables, "Unauthorized");
@@ -177,7 +180,7 @@ describe("TablelandTables", function () {
       .connect(owner)
       ["create(address,string)"](owner.address, createStatement);
     let receipt = await tx.wait();
-    const [, createEvent] = receipt.events ?? [];
+    const [, createEvent] = receipt?.logs.filter(isEventLog) ?? [];
     const tableId = createEvent.args!.tableId;
 
     // Test owner can run SQL on table
@@ -185,7 +188,7 @@ describe("TablelandTables", function () {
       .connect(owner)
       ["mutate(address,uint256,string)"](owner.address, tableId, runStatement);
     receipt = await tx.wait();
-    let [runEvent] = receipt.events ?? [];
+    let [runEvent] = receipt?.logs.filter(isEventLog) ?? [];
     expect(runEvent.args!.caller).to.equal(owner.address);
     expect(runEvent.args!.isOwner).to.equal(true);
     expect(runEvent.args!.tableId).to.equal(tableId);
@@ -202,7 +205,7 @@ describe("TablelandTables", function () {
         runStatement
       );
     receipt = await tx.wait();
-    [runEvent] = receipt.events ?? [];
+    [runEvent] = receipt?.logs.filter(isEventLog) ?? [];
     expect(runEvent.args!.caller).to.equal(nonOwner.address);
     expect(runEvent.args!.isOwner).to.equal(false);
     expect(runEvent.args!.tableId).to.equal(tableId);
@@ -253,7 +256,7 @@ describe("TablelandTables", function () {
       .connect(owner)
       ["create(address,string)"](owner.address, createStatement);
     const receipt = await tx.wait();
-    const [, createEvent] = receipt.events ?? [];
+    const [, createEvent] = receipt?.logs.filter(isEventLog) ?? [];
     const tableId = createEvent.args!.tableId;
 
     tx = await tables
@@ -261,7 +264,7 @@ describe("TablelandTables", function () {
       .setController(
         owner.address,
         tableId,
-        runSqlLegacyReentrantController.address
+        await runSqlLegacyReentrantController.getAddress()
       );
     await tx.wait();
 
@@ -280,7 +283,7 @@ describe("TablelandTables", function () {
       .connect(owner)
       ["create(address,string)"](owner.address, createStatement);
     const receipt = await tx.wait();
-    const [, createEvent] = receipt.events ?? [];
+    const [, createEvent] = receipt?.logs.filter(isEventLog) ?? [];
     const tableId = createEvent.args!.tableId;
 
     tx = await tables
@@ -288,7 +291,7 @@ describe("TablelandTables", function () {
       .setController(
         owner.address,
         tableId,
-        mutateOneReentrantController.address
+        await mutateOneReentrantController.getAddress()
       );
     await tx.wait();
 
@@ -310,14 +313,14 @@ describe("TablelandTables", function () {
       .connect(owner)
       ["create(address,string)"](owner.address, createStatement);
     let receipt = await tx.wait();
-    const [, createEvent1] = receipt.events ?? [];
+    const [, createEvent1] = receipt?.logs.filter(isEventLog) ?? [];
     const tableId1 = createEvent1.args!.tableId;
 
     tx = await tables
       .connect(owner)
       ["create(address,string)"](owner.address, createStatement);
     receipt = await tx.wait();
-    const [, createEvent2] = receipt.events ?? [];
+    const [, createEvent2] = receipt?.logs.filter(isEventLog) ?? [];
     const tableId2 = createEvent2.args!.tableId;
 
     // Test owner can run SQLs on table
@@ -328,7 +331,7 @@ describe("TablelandTables", function () {
         { tableId: tableId2, statement: runStatement2 },
       ]);
     receipt = await tx.wait();
-    const [runEvent1, runEvent2] = receipt.events ?? [];
+    const [runEvent1, runEvent2] = receipt?.logs.filter(isEventLog) ?? [];
 
     // event 1
     expect(runEvent1.args!.caller).to.equal(owner.address);
@@ -356,12 +359,16 @@ describe("TablelandTables", function () {
       .connect(owner)
       ["create(address,string)"](owner.address, createStatement);
     const receipt = await tx.wait();
-    const [, createEvent] = receipt.events ?? [];
+    const [, createEvent] = receipt?.logs.filter(isEventLog) ?? [];
     const tableId = createEvent.args!.tableId;
 
     tx = await tables
       .connect(owner)
-      .setController(owner.address, tableId, mutateReentrantController.address);
+      .setController(
+        owner.address,
+        tableId,
+        await mutateReentrantController.getAddress()
+      );
     await tx.wait();
 
     await expect(
@@ -383,8 +390,8 @@ describe("TablelandTables", function () {
       tables
         .connect(owner)
         ["mutate(address,(uint256,string)[])"](owner.address, [
-          { tableId: BigNumber.from(1), statement: runStatement1 },
-          { tableId: BigNumber.from(1), statement: runStatement2 },
+          { tableId: BigInt(1), statement: runStatement1 },
+          { tableId: BigInt(1), statement: runStatement2 },
         ])
     ).to.be.revertedWithCustomError(tables, "Unauthorized");
   });
@@ -402,7 +409,7 @@ describe("TablelandTables", function () {
       .connect(owner)
       ["create(address,string)"](owner.address, createStatement);
     let receipt = await tx.wait();
-    const [, createEvent] = receipt.events ?? [];
+    const [, createEvent] = receipt?.logs.filter(isEventLog) ?? [];
     const tableId = createEvent.args!.tableId;
 
     tx = await tables
@@ -412,7 +419,7 @@ describe("TablelandTables", function () {
         { tableId, statement: runStatement2 },
       ]);
     receipt = await tx.wait();
-    const [runEvent1, runEvent2] = receipt.events ?? [];
+    const [runEvent1, runEvent2] = receipt?.logs.filter(isEventLog) ?? [];
 
     expect(runEvent1.args!.caller).to.equal(nonOwner.address);
     expect(runEvent1.args!.isOwner).to.equal(false);
@@ -441,7 +448,7 @@ describe("TablelandTables", function () {
       .connect(owner)
       ["create(address,string)"](owner.address, createStatement);
     const receipt = await tx.wait();
-    const [, createEvent] = receipt.events ?? [];
+    const [, createEvent] = receipt?.logs.filter(isEventLog) ?? [];
     const tableId = createEvent.args!.tableId;
 
     await expect(
@@ -467,7 +474,7 @@ describe("TablelandTables", function () {
       .connect(owner)
       ["create(address,string)"](owner.address, createStatement);
     const receipt = await tx.wait();
-    const [, createEvent] = receipt.events ?? [];
+    const [, createEvent] = receipt?.logs.filter(isEventLog) ?? [];
     const tableId = createEvent.args!.tableId;
 
     // Pause with contract owner
@@ -508,7 +515,7 @@ describe("TablelandTables", function () {
       .connect(owner)
       ["create(address,string)"](owner.address, createStatement);
     const receipt = await tx.wait();
-    const [, createEvent] = receipt.events ?? [];
+    const [, createEvent] = receipt?.logs.filter(isEventLog) ?? [];
     const tableId = createEvent.args!.tableId;
 
     // Pause with contract owner
@@ -530,8 +537,8 @@ describe("TablelandTables", function () {
       tables
         .connect(owner)
         ["mutate(address,(uint256,string)[])"](owner.address, [
-          { tableId: BigNumber.from(1), statement: runStatement1 },
-          { tableId: BigNumber.from(1), statement: runStatement2 },
+          { tableId: BigInt(1), statement: runStatement1 },
+          { tableId: BigInt(1), statement: runStatement2 },
         ])
     ).to.be.revertedWithCustomError(tables, "Unauthorized");
   });
@@ -549,7 +556,7 @@ describe("TablelandTables", function () {
       .connect(owner)
       ["create(address,string)"](owner.address, createStatement);
     let receipt = await tx.wait();
-    const [, createEvent] = receipt.events ?? [];
+    const [, createEvent] = receipt?.logs.filter(isEventLog) ?? [];
     const tableId = createEvent.args!.tableId;
 
     tx = await tables
@@ -559,7 +566,7 @@ describe("TablelandTables", function () {
         { tableId, statement: runStatement2 },
       ]);
     receipt = await tx.wait();
-    const [runEvent1, runEvent2] = receipt.events ?? [];
+    const [runEvent1, runEvent2] = receipt?.logs.filter(isEventLog) ?? [];
 
     expect(runEvent1.args!.caller).to.equal(nonOwner.address);
     expect(runEvent1.args!.isOwner).to.equal(false);
@@ -588,7 +595,7 @@ describe("TablelandTables", function () {
       .connect(owner)
       ["create(address,string)"](owner.address, createStatement);
     const receipt = await tx.wait();
-    const [, createEvent] = receipt.events ?? [];
+    const [, createEvent] = receipt?.logs.filter(isEventLog) ?? [];
     const tableId = createEvent.args!.tableId;
 
     await expect(
@@ -615,7 +622,7 @@ describe("TablelandTables", function () {
       .connect(tableOwner)
       ["create(address,string)"](tableOwner.address, createStatement);
     const receipt = await tx.wait();
-    const [, createEvent] = receipt.events ?? [];
+    const [, createEvent] = receipt?.logs.filter(isEventLog) ?? [];
     const tableId = createEvent.args!.tableId;
 
     await expect(
@@ -635,12 +642,13 @@ describe("TablelandTables", function () {
       .connect(owner)
       ["create(address,string)"](owner.address, createStatement);
     let receipt = await tx.wait();
-    const [, createEvent] = receipt.events ?? [];
+    const [, createEvent] = receipt?.logs.filter(isEventLog) ?? [];
     const tableId = createEvent.args!.tableId;
 
     // Test events from creating table do not include transfer event
     // (should be one from mint event and one custom create table event)
-    expect(receipt.events?.length).to.equal(2);
+    const logs = receipt?.logs.filter(isEventLog);
+    expect(logs?.length).to.equal(2);
 
     // Test owner transferring table
     const newOwner = accounts[5];
@@ -648,7 +656,7 @@ describe("TablelandTables", function () {
       .connect(owner)
       .transferFrom(owner.address, newOwner.address, tableId);
     receipt = await tx.wait();
-    const [, transferTableEvent] = receipt.events ?? [];
+    const [, transferTableEvent] = receipt?.logs.filter(isEventLog) ?? [];
     expect(transferTableEvent.args!.from).to.equal(owner.address);
     expect(transferTableEvent.args!.to).to.equal(newOwner.address);
     expect(transferTableEvent.args!.tableId).to.equal(
@@ -724,12 +732,12 @@ describe("TablelandTables", function () {
     await expect(
       tables
         .connect(owner)
-        .setController(owner.address, BigNumber.from(1), accounts[5].address)
+        .setController(owner.address, BigInt(1), accounts[5].address)
     ).to.be.revertedWith("Pausable: paused");
 
     // Test locking controller is paused
     await expect(
-      tables.connect(owner).lockController(owner.address, BigNumber.from(1))
+      tables.connect(owner).lockController(owner.address, BigInt(1))
     ).to.be.revertedWith("Pausable: paused");
 
     // Test only contract owner can unpause
@@ -755,7 +763,7 @@ describe("TablelandTables", function () {
       .connect(owner)
       ["create(address,string)"](owner.address, createStatement);
     const receipt = await tx.wait();
-    const [, createEvent] = receipt.events ?? [];
+    const [, createEvent] = receipt?.logs.filter(isEventLog) ?? [];
     const tableId = createEvent.args!.tableId;
 
     // Creating a fake statement greater than 35000 bytes
@@ -771,13 +779,13 @@ describe("TablelandTables", function () {
   it("Should be able to get tableId inside a contract", async function () {
     const Factory = await ethers.getContractFactory("TestCreateFromContract");
     // supply the address of the registry contract
-    const contract = await Factory.deploy(tables.address);
-    await contract.deployed();
+    const contract = await Factory.deploy(await tables.getAddress());
+    await contract.waitForDeployment();
     const createTx = await contract.create("test_table");
     await createTx.wait();
     const tableId = await contract.tables("test_table");
 
-    expect(tableId instanceof BigNumber).to.equal(true);
-    expect(tableId.toNumber()).to.equal(1);
+    expect(typeof tableId === "bigint").to.equal(true);
+    expect(Number(tableId)).to.equal(1);
   });
 });
