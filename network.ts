@@ -35,7 +35,7 @@ export const proxies: TablelandNetworkConfig = {
   sepolia: "0xc50C62498448ACc8dBdE43DA77f8D5D2E2c7597D",
   "optimism-sepolia": "0x68A2f4423ad3bf5139Db563CF3bC80aA09ed7079",
   "arbitrum-sepolia": "0x223A74B8323914afDC3ff1e5005564dC17231d6e",
-  "polygon-amoy": "",
+  "polygon-amoy": "0x170fb206132b693e38adFc8727dCfa303546Cec1",
   "filecoin-calibration": "0x030BCf3D50cad04c2e57391B12740982A9308621",
   // devnets (uncomment when needed for admin)
   // "optimism-sepolia-staging": "0xinternal",
