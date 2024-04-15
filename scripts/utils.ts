@@ -37,8 +37,8 @@ export async function getFeeData(chainName: string): Promise<FeeData> {
       const data = (await response.json()) as AmoyFeeData;
       const feeData = new FeeData(
         null, // No gas price value needed
-        BigInt(Math.ceil(data.fast.maxFee * 1e9)),
-        BigInt(data.fast.maxPriorityFee * 1e9)
+        BigInt(ethers.parseUnits(String(data.fast.maxFee), "gwei")),
+        BigInt(ethers.parseUnits(String(data.fast.maxPriorityFee), "gwei"))
       );
       return feeData;
     } catch {
