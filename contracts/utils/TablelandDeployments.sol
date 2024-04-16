@@ -30,7 +30,7 @@ library TablelandDeployments {
     address internal constant ARBITRUM_NOVA =
         0x1A22854c5b1642760a827f20137a67930AE108d2;
     // TablelandTables address on Polygon.
-    address internal constant MATIC =
+    address internal constant POLYGON =
         0x5c4e6A9e5C1e1BF445A062006faF19EA6c49aFeA;
     // TablelandTables address on Filecoin.
     address internal constant FILECOIN =
@@ -45,9 +45,9 @@ library TablelandDeployments {
     // TablelandTables address on Arbitrum Sepolia.
     address internal constant ARBITRUM_SEPOLIA =
         0x223A74B8323914afDC3ff1e5005564dC17231d6e;
-    // TablelandTables address on Polygon Mumbai.
-    address internal constant MATICMUM =
-        0x4b48841d4b32C4650E4ABc117A03FE8B51f38F68;
+    // TablelandTables address on Polygon Amoy.
+    address internal constant POLYGON_AMOY =
+        0x170fb206132b693e38adFc8727dCfa303546Cec1;
     // TablelandTables address on Filecoin Calibration.
     address internal constant FILECOIN_CALIBRATION =
         0x030BCf3D50cad04c2e57391B12740982A9308621;
@@ -75,7 +75,7 @@ library TablelandDeployments {
         } else if (block.chainid == 42170) {
             return TablelandTablesImpl(ARBITRUM_NOVA);
         } else if (block.chainid == 137) {
-            return TablelandTablesImpl(MATIC);
+            return TablelandTablesImpl(POLYGON);
         } else if (block.chainid == 314) {
             return TablelandTablesImpl(FILECOIN);
         } else if (block.chainid == 11155111) {
@@ -84,8 +84,8 @@ library TablelandDeployments {
             return TablelandTablesImpl(OPTIMISM_SEPOLIA);
         } else if (block.chainid == 421614) {
             return TablelandTablesImpl(ARBITRUM_SEPOLIA);
-        } else if (block.chainid == 80001) {
-            return TablelandTablesImpl(MATICMUM);
+        } else if (block.chainid == 80002) {
+            return TablelandTablesImpl(POLYGON_AMOY);
         } else if (block.chainid == 314159) {
             return TablelandTablesImpl(FILECOIN_CALIBRATION);
         } else if (block.chainid == 31337) {
@@ -123,7 +123,7 @@ library TablelandDeployments {
             return "https://testnets.tableland.network/api/v1/";
         } else if (block.chainid == 421614) {
             return "https://testnets.tableland.network/api/v1/";
-        } else if (block.chainid == 80001) {
+        } else if (block.chainid == 80002) {
             return "https://testnets.tableland.network/api/v1/";
         } else if (block.chainid == 314159) {
             return "https://testnets.tableland.network/api/v1/";

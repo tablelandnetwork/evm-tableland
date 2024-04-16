@@ -1,6 +1,6 @@
 import { promisify } from "util";
 import { ethers, upgrades, network, baseURI, proxy } from "hardhat";
-import { isEventLog } from "./utils";
+import { getFeeData, isEventLog } from "./utils";
 import type { TablelandTables } from "../typechain-types";
 import assert from "assert";
 
@@ -30,12 +30,17 @@ async function main() {
 
   // Deploy proxy
   const Factory = await ethers.getContractFactory("TablelandTables");
+  // Needed for Polygon Amoy; can use to get prices for other networks, too
+  const chainName = network.name;
+  const { maxFeePerGas, maxPriorityFeePerGas } = await getFeeData(chainName);
+
   // @ts-expect-error ignore `Conversion of type 'Contract'` error since
   // `Contract` is subclass of `BaseContract` of which `TablelandTables` extends
   const proxyDeploy = (await upgrades.deployProxy(Factory, [baseURI], {
     kind: "uups",
     timeout: pollTimeout,
     pollingInterval: pollInterval,
+    txOverrides: { maxFeePerGas, maxPriorityFeePerGas },
   })) as TablelandTables;
   const tables = await proxyDeploy.waitForDeployment();
 
