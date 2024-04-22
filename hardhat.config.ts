@@ -68,7 +68,7 @@ const config: HardhatUserConfig = {
 
       // polygon
       polygon: process.env.POLYSCAN_API_KEY || "",
-      polygonAmoy: process.env.OKLINK_API_KEY || "",
+      polygonAmoy: process.env.POLYSCAN_API_KEY || "",
     },
     customChains: [
       {
@@ -99,9 +99,8 @@ const config: HardhatUserConfig = {
         network: "polygonAmoy",
         chainId: 80002,
         urls: {
-          apiURL:
-            "https://www.oklink.com/api/v5/explorer/contract/verify-source-code-plugin/AMOY_TESTNET",
-          browserURL: "https://www.oklink.com/amoy",
+          apiURL: "https://api-amoy.polygonscan.com/api",
+          browserURL: "https://amoy.polygonscan.com/",
         },
       },
     ],
