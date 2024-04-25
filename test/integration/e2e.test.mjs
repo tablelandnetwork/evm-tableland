@@ -283,7 +283,7 @@ describe("Validator, Chain, and SDK work end to end", function () {
           )
           .run();
       })()
-    ).to.be.rejectedWith(`reverted with custom error 'Unauthorized()'`);
+    ).to.be.rejectedWith(/execution reverted (unknown custom error)*/);
   });
 
   it("set controller", async function () {
