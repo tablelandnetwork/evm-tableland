@@ -45,6 +45,9 @@ library TablelandDeployments {
     // TablelandTables address on Arbitrum Sepolia.
     address internal constant ARBITRUM_SEPOLIA =
         0x223A74B8323914afDC3ff1e5005564dC17231d6e;
+    // TablelandTables address on Base Sepolia.
+    address internal constant BASE_SEPOLIA =
+        0xA85aAE9f0Aec5F5638E5F13840797303Ab29c9f9;
     // TablelandTables address on Polygon Amoy.
     address internal constant POLYGON_AMOY =
         0x170fb206132b693e38adFc8727dCfa303546Cec1;
@@ -84,6 +87,8 @@ library TablelandDeployments {
             return TablelandTablesImpl(OPTIMISM_SEPOLIA);
         } else if (block.chainid == 421614) {
             return TablelandTablesImpl(ARBITRUM_SEPOLIA);
+        } else if (block.chainid == 84532) {
+            return TablelandTablesImpl(BASE_SEPOLIA);
         } else if (block.chainid == 80002) {
             return TablelandTablesImpl(POLYGON_AMOY);
         } else if (block.chainid == 314159) {
@@ -122,6 +127,8 @@ library TablelandDeployments {
         } else if (block.chainid == 11155420) {
             return "https://testnets.tableland.network/api/v1/";
         } else if (block.chainid == 421614) {
+            return "https://testnets.tableland.network/api/v1/";
+        } else if (block.chainid == 84532) {
             return "https://testnets.tableland.network/api/v1/";
         } else if (block.chainid == 80002) {
             return "https://testnets.tableland.network/api/v1/";
