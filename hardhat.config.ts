@@ -66,6 +66,9 @@ const config: HardhatUserConfig = {
       arbitrumNova: process.env.ARBISCAN_NOVA_API_KEY || "",
       arbitrumSepolia: process.env.ARBISCAN_API_KEY || "",
 
+      // base
+      baseSepolia: process.env.BASESCAN_API_KEY || "",
+
       // polygon
       polygon: process.env.POLYSCAN_API_KEY || "",
       polygonAmoy: process.env.POLYSCAN_API_KEY || "",
@@ -93,6 +96,14 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: "https://api-sepolia.arbiscan.io/api",
           browserURL: "https://sepolia.arbiscan.io/",
+        },
+      },
+      {
+        network: "baseSepolia",
+        chainId: 84532,
+        urls: {
+          apiURL: "https://api-sepolia.basescan.org/api",
+          browserURL: "https://sepolia.basescan.org/",
         },
       },
       {
@@ -180,6 +191,15 @@ const config: HardhatUserConfig = {
       accounts:
         process.env.ARBITRUM_SEPOLIA_PRIVATE_KEY !== undefined
           ? [process.env.ARBITRUM_SEPOLIA_PRIVATE_KEY]
+          : [],
+    },
+    "base-sepolia": {
+      url: `https://base-sepolia.g.alchemy.com/v2/${
+        process.env.BASE_SEPOLIA_API_KEY ?? ""
+      }`,
+      accounts:
+        process.env.BASE_SEPOLIA_PRIVATE_KEY !== undefined
+          ? [process.env.BASE_SEPOLIA_PRIVATE_KEY]
           : [],
     },
     "polygon-amoy": {
