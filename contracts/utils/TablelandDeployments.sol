@@ -29,6 +29,8 @@ library TablelandDeployments {
     // TablelandTables address on Arbitrum Nova.
     address internal constant ARBITRUM_NOVA =
         0x1A22854c5b1642760a827f20137a67930AE108d2;
+    // TablelandTables address on Base.
+    address internal constant BASE = 0x8268F7Aba0E152B3A853e8CB4Ab9795Ec66c2b6B;
     // TablelandTables address on Polygon.
     address internal constant POLYGON =
         0x5c4e6A9e5C1e1BF445A062006faF19EA6c49aFeA;
@@ -77,6 +79,8 @@ library TablelandDeployments {
             return TablelandTablesImpl(ARBITRUM);
         } else if (block.chainid == 42170) {
             return TablelandTablesImpl(ARBITRUM_NOVA);
+        } else if (block.chainid == 8453) {
+            return TablelandTablesImpl(BASE);
         } else if (block.chainid == 137) {
             return TablelandTablesImpl(POLYGON);
         } else if (block.chainid == 314) {
@@ -117,6 +121,8 @@ library TablelandDeployments {
         } else if (block.chainid == 42161) {
             return "https://tableland.network/api/v1/";
         } else if (block.chainid == 42170) {
+            return "https://tableland.network/api/v1/";
+        } else if (block.chainid == 8453) {
             return "https://tableland.network/api/v1/";
         } else if (block.chainid == 137) {
             return "https://tableland.network/api/v1/";
