@@ -139,7 +139,6 @@ PRs accepted.
 Small note: If editing the README, please conform to the
 [standard-readme](https://github.com/RichardLitt/standard-readme) specification.
 
-
 # License
 
 MIT AND Apache-2.0, © 2021-2022 Tableland Network Contributors
