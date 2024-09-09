@@ -5,6 +5,7 @@ export interface TablelandNetworkConfig {
   optimism: string | number;
   arbitrum: string | number;
   "arbitrum-nova": string | number;
+  base: string | number;
   polygon: string | number;
   filecoin: string | number;
   // tableland testnet testnets
@@ -30,6 +31,7 @@ export const proxies: TablelandNetworkConfig = {
   optimism: "0xfad44BF5B843dE943a09D4f3E84949A11d3aa3e6",
   arbitrum: "0x9aBd75E8640871A5a20d3B4eE6330a04c962aFfd",
   "arbitrum-nova": "0x1A22854c5b1642760a827f20137a67930AE108d2",
+  base: "0x8268F7Aba0E152B3A853e8CB4Ab9795Ec66c2b6B",
   polygon: "0x5c4e6A9e5C1e1BF445A062006faF19EA6c49aFeA",
   filecoin: "0x59EF8Bf2d6c102B4c42AEf9189e1a9F0ABfD652d",
   // testnets
@@ -57,6 +59,7 @@ export const baseURIs: TablelandNetworkConfig = {
   optimism: "https://tableland.network/api/v1/tables/10/",
   arbitrum: "https://tableland.network/api/v1/tables/42161/",
   "arbitrum-nova": "https://tableland.network/api/v1/tables/42170/",
+  base: "https://tableland.network/api/v1/tables/8453/",
   polygon: "https://tableland.network/api/v1/tables/137/",
   filecoin: "https://tableland.network/api/v1/tables/314/",
   // testnets
@@ -89,6 +92,7 @@ export const validatorPollingTimeouts: TablelandNetworkConfig = {
   optimism: 10_000,
   arbitrum: 10_000,
   "arbitrum-nova": 10_000,
+  base: 10_000,
   polygon: 15_000,
   filecoin: 210_000,
   // testnets
